@@ -1,0 +1,95 @@
+name: Build and Package
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main_dev
+  # pull_request:
+  #   branches:
+  #     - main_dev
+
+permissions:
+  contents: write
+  
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:   
+      # 1. Cloning  repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setting Python
+      - name: Set up Python 3.12.5
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.5' 
+
+      # 3. Installing dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+
+      # 4. Reading version
+      - name: Read version from version.yaml
+        id: read_version
+        shell: python
+        run: |
+          import yaml, os
+          #Uploading yamal
+          temp = open('src/settings/version.yaml', 'r')
+          #Getting version
+          with open('src/Settings/version.yaml', 'r') as f:
+              version = yaml.safe_load(f)['version']
+          #Saving on env
+          with open(os.environ['GITHUB_ENV'], 'a') as env_file:
+              env_file.write(f"VERSION={version}\n")
+      
+      # 5. Build the executable with PyInstaller
+      - name: Build executable
+        run: |
+          pyinstaller --onedir --optimize=2 --windowed --noupx --strip --icon=src\Guis\Resources\icon0.ico --specpath . src\Luck.py
+      
+      # 6. Copy paths to Luck
+      - name: Copy Guis and Settings folders
+        run: |
+          xcopy /E /I /Y "src\Guis" "dist\Luck\Guis"
+          xcopy /E /I /Y "src\Settings" "dist\Luck\Settings"
+                   
+      #7. Creating .zip
+      - name: Create ZIP archive
+        run: |
+          $version = "${{ env.VERSION }}"  # Obtiene la versión del entorno
+          Compress-Archive -Path "dist/Luck/*" -DestinationPath "dist/Luck_$version.zip"
+      
+      #8. Uploading zip artifact
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Executable
+          path: dist/Luck_${{ env.VERSION }}.zip
+      
+      # # 9. Creating Release
+      # - name: Create GitHub Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: "v${{ env.VERSION }}"
+      #     release_name: "v${{ env.VERSION }}"
+      #     body: "Release for version v${{ env.VERSION }}"
+      #     draft: false
+      #     prerelease: true
+      
+      # # 10. Upload zip to release
+      # - name: Upload ZIP to Release
+      #   uses: actions/upload-release-asset@v1
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: dist/Luck_${{ env.VERSION }}.zip
+      #     asset_name: Luck_${{ env.VERSION }}.zip
+      #     asset_content_type: application/zip
