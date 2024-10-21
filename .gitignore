@@ -1,0 +1,22 @@
+#Ignoring specific folders
+src/Guis/Resources/Other Resources
+noFunctional/
+Lib/
+Scripts/
+Include/
+Basurero/
+dist/
+build/
+.venv/
+.github/
+*__pycache__
+
+#Ignoring specific files
+pyvenv.cfg
+*.pyc
+*.spec
+Luck.exe
+Luck.bat
+
+#Do not ignore these files
+#!install_env.bat

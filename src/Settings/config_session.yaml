@@ -1,0 +1,27 @@
+global_theme: dark_theme
+internal_theme: Gris oscuro 1
+prede_font:
+    editor-font: Roboto Mono
+    editor-size: 10
+    result-font: Segoe UI
+    result-size: 9
+worldWrap: false
+prede_geo:
+- 0.066
+- 0.1422
+- 0.8799
+- 0.75
+result_geo:
+- 77
+- 98
+- 61
+- 70
+splitter_geo:
+- 0.5847
+- 0.4153
+- 0.8
+- 0.2
+splitter_geo_eco:
+- 0.33
+- 0.33
+prede_dsn: IMPALA_PROD

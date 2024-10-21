@@ -1,0 +1,11 @@
+version: "0.61.1"
+release_date: "Soon..."
+download_url: "https://github.com/jlondohi/Luck"
+checksum: "hash -> SHA256"
+dependencies:
+  cloudera_odbc_driver: ">=2.6"
+metadata:
+  developer: "Julian D. Londono H."
+  website: ""
+  support_email: "jlondohi@gmail.com"
+  message: "In honor and memory of my beloved Luck the Siberian wolf. RIP: 2013-2024."

@@ -1,0 +1,24 @@
+Compute stats: COMPUTE STATS {NOMBRE_TABLA} ;
+Drop table: DROP TABLE IF EXISTS {NOMBRE_TABLA} PURGE ;
+Copy table: "DROP TABLE IF EXISTS proceso.{NOMBRE_TABLA} PURGE; \nCREATE TABLE proceso.{NOMBRE_TABLA}\
+  \ STORED AS PARQUET TBLPROPERTIES('transactional'='false') AS \nSELECT * \nFROM\
+  \ {ZONA_FIN}.{NOMBRE_TABLA}; \n\nCOMPUTE STATS proceso.{NOMBRE_TABLA};"
+Create table: "DROP TABLE IF EXISTS {ZONA_INI}.{NOMBRE_TABLA} PURGE; \nCREATE TABLE\
+  \ {ZONA_INI}.{NOMBRE_TABLA} STORED AS PARQUET TBLPROPERTIES('transactional'='false')\
+  \ AS \nSELECT * \nFROM {ZONA_FIN}.{NOMBRE_TABLA}; \n\nCOMPUTE STATS {ZONA_INI}.{NOMBRE_TABLA};"
+Duplicates validation: "SELECT {VAR}, COUNT(1) \nFROM \nWHERE ingestion_year = XXX\
+  \ and ingestion_month = XXX and ingestion_day = XXX \nGROUP BY 1 \nHAVING COUNT(1)\
+  \ > 1"
+Group by ingestions: GROUP BY ingestion_year, ingestion_month, ingestion_day
+Ingestions: ' ingestion_year, ingestion_month, ingestion_day'
+Ingestions bigint: (ingestion_year*10000 + ingestion_month*100 + ingestion_day)
+On of joins: 'ON cast(t1. as bigint) = cast(t2. as bigint) AND cast(t1. as bigint)
+  = cast(t2. as bigint) '
+Order by ingestions: ORDER BY ingestion_year DESC, ingestion_month DESC, ingestion_day
+  DESC
+Row number: ROW_NUMBER() OVER (PARTITION BY {VAR} ORDER BY ingestion_year DESC, ingestion_month
+  DESC, ingestion_day DESC) AS rn
+Select from: "SELECT \nFROM \nWHERE ingestion_year = {PARAM_YEAR} AND ingestion_month\
+  \ = {PARAM_MONTH} \nORDER BY  ingestion_year DESC, ingestion_month DESC, ingestion_day\
+  \ DESC \nLIMIT  100;"
+Stored as parquet: STORED AS PARQUET TBLPROPERTIES('transactional'='false') AS

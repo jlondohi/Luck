@@ -1,0 +1,228 @@
+/*----------------------------------*/
+/*General Objects*/
+/*----------------------------------*/
+/*Configuration for all QGroupBox*/
+QGroupBox {
+    color: #D4D4D4;
+    border: 2px solid black;
+    border-radius: 5px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0 10px;
+    color: #D4D4D4;
+    background-color: black;
+    border-radius: 3px;
+}
+
+/*Settings for all QMenus*/
+QMenu {
+    background-color: #252526;
+    color: #D4D4D4;
+    border: 1px solid black;
+    border-radius: 5px;
+    font: 9pt "Segoe UI";
+}
+
+QMenu::item {
+    background-color: #252526;
+    padding: 5px 20px;
+}
+
+QMenu::item:selected {
+    background-color: #04395e;
+    font: 9pt;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: #4e4e4e;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+/*Settings for all ScrollBars*/
+QScrollBar:vertical {
+    width: 12px;
+    background-color: #1e1e1e;
+}
+
+QScrollBar:horizontal {
+    height: 12px;
+    background-color: #1e1e1e;
+}
+
+QScrollBar::handle:vertical {
+    border: none;
+    background-color: #5e5e5e;
+}
+
+QScrollBar::handle:horizontal {
+    border: none;
+    background-color: #5e5e5e;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background-color: none;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical,
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    border: none;
+    background-color: none;
+    width: 15px;
+    height: 15px;
+}
+
+/*----------------------------------*/
+/*Specific Objects*/
+/*----------------------------------*/
+#centralFrame {
+    border-radius: 0;
+    border: 2px solid #000000;
+}
+
+#fm_title { /*Override the title bar */
+    background-color: #4b4b4b;
+    border-radius: 0;
+}
+
+#fm_title QLabel { /*Override labels in title bar*/
+    background-color: #4b4b4b;
+}
+
+TitleButton,
+#fm_title QPushButton { /*Override buttons in title bar*/
+    border: 20px;
+    color: #D4D4D4;
+    font: 9pt "Segoe UI";
+}
+
+TitleButton:hover,
+#fm_title QPushButton:hover {
+    background-color: #59cbe8fe;
+    border-radius: 5px;
+    font: 10pt;
+}
+
+TitleMenuButton { /*Override buttons in title bar*/
+    border: 20px;
+    padding-left: 10;
+    padding-right: 10;
+    color: #D4D4D4;
+    font: 9pt "Segoe UI";
+}
+
+TitleMenuButton:hover {
+    background-color: #59cbe8fe;
+    border-radius: 5px;
+    padding-left: 10;
+    padding-right: 10;
+    font: 10pt;
+}
+
+
+#fm_principal {
+    background-color: #303030;
+    border-radius: 0;
+}
+
+#fm_title #bt_close:hover {
+    background-color: #e81123;
+    border-radius: 5px;
+}
+
+/*This frame contains the QtabWidget*/
+#fm_principal QSplitter::handle {
+    background-color: #303030;
+}
+
+#fm_principal QFrame {
+    background-color: #2d2d2d; /*Overwrites Frames created within fm Main (Table)*/
+}
+
+/*Traversal settings for all QTabsWidgets*/
+/*The other attributes depend on the theme.*/
+#fm_principal QTabWidget::pane {
+    border: none;
+    top: -1px;
+}
+
+#fm_principal QTabBar::tab {
+    color: #D4D4D4;
+    background-color: #262626;  
+    font: 9pt "Segoe UI";
+    height: 30px;
+
+    border-right: 2px solid #454545;
+    padding-left: 10px;
+    padding-right: 7px;
+}
+
+#fm_principal QTabBar::tab:selected {
+    color: #D4D4D4;
+    font: 9pt "Segoe UI";
+    border-top: 1px solid #59CBE8;
+}
+
+#fm_principal QTabBar::tab:hover {
+    background-color: #3c3c3c;
+    color: #D4D4D4;
+    border-top: 2px solid #a8dcea;
+}
+
+#fm_principal QTabBar::close-button {
+    image: url('Guis/Resources/close-tab1.png');
+    subcontrol-origin: padding;
+    subcontrol-position: right;
+    width: 8px;
+    height: 8px;
+}
+
+#fm_principal QTabBar::close-button:selected {
+    image: url('Guis/Resources/close-tab2.png');
+}
+
+#fm_principal QTabBar::close-button:hover {
+    image: url('Guis/Resources/close-tab3.png');
+    background-color: #e81123;
+}
+
+#fm_principal QPlainTextEdit {
+    border: none;
+}
+
+#fm_principal QTableWidget {
+    border: none;
+}
+
+/*This frame contains the status bar and some buttons*/
+#fm_bar {
+    background-color: #59CBE8;
+    border-radius: 0;
+}
+
+#fm_bar QPushButton {
+    font: 10pt "Segoe UI";
+    border: none;
+    padding: 0;
+}
+
+#fm_bar QLabel {
+    color: white;
+    background-color: #59CBE8;
+    font: 10pt "Segoe UI";
+}
+
+#fm_bar #lbl_version {
+    font: 9pt "Segoe UI";
+}

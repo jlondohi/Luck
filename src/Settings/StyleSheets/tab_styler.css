@@ -1,0 +1,7 @@
+QTabWidget {{
+    background-color: {0};
+}}
+QTabBar::tab:selected {{
+    color: {1};
+    background-color: {2};
+}}

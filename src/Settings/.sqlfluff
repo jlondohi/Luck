@@ -1,0 +1,338 @@
+[sqlfluff]
+# Dialecto de SQL que quieres utilizar (por ejemplo, 'impala')
+dialect = hive
+
+# Lista de reglas habilitadas por defecto
+# Puedes modificar esta lista para incluir o excluir reglas
+# rules = L001, L002, L003, ..., L099
+
+# Configuración general
+max_line_length = 120  # Longitud máxima de línea (puedes ajustar según tus necesidades)
+exclude_rules =  # Aquí puedes listar reglas que deseas excluir, separadas por comas
+
+# Reglas de linting
+# Las reglas están comentadas y puedes habilitar/deshabilitar cualquiera cambiando 'enable' a 'disable'
+
+[sqlfluff:rules]
+
+LT13 = disable
+
+LT12 = disable
+
+# L001: Verificar la longitud de las líneas
+# Esta regla verifica que las líneas no excedan la longitud especificada.
+L001 = enable
+
+# L002: Verificar la sangría de las líneas
+# Asegura que la sangría sea consistente (por ejemplo, usar espacios en lugar de tabs).
+L002 = enable
+
+# L003: Verificar el uso correcto de las palabras clave
+# Por ejemplo, asegura que SELECT, FROM, etc. estén en el orden correcto.
+L003 = enable
+
+# L004: Verificar el uso de alias en las tablas
+# Verifica que se utilicen correctamente los alias cuando se hace referencia a tablas.
+L004 = enable
+
+# L005: Verificar comas al final de las líneas
+# Esta regla se asegura de que las comas en listas de columnas o expresiones estén colocadas al final de la línea.
+L005 = enable
+
+# L006: Verificar el inicio de las declaraciones en una nueva línea
+# Asegura que las declaraciones importantes (por ejemplo, SELECT) comiencen en una nueva línea.
+L006 = enable
+
+# L007: Verificar la alineación de operaciones
+# Verifica la alineación de operadores (como `=` en una cláusula WHERE).
+L007 = enable
+
+# L008: Verificar el uso de tabs en lugar de espacios
+# Esta regla asegura que se utilicen espacios en lugar de tabs.
+L008 = enable
+
+# L009: Palabras clave en mayúsculas/minúsculas
+# Verifica si las palabras clave deben estar en mayúsculas o minúsculas.
+L009 = enable  # Por defecto, se espera mayúsculas
+
+# L010: Verificar la sangría correcta
+# Asegura que la sangría sea consistente con las configuraciones del archivo.
+L010 = enable
+
+# L011: Verificar el uso de espacios alrededor de operadores
+# Por ejemplo, asegurarse de que haya un espacio antes y después de `=`, `>`, etc.
+L011 = enable
+
+# L012: Verificar el uso de alias sin AS
+# Detecta si se están utilizando alias sin la palabra clave AS, donde sea necesario.
+L012 = enable
+
+# L013: Evitar el uso de `SELECT *`
+# Esta regla desaconseja el uso de `SELECT *` por razones de rendimiento y legibilidad.
+L013 = enable
+
+# L014: Verificar el uso correcto de comillas
+# Asegura que se utilicen comillas simples o dobles de manera consistente.
+L014 = enable
+
+# L015: Verificar la alineación de las declaraciones
+# Asegura que las declaraciones (como SELECT, FROM) estén alineadas correctamente.
+L015 = enable
+
+# L016: Verificar comas faltantes o mal colocadas
+# Detecta la falta o mala colocación de comas en listas (por ejemplo, entre columnas en SELECT).
+L016 = enable
+
+# L017: Verificar la colocación de funciones
+# Asegura que las funciones (como COUNT, SUM) estén colocadas correctamente, y las claves como OVER estén en la misma línea.
+L017 = enable
+
+# L018: Verificar la coherencia de los alias
+# Asegura que los alias de columnas sean consistentes a lo largo del código SQL.
+L018 = enable
+
+# L019: Verificar la presencia de cláusulas obligatorias (por ejemplo, FROM)
+# Asegura que se incluyan las cláusulas esenciales como FROM en las consultas.
+L019 = enable
+
+# L020: Verificar el uso correcto de JOIN
+# Asegura que los JOINs estén estructurados de manera coherente.
+L020 = enable
+
+# L021: Verificar la posición de las cláusulas WHERE, GROUP BY, etc.
+# Asegura que las cláusulas WHERE, GROUP BY, etc. estén colocadas correctamente y alineadas.
+L021 = enable
+
+# L022: Verificar la coherencia de comillas en cadenas
+# Asegura que el uso de comillas en las cadenas sea consistente (comillas simples o dobles).
+L022 = enable
+
+# L023: Verificar el uso de paréntesis
+# Asegura que los paréntesis se utilicen correctamente y estén balanceados.
+L023 = enable
+
+# L024: Verificar la coherencia de la sintaxis de CASE
+# Asegura que las cláusulas CASE estén estructuradas correctamente.
+L024 = enable
+
+# L025: Verificar el uso correcto de columnas en GROUP BY
+# Asegura que las columnas en GROUP BY sean consistentes con las columnas en SELECT.
+L025 = enable
+
+# L026: Verificar el uso de claves primarias en CREATE TABLE
+# Asegura que se definan claves primarias cuando se crean tablas.
+L026 = enable
+
+# L027: Verificar la longitud de las palabras clave
+# Asegura que las palabras clave estén dentro de un límite razonable de longitud.
+L027 = enable
+
+# L028: Verificar la colocación de cláusulas ORDER BY y LIMIT
+# Asegura que estas cláusulas estén correctamente posicionadas.
+L028 = enable
+
+# L029: Verificar la existencia de alias en las subconsultas
+# Asegura que todas las subconsultas tengan un alias definido.
+L029 = enable
+
+# L030: Verificar que no haya subconsultas sin alias
+# Asegura que todas las subconsultas en FROM tengan un alias.
+L030 = enable
+
+# L031: Verificar el uso de AS en alias
+# Asegura que se utilice la palabra clave AS cuando se definan alias.
+L031 = enable
+
+# L032: Verificar la coherencia de los tipos de datos
+# Asegura que los tipos de datos definidos en las tablas sean consistentes.
+L032 = enable
+
+# L033: Verificar la longitud de los identificadores
+# Asegura que los nombres de tablas, columnas y alias no sean demasiado largos.
+L033 = enable
+
+# L034: Verificar la coherencia en las declaraciones de UPDATE
+# Asegura que las declaraciones de actualización sigan un formato coherente.
+L034 = enable
+
+# L035: Verificar el uso de paréntesis en funciones
+# Asegura que las funciones como COUNT() utilicen paréntesis correctamente.
+L035 = enable
+
+# L036: Verificar el uso de cláusulas HAVING
+# Asegura que las cláusulas HAVING estén presentes si son necesarias.
+L036 = enable
+
+# L037: Verificar la coherencia de la sintaxis de UNION
+# Asegura que las consultas UNION sean consistentes y correctas.
+L037 = enable
+
+# L038: Verificar la longitud de las listas de valores
+# Asegura que las listas de valores (por ejemplo, en `IN()`) no sean demasiado largas.
+L038 = enable
+
+# L039: Verificar el uso de ORDER BY en subconsultas
+# Asegura que las subconsultas no utilicen ORDER BY innecesariamente.
+L039 = enable
+
+# L040: Verificar que no haya funciones sin paréntesis
+# Asegura que las funciones SQL estén siempre seguidas de paréntesis.
+L040 = enable
+
+# L041: Evitar comas al final de las líneas en las listas de selección.
+L041 = enable
+
+# L042: Asegurar que no haya espacios innecesarios después de una coma.
+L042 = enable
+
+# L043: Verificar que las declaraciones 'CREATE' y 'ALTER' estén correctamente alineadas.
+L043 = enable
+
+# L044: Asegurar que las palabras clave 'WITH' y 'AS' dentro de las expresiones CTE estén correctamente alineadas.
+L044 = enable
+
+# L045: Verificar que las claves foráneas se nombren correctamente y sigan las convenciones de estilo.
+L045 = enable
+
+# L046: Asegurar que las cláusulas 'JOIN' estén en líneas separadas para una mejor legibilidad.
+L046 = enable
+
+# L047: Verificar que las tablas y columnas no utilicen palabras clave reservadas de SQL como nombres.
+L047 = enable
+
+# L048: Asegurar que las consultas dentro de las subconsultas estén correctamente alineadas y formateadas.
+L048 = enable
+
+# L049: Evitar el uso de caracteres especiales y no estándar en los nombres de tablas y columnas.
+L049 = enable
+
+# Reglas de convenciones de estilo (S)
+# ------------------------------------
+# S001: Asegurarse de que no haya varios espacios consecutivos.
+S001 = enable
+
+# S002: Verificar que los nombres de tablas, columnas y otros identificadores usen snake_case.
+S002 = enable
+
+# S003: Verificar que las palabras clave SQL se usen en mayúsculas.
+S003 = enable
+
+# S004: Asegurar consistencia en el uso de paréntesis.
+S004 = enable
+
+# S005: Evitar el uso de múltiples instrucciones SQL en una sola línea.
+S005 = enable
+
+# S006: Evitar el uso de nombres de columnas ambiguos.
+S006 = enable
+
+# S007: Asegurar que las declaraciones CASE estén bien estructuradas y alineadas.
+S007 = enable
+
+# S008: Verificar que las declaraciones IF y ELSE sigan las convenciones de estilo de SQL.
+S008 = enable
+
+# S009: Asegurar que las declaraciones CREATE TABLE sigan las convenciones de estilo definidas.
+S009 = enable
+
+# S010: Asegurar consistencia en el uso de comillas en los alias de columnas.
+S010 = enable
+
+# Reglas relacionadas con tablas y estructura (T)
+# -----------------------------------------------
+# T001: Asegurar que todas las tablas tengan una clave primaria.
+T001 = enable
+
+# T002: Verificar que no se usen tablas temporales de forma innecesaria.
+T002 = enable
+
+# T003: Asegurar que los nombres de las tablas sean claros y estén documentados.
+T003 = enable
+
+# T004: Verificar que las tablas tengan índices en las columnas adecuadas.
+T004 = enable
+
+# T005: Asegurar consistencia en el uso de alias para tablas en las consultas.
+T005 = enable
+
+# T006: Verificar que las tablas de relaciones estén normalizadas adecuadamente.
+T006 = enable
+
+# T007: Evitar el uso de columnas que permitan valores NULL en tablas que no lo requieren.
+T007 = enable
+
+# T008: Verificar que todas las claves foráneas estén documentadas correctamente.
+T008 = enable
+
+# T009: Asegurar consistencia en los nombres de columnas entre tablas relacionadas.
+T009 = enable
+
+# T010: Verificar que las tablas no contengan columnas sin un propósito claro o documentado.
+T010 = enable
+
+# T011: Evitar el uso de columnas calculadas dentro de las tablas, salvo que sean necesarias.
+T011 = enable
+
+# T012: Verificar que todas las columnas sean indexadas apropiadamente si se utilizan en WHERE o JOIN.
+T012 = enable
+
+# Reglas de formato adicional (F)
+# --------------------------------
+# F001: Asegurar consistencia en la colocación de comentarios dentro del código SQL.
+F001 = enable
+
+# F002: Verificar que los comentarios sean claros y descriptivos.
+F002 = enable
+
+# F003: Evitar el uso de comentarios excesivos o innecesarios en el código SQL.
+F003 = enable
+
+# F004: Asegurar consistencia en el uso de los saltos de línea entre bloques de código SQL.
+F004 = enable
+
+# F005: Evitar el uso de demasiados espacios en blanco entre declaraciones.
+F005 = enable
+
+# Reglas relacionadas con consultas complejas (C)
+# ------------------------------------------------
+# C001: Verificar que las consultas no sean demasiado complejas (por ejemplo, un número excesivo de JOINs).
+C001 = enable
+
+# C002: Asegurar que las subconsultas estén estructuradas adecuadamente.
+C002 = enable
+
+# C003: Verificar que las consultas anidadas no sean excesivamente profundas.
+C003 = enable
+
+# C004: Asegurar que los CTEs (Common Table Expressions) no se usen de manera innecesaria.
+C004 = enable
+
+# C005: Verificar que los índices se usen de manera eficiente en las consultas.
+C005 = enable
+
+# C006: Asegurar que las consultas de agregación estén bien optimizadas.
+C006 = enable
+
+# C007: Verificar que las consultas con UNION/UNION ALL sigan las mejores prácticas.
+C007 = enable
+
+# C008: Asegurar que las consultas con OUTER JOIN no sean innecesarias.
+C008 = enable
+
+# C009: Evitar el uso excesivo de funciones dentro de las cláusulas SELECT.
+C009 = enable
+
+# Reglas específicas de seguridad (SEC)
+# --------------------------------------
+# SEC001: Verificar que las consultas no permitan inyecciones SQL.
+SEC001 = enable
+
+# SEC002: Asegurar que las consultas no usen información sensible sin medidas adecuadas de seguridad.
+SEC002 = enable
+
+# SEC003: Verificar que las tablas que contengan datos sensibles tengan encriptación.
+SEC003 = enable
+
+# SEC004: Asegurar que las consultas no expongan demasiada información innecesaria a los usuarios.
+SEC004 = enable
+

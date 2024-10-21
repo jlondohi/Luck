@@ -1,0 +1,202 @@
+es:
+  header:
+    file: Archivo
+    edit: Editar
+    select: Seleccionar
+    view: Vista
+    sql: SQL
+    ai: AI
+    help: Ayuda
+  file:
+    new: Nuevo
+    open: Abrir
+    open-block: Abrir en bloque
+    reload: Recargar
+    save: Guardar
+    save-as: Guardar como
+    open-param: Abrir parámetros
+    open-param-block: Abrir parámetros en bloque
+    save-param: Guardar parámetros
+    save-param-as: Guardar parámetros como
+    close: Cerrar
+  edit:
+    search: Buscar
+    replace: Reemplazar
+    comment: Comentar/Descomentar
+    super-com: Insertar super comentario
+  select:
+    go-ini: Ir al inicio
+    go-end: Ir al final
+    prev-q: Query anterior
+    next-q: Query siguiente
+    stpq: Sel. hasta query anterior
+    stnq: Sel. hasta query siguiente
+    prev-block: Bloque anterior
+    next-block: Bloque siguiente
+    snexo: Sel. sig. ocurrencia
+    acel: Añadir cursor al final de las lineas
+    acsl: Añadir cursor al inicio de las lineas
+    ac-above: Añadir cursor arriba
+    ac-below: Añadir cursor abajo
+  view:
+    theme: Tema
+    font:
+      main: Fuente
+      font-editor: Editor y paramtrs
+      font-result: Resultados
+    ifse: Subir tamaño font editor
+    lfse: Bajar tamaño font editor
+    ifsr: Subir tamaño font resultados
+    lfsr: Bajar tamaño font resultados
+    pt: Tab siguiente
+    nt: Tab anterior
+    ww: Word wrap
+  sql:
+    sel-dsn: Seleccionar DSN
+    con-dsn: Conectar/Recnectar DSN
+    stop-run: Detener ejecución
+    run-query: Ejecutar query
+    run-all: Ejecutar todo
+    query-file: Query a archivo local
+    ufftlz: Subir desde archivo a DB
+    tmplts: Plantillas
+    assistant: Asistente
+    start-log: Iniciar grabación
+    end-log: Detener grabación
+  ai:
+    analize-query1: Analizar Query con AI
+    analize-query2: Analizar Query con Fluff
+  help:
+    about: Acerca de
+    update: Actualizar
+  execution:
+    header:
+      status: Estatus
+      query: Query
+      time: Tiempo
+      error: Error
+      table: Tabla
+    status:
+      running: Ejecutando
+      executed: Ejecutado
+      failed: Falló
+    msgs:
+      msg0: Seg
+      msg1: Parámetros
+      msg2: Inició
+      msg3: Guardando
+      msg4: Descargado, ejecutando guardado local
+      msg5: El proceso ha sido interrumpido por el usuario
+      msg6: Sin conexión con DB
+      msg7: Error en parámetros
+      msg8: Parámetros sin especificar
+      msg9: ¿Continuamos?
+      msgE: Error
+      msgBE: Ejecución en bloque
+  tooltips:
+    ttp1: Iluminar (F12)
+    ttp2: Normalizar (F12)
+    ttp3: Contraer (F11)
+    ttp4: Expandir (F11)
+    ttp5: Iniciar grabación del log
+    ttp6: Detener grabación del log
+    ttp7: Copiar
+    ttp8: Cerrar
+  status-bar:
+    starting: Iniciando ...
+    working: Trabando ...
+    end: Finalizó
+    end-e: Finalizado con error
+    cmic: Revisar, datos faltantes o erroneos
+    nc-db: Sin conexión con {}
+    sc-db: Conectando con {}
+    c_db: Conectado con {}
+    update-tree: Actualizando arbol ...
+    updated-tree: Arbol actualizado
+    log-started: Grabación del log iniciada
+    log-end: Grabación del log finalizada
+  tab-editor:
+    new: Nuevo
+    pht-editor: Editor
+    pht-param: Parámetros
+  tab-eco:
+    eco: Ecosistema
+    db: Bases de datos
+    searh-table: Buscar tabla
+    table-strctr: Estructura de la tabla
+    history:
+      header: Historial
+      type: Tipo
+      type-u: Unitario
+      type-b: Bloque
+      time: Hora
+      query: Consulta
+      param: Parámetros
+  open-file:
+    open1: Abrir
+    open2: Abrir archivo
+    open3: ¿Abrimos en un solo bloque?
+    open4: Archivos permitidos
+    openSQL: Archivos SQL
+    openP1: Abrir parámetros
+    openP2: ¿Abrimos en un solo bloque?
+    openP3: Archivos de parámetros SQL
+  save-files:
+    toFile1: Archivos CSV delimitado por coma
+    toFile2: Archivos CSV delimitado por punto y coma
+    toFile3: Archivos CSV delimitado por pipe
+    toFile4: Archivo de Excel
+    toFile5: Archivo Log
+    toFile6: Archivo SQL
+    toFile7: Archivos de parámetros SQL
+    save1: Guardar
+    save2: Guardar archivo
+    save3: Guardado como
+    saveE1: ¿Guardar cambios?
+    saveE2: ¿Guardamos cambios antes de cerrar?
+    saveM1: Guardado
+    saveM2: Guardado como
+    saveM3: Guardado en Descargas
+    saveM4: Archivo guardado exitosamente
+    error1: Acceso denegado
+    error2: Error crítico
+    error3: Archivo superó maximo de filas permitidas en excel. Guardado en
+    error4: Imposible guardar archivo. Error
+  log:
+    log-started: La grabación del Log inició el
+    log-end: La grabación del Log finalizó el
+  update-app:
+    update1: Actualizado
+    update2: Actualmente usas la versión mas reciente
+  upload-to-db:
+    header: Subir archivo a DB
+    option1: Sustituir si existe en DB
+    option2: Interrumpir si existe en DB
+    option3: Concatenar a fuente de DB
+    state:
+    time:
+  msgs:
+    msg1: Sin resultados
+    msg2: Error desconocido
+    msg3: ¡Ups! Algo salio mal
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+    
+
+
+
+
+
+

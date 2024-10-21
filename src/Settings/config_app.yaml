@@ -1,0 +1,332 @@
+list_thems:
+  Blanco brillante:
+    editor-background-color: '#FFFFFF'
+    editor-color_num: '#2C2A29'
+    editor-color_text: '#2C2A29'
+    editor-line-highlight: '#3B9EDF'
+    other_colors:
+      block_format:
+      - '#ffbf00'
+      - true
+      command_format:
+      - '#009055'
+      - false
+      comment_format:
+      - '#0172b4'
+      - true
+      numbers:
+      - '#ae81ff'
+      - false
+      operator_format:
+      - '#7c368f'
+      - false
+      parameter_format:
+      - '#ff8e01'
+      - false
+      parenthesis:
+      - - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#2b7c27'
+        - '#285aa1'
+        - '#2b7c27'
+        - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#1c5b18'
+      - false
+      searching: '#2B7BB0'
+      semicolon:
+      - '#FC7A1E'
+      - true
+      strings:
+      - '#b39730'
+      - false
+    result-alternate-background-color: '#E0E0E0'
+    result-background-color: '#FFFFFF'
+    result-color_text: '#2C2A29'
+    result-gridline-color: '#484746'
+    result-header-color: '#A6A6A6'
+    result-highlight: '#3B9EDF'
+    result-trafficlight:
+    - '#4c9141'
+    - '#afad00'
+    - '#d57125'
+  Blanco opaco:
+    editor-background-color: '#D4D4D4'
+    editor-color_num: '#2C2A29'
+    editor-color_text: '#2C2A29'
+    editor-line-highlight: '#3B9EDF'
+    other_colors:
+      block_format:
+      - '#ffbf00'
+      - true
+      command_format:
+      - '#009055'
+      - false
+      comment_format:
+      - '#0172b4'
+      - true
+      numbers:
+      - '#ae81ff'
+      - false
+      operator_format:
+      - '#7c368f'
+      - false
+      parameter_format:
+      - '#ff8e01'
+      - false
+      parenthesis:
+      - - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#2b7c27'
+        - '#285aa1'
+        - '#2b7c27'
+        - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#1c5b18'
+      - false
+      searching: '#2B7BB0'
+      semicolon:
+      - '#FC7A1E'
+      - true
+      strings:
+      - '#b39730'
+      - false
+    result-alternate-background-color: '#BDBDBD'
+    result-background-color: '#D4D4D4'
+    result-color_text: '#2C2A29'
+    result-gridline-color: '#484746'
+    result-header-color: '#A6A6A6'
+    result-highlight: '#3B9EDF'
+    result-trafficlight:
+    - '#4c9141'
+    - '#afad00'
+    - '#d57125'
+  Clasico:
+    editor-background-color: '#272822'
+    editor-color_num: '#D4D4D4'
+    editor-color_text: '#D4D4D4'
+    editor-line-highlight: '#212121'
+    other_colors:
+      block_format:
+      - '#ffbf00'
+      - true
+      command_format:
+      - '#80FF80'
+      - false
+      comment_format:
+      - '#6A9955'
+      - false
+      numbers:
+      - '#ae81ff'
+      - false
+      operator_format:
+      - '#66d9ef'
+      - false
+      parameter_format:
+      - '#CE9178'
+      - false
+      parenthesis:
+      - - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#2b7c27'
+        - '#285aa1'
+        - '#2b7c27'
+        - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#1c5b18'
+      - false
+      searching: '#2B7BB0'
+      semicolon:
+      - '#FC7A1E'
+      - true
+      strings:
+      - '#e0bd3d'
+      - false
+    result-alternate-background-color: '#E0E0E0'
+    result-background-color: '#FFFFFF'
+    result-color_text: '#2C2A29'
+    result-gridline-color: '#484746'
+    result-header-color: '#A6A6A6'
+    result-highlight: '#3B9EDF'
+    result-trafficlight:
+    - '#4c9141'
+    - '#afad00'
+    - '#d57125'
+  Gris duende verde:
+    editor-background-color: '#202020'
+    editor-color_num: '#FFFFFF'
+    editor-color_text: '#FFFFFF'
+    editor-line-highlight: '#212121'
+    other_colors:
+      block_format:
+      - '#ffbf00'
+      - true
+      command_format:
+      - '#0DB06D'
+      - false
+      comment_format:
+      - '#09DCCF'
+      - false
+      numbers:
+      - '#e0bd3d'
+      - false
+      operator_format:
+      - '#AA00FF'
+      - false
+      parameter_format:
+      - '#7c368f'
+      - false
+      parenthesis:
+      - - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#2b7c27'
+        - '#285aa1'
+        - '#2b7c27'
+        - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#1c5b18'
+      - false
+      searching: '#2B7BB0'
+      semicolon:
+      - '#FC7A1E'
+      - true
+      strings:
+      - '#ae81ff'
+      - false
+    result-alternate-background-color: '#585858'
+    result-background-color: '#464646'
+    result-color_text: '#FFFFFF'
+    result-gridline-color: '#1E1E1E'
+    result-header-color: '#464646'
+    result-highlight: '#04395e'
+    result-trafficlight:
+    - '#4c9141'
+    - '#afad00'
+    - '#d57125'
+  Gris oscuro 1:
+    editor-background-color: '#1E1E1E'
+    editor-color_num: '#D4D4D4'
+    editor-color_text: '#D4D4D4'
+    editor-line-highlight: '#212121'
+    other_colors:
+      block_format:
+      - '#ffbf00'
+      - true
+      command_format:
+      - '#569CD6'
+      - false
+      comment_format:
+      - '#6A9955'
+      - false
+      numbers:
+      - '#ae81ff'
+      - false
+      operator_format:
+      - '#4EC9B0'
+      - false
+      parameter_format:
+      - '#CE9178'
+      - false
+      parenthesis:
+      - - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#2b7c27'
+        - '#285aa1'
+        - '#2b7c27'
+        - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#1c5b18'
+      - false
+      searching: '#2B7BB0'
+      semicolon:
+      - '#FC7A1E'
+      - true
+      strings:
+      - '#e0bd3d'
+      - false
+    result-alternate-background-color: '#585858'
+    result-background-color: '#464646'
+    result-color_text: '#D4D4D4'
+    result-gridline-color: '#1E1E1E'
+    result-header-color: '#464646'
+    result-highlight: '#04395e'
+    result-trafficlight:
+    - '#4c9141'
+    - '#afad00'
+    - '#d57125'
+  Gris oscuro 2:
+    editor-background-color: '#1E1E1E'
+    editor-color_num: '#D4D4D4'
+    editor-color_text: '#D4D4D4'
+    editor-line-highlight: '#212121'
+    other_colors:
+      block_format:
+      - '#ffbf00'
+      - true
+      command_format:
+      - '#009055'
+      - false
+      comment_format:
+      - '#0172b4'
+      - false
+      numbers:
+      - '#ae81ff'
+      - false
+      operator_format:
+      - '#ff8e01'
+      - false
+      parameter_format:
+      - '#7c368f'
+      - false
+      parenthesis:
+      - - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#2b7c27'
+        - '#285aa1'
+        - '#2b7c27'
+        - '#a17014'
+        - '#e094d5'
+        - '#2e8fe4'
+        - '#1c5b18'
+      - false
+      searching: '#2B7BB0'
+      semicolon:
+      - '#FC7A1E'
+      - true
+      strings:
+      - '#e0bd3d'
+      - false
+    result-alternate-background-color: '#585858'
+    result-background-color: '#464646'
+    result-color_text: '#D4D4D4'
+    result-gridline-color: '#1E1E1E'
+    result-header-color: '#464646'
+    result-highlight: '#04395e'
+    result-trafficlight:
+    - '#4c9141'
+    - '#afad00'
+    - '#d57125'
+list_fonts:
+  font:
+  - Arial
+  - Segoe UI
+  - French Script MT
+  - Javanese Text
+  - Verdana
+  - Cascadia Code
+  - Consolas
+  - Fira Code
+  - Roboto Mono
+  - Courier New
+  - DejaVu Sans Mono
