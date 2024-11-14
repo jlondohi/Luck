@@ -140,6 +140,7 @@ class MyTitleBar(QFrame):
             self.bt_sql = TitleMenuButton(nested(lgg, "header", "sql"))
             self.layout.addWidget(self.bt_sql)
             self.bt_ai = TitleMenuButton(nested(lgg, "header", "ai"))
+            self.bt_ai.setEnabled(False) #At some point, It'll be true.
             self.layout.addWidget(self.bt_ai)
             self.bt_help = TitleMenuButton(nested(lgg, "header", "help"))
             self.layout.addWidget(self.bt_help)

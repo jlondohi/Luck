@@ -158,7 +158,7 @@ class MyPlainTextEdit(QPlainTextEdit):
     #Creating a function that will change the font size
     def changeFontSize(self, delta):
         #Getting current font size
-        current_font = self.font()
+        current_font = self.document().defaultFont()
         font_size = current_font.pointSizeF()
         #Adjust font size
         font_size += delta
@@ -589,13 +589,13 @@ class MyPlainTextEdit(QPlainTextEdit):
         cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
         line_text = cursor.block().text()
         cursor.beginEditBlock()
-        cont = 0
+        count = 0
         if line_text.startswith(" "):
             for _ in range(4):
                 line_text = cursor.block().text()
                 if line_text.startswith(" "):
                     cursor.deleteChar()
-                    cont += 1
+                    count += 1
         elif line_text.startswith("\t"):
             cursor.deleteChar()
         cursor.endEditBlock()
@@ -603,7 +603,7 @@ class MyPlainTextEdit(QPlainTextEdit):
         cursor.setPosition(current_position)
         #Modifying cursor in multicursor list
         if self.multiCursorEnabled:
-            for _ in range(cont):
+            for _ in range(count):
                 cursor.movePosition(QTextCursor.MoveOperation.Left)
 
     #Managing and commenting on multiple lines 

@@ -257,16 +257,16 @@ def createPMenu(self):
     
     dsnGroup = QActionGroup(self)
     dsnGroup.setExclusive(True)
-    cont = 0
+    count = 0
     for _dsn in sorted(dsn_dict.keys()):
-        cont += 1
+        count += 1
         action_dsn = QAction(_dsn, self)
         action_dsn.setCheckable(True)
         action_dsn.setToolTip(dsn_dict.get(_dsn, ""))
         dsnGroup.addAction(action_dsn)
         action_dsn.triggered.connect(self.applySelectedDSN)
         self.menuSelectDSN.addAction(action_dsn)
-        if cont % 4 == 0:
+        if count % 4 == 0:
             self.menuSelectDSN.addSeparator()
 
     #Creating the submenus for view\font and view\theme
@@ -280,9 +280,9 @@ def createPMenu(self):
     group_fontEditor.setExclusive(True)
     group_fontResult = QActionGroup(self)
     group_fontResult.setExclusive(True)
-    cont = 10
+    count = 10
     for font in sorted(list_fonts):
-        cont += 1
+        count += 1
         #font for Editor and Parameters
         action_fontEditor = QAction(font, self)
         action_fontEditor.setCheckable(True)
@@ -295,47 +295,47 @@ def createPMenu(self):
         group_fontResult.addAction(accion_fontResult)
         accion_fontResult.triggered.connect(self.applyFontResult)
         self.menuFontResult.addAction(accion_fontResult)
-        if cont % 4 == 0:
+        if count % 4 == 0:
             self.menuFontEditor.addSeparator()
             self.menuFontResult.addSeparator()
     #Creating actions for themes
     group_theme = QActionGroup(self)
     group_theme.setExclusive(True)
-    cont = 10
+    count = 10
     for theme in sorted(list_thems):
-        cont += 1
+        count += 1
         accion_theme = QAction(theme, self)
         accion_theme.setCheckable(True)
         group_theme.addAction(accion_theme)
         accion_theme.triggered.connect(self.captureThemeFormat)
         self.menuTheme.addAction(accion_theme)
-        self.menuTheme.addSeparator() if cont % 4 == 0 else None
+        self.menuTheme.addSeparator() if count % 4 == 0 else None
     #Creating actions for assistance
     self.menuAssistant.addAction(self.actionRun)
     self.menuAssistant.addAction(self.actionRunAll)
     self.menuAssistant.addSeparator()
-    cont = 10
+    count = 10
     for assist in list_assist.keys():
-        cont += 1
-        shortcut = "Alt+A,{}".format(",".join(list(str(cont))))
+        count += 1
+        shortcut = "Alt+A,{}".format(",".join(list(str(count))))
         accion_assist = QAction(assist, self)
         accion_assist.triggered.connect(self.runAssist)
         accion_assist.setShortcut(QKeySequence(shortcut))
         self.menuAssistant.addAction(accion_assist)
         self.centralwidget.addAction(accion_assist)
-        self.menuAssistant.addSeparator() if cont % 4 == 0 else None
+        self.menuAssistant.addSeparator() if count % 4 == 0 else None
     #Creating actions for templates
-    cont = 10
+    count = 10
     for plantilla in list_tmplts.keys():
-        cont += 1
-        shortcut = "Alt+P,{}".format(",".join(list(str(cont))))
+        count += 1
+        shortcut = "Alt+P,{}".format(",".join(list(str(count))))
         plantilla_assist = QAction(plantilla, self)
-        plantilla_assist.setShortcut(QKeySequence(str(cont)))
+        plantilla_assist.setShortcut(QKeySequence(str(count)))
         plantilla_assist.triggered.connect(self.runTemplate)
         plantilla_assist.setShortcut(QKeySequence(shortcut))
         self.menuPlantillas.addAction(plantilla_assist)
         self.centralwidget.addAction(plantilla_assist)
-        self.menuPlantillas.addSeparator() if cont % 4 == 0 else None
+        self.menuPlantillas.addSeparator() if count % 4 == 0 else None
     #Creating the shortcuts for these custom functions
     self.actionShowAsistente = QAction("Show assistant", self)
     self.actionShowPlantillas = QAction("Show tmplts", self)

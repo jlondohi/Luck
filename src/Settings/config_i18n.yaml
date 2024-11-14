@@ -27,10 +27,10 @@ es:
   select:
     go-ini: Ir al inicio
     go-end: Ir al final
-    prev-q: Query anterior
-    next-q: Query siguiente
-    stpq: Sel. hasta query anterior
-    stnq: Sel. hasta query siguiente
+    prev-q: Consulta anterior
+    next-q: Consulta siguiente
+    stpq: Sel. hasta consulta anterior
+    stnq: Sel. hasta consulta siguiente
     prev-block: Bloque anterior
     next-block: Bloque siguiente
     snexo: Sel. sig. ocurrencia
@@ -55,25 +55,27 @@ es:
     sel-dsn: Seleccionar DSN
     con-dsn: Conectar/Recnectar DSN
     stop-run: Detener ejecución
-    run-query: Ejecutar query
+    run-query: Ejecutar consulta
     run-all: Ejecutar todo
-    query-file: Query a archivo local
+    query-file: Consulta a archivo local
     ufftlz: Subir desde archivo a DB
     tmplts: Plantillas
     assistant: Asistente
     start-log: Iniciar grabación
     end-log: Detener grabación
   ai:
-    analize-query1: Analizar Query con AI
-    analize-query2: Analizar Query con Fluff
+    analize-query1: Analizar consulta con AI
+    analize-query2: Analizar consulta con Fluff
   help:
     about: Acerca de
     update: Actualizar
   execution:
     header:
-      status: Estatus
-      query: Query
+      status: Estado
+      query: Consulta
+      shape: Tamaño
       time: Tiempo
+      resources: Recursos
       error: Error
       table: Tabla
     status:
@@ -92,7 +94,18 @@ es:
       msg8: Parámetros sin especificar
       msg9: ¿Continuamos?
       msgE: Error
+      msgI: Ejecución individual
       msgBE: Ejecución en bloque
+      msgF: Descarga a archivo local
+      msgT: Tiempo de ejecución
+  log-messages:
+    log-started: Grabación del log iniciada. Hora 
+    log-end: Grabación del log finalizada. Hora
+    user: Usuario
+    dsn-changed: DSN cambió
+    rows-affected: Filas afectadas
+    Num-columns: Núm. columnas
+    Num-rows: Núm. filas
   tooltips:
     ttp1: Iluminar (F12)
     ttp2: Normalizar (F12)

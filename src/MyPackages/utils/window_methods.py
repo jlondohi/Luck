@@ -227,7 +227,7 @@ def openDownloadsFolder(self):
     path = self.cfg_user.index['ruta_data']
     if platform.system() == 'Windows':
         os.startfile(path)
-    elif platform.system() == 'Darwin':  #MacOS
+    elif platform.system() == "Darwin": #MacOS
         subprocess.run(['open', path])
     else:  #Linux and others
         subprocess.run(['xdg-open', path])
@@ -261,6 +261,9 @@ def closeEvent(self, event):
     self.cfg_session.save()
     #Saving session
     self.actualSession.saveSesion(self.tab_info)
+    #Saving log
+    if self.recordingLog:
+        self.recLog()
     #Closing
     event.accept()
 
@@ -306,28 +309,28 @@ def openBlockFiles(self, dialog=True, fileNames=[]):
         self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
         combined_content = ""
         #Opening files in order
-        cont=0
+        count = 0
         for fileName in fileNames:
-            cont += 1
+            count += 1
             with open(fileName, 'r', encoding='utf-8') as file:
                 content = file.read()
-                combined_content += \
+                combined_countent += \
                     "--"+"#"*40 + "\n" \
-                    + "--#- Bloque {}: {}".format(cont, str(fileName).rsplit('/', 1)[-1]) \
+                    + "--#- Bloque {}: {}".format(count, str(fileName).rsplit('/', 1)[-1]) \
                     + "\n" + "--"+"#"*40 + "\n"*2 \
-                    + content \
+                    + countent \
                     + "\n"*2
         
-        #Saving combined content to a file in downloads
+        #Saving combined countent to a file in downloads
         temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), 'combined_script.sql')
         #Checking which file does not exist
-        cont = 1
+        count = 1
         while os.path.exists(temp_file):
-            temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), f'combined_script ({cont}).sql')
-            cont += 1
+            temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), f'combined_script ({count}).sql')
+            count += 1
         #Saving file
         with open(temp_file, 'w', encoding='utf-8') as temp:
-            temp.write(combined_content)
+            temp.write(combined_countent)
         #Changing mouse pointer to default state
         self.app.restoreOverrideCursor()
         #Concatenated loading
@@ -346,25 +349,25 @@ def openBlockFilesP(self, dialog=True, fileNames=[]):
     if fileNames:
         #Changing mouse pointer to standby state
         self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
-        combined_content = ""
+        combined_countent = ""
         #Opening files in order
-        cont=0
+        count = 0
         for fileName in fileNames:
-            cont += 1
+            count += 1
             with open(fileName, 'r', encoding='utf-8') as file:
-                content = file.read()
-                combined_content += f", {content}"
+                countent = file.read()
+                combined_countent += f", {countent}"
         
-        #Saving combined content to a file in downloads
+        #Saving combined countent to a file in downloads
         temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), 'combined_params.sqlp')
         #Checking which file does not exist
-        cont = 1
+        count = 1
         while os.path.exists(temp_file):
-            temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), f'combined_params ({cont}).sqlp')
-            cont += 1
+            temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), f'combined_params ({count}).sqlp')
+            count += 1
         #Saving file
         with open(temp_file, 'w', encoding='utf-8') as temp:
-            temp.write(combined_content)
+            temp.write(combined_countent)
         
         #Changing mouse pointer to default state
         self.app.restoreOverrideCursor()
@@ -423,7 +426,7 @@ def saveFilePAS(self):
 
 #About window
 def showAcercaDe(self):
-    self.aboutOfWindow = AboutWidget(self.cfg_session, self.version)
+    self.aboutOfWindow = AboutWidget(self)
     self.aboutOfWindow.show()
 
 #Software update

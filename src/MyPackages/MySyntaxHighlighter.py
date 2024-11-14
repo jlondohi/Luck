@@ -44,14 +44,14 @@ class MySyntaxHighlighter(QSyntaxHighlighter):
         #Numbers
         rules["Numbers"] = (QRegularExpression(r'\b\d+\b', sensitive), self.myFormat("numbers"))
         #User-defined syntax lists
-        cont = 0
+        count = 0
         for elemnt in self.syntax_list.index.keys():
             #Concatenating all the elements that belong to the pattern (| means OR)
             pattern = '|'.join(self.syntax_list.index[elemnt])
             #Defining format set
             set_ = (QRegularExpression(r"\b({})\b".format(pattern), sensitive), self.myFormat(elemnt))
-            rules[f"List{cont}"] = set_
-            cont += 1
+            rules[f"List{count}"] = set_
+            count += 1
         #Strings
         rules["String1"] = (QRegularExpression(r"'([^']*)'", sensitive), self.myFormat("strings")) #Between ''
         rules["String2"] = (QRegularExpression(r'"([^"]*)"', sensitive), self.myFormat("strings")) #Between ""
