@@ -61,12 +61,12 @@ class SessionHandler:
     #Function to save the session
     def saveSesion(self, object):
         #Extracting information from the session
-        cont = 0
+        count = 0
         sesion = {}
         for tab in object.keys():
             tab_data = object.get(tab)
             #Saving all the information in a dictionary
-            sesion[cont] = {  'version': self._version
+            sesion[count] = {  'version': self._version
                             , 'text_editor':tab_data.get('text_editor').toPlainText()
                             , 'text_params':tab_data.get('text_params').toPlainText() 
                             , 'dict_paramsEtl': tab_data.get('dict_paramsEtl')
@@ -74,7 +74,7 @@ class SessionHandler:
                             , 'origin_param': tab_data.get('origin_param')
                             , 'result_data': tab_data.get('result_data')
                             }
-            cont += 1
+            count += 1
         try:
             pickle.dump(sesion, open(self.sessionPath, "wb"))
         except Exception as exc:

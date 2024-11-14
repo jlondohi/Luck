@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QApplication, QTableView \
 from PyQt6.QtGui import QAction, QStandardItemModel \
     , QStandardItem, QFont, QColor, QBrush, QPen
 from PyQt6.QtCore import Qt, pyqtSignal, QSortFilterProxyModel
-from MyPackages import MyTooltip
+from MyPackages.MyTooltip import MyTooltip
 
 #========================================
 ### Creating class to draw results table
@@ -14,7 +14,7 @@ class CustomDelegate(QStyledItemDelegate):
     #Defining Slots
     #-----------------
     #Boolean for status or other results
-    estatus = False
+    status = False
     #Trafficlight
     tl_1 = "white"
     tl_2 = "white"
@@ -24,8 +24,8 @@ class CustomDelegate(QStyledItemDelegate):
     alter_background_color = "white"
     gridline_color = "black"
 
-    def __init__(self, cfg_app, parent=None):
-        self.cfg_app = cfg_app
+    def __init__(self, parent=None):
+        self.cfg_app = parent.cfg_app
         super().__init__(parent)
 
     def updatePaint(self, theme_name):
@@ -45,7 +45,7 @@ class CustomDelegate(QStyledItemDelegate):
             option.backgroundBrush = QBrush(QColor(self.alter_background_color))
 
         #Modifying background color based on cell value
-        if self.estatus:
+        if self.status:
             if value == "Ejecutado":
                 option.backgroundBrush = QBrush(QColor(self.tl_1))
             elif value == "Ejecutando":
@@ -77,6 +77,22 @@ class ResultTable(QTableView):
         self.app = QApplication.instance()
         self.cfg_session = parent.cfg_session
         self.cfg_app = parent.cfg_app
+
+        #Language
+        self.i18n = parent.i18n
+        self.lgg = parent.lgg
+        nested = self.i18n.getNested
+        lgg = self.lgg
+        #Headers
+        self._status = nested(lgg, "execution", "header", "status")
+        self._query = nested(lgg, "execution", "header", "query")
+        self._shape = nested(lgg, "execution", "header", "shape")
+        self._time = nested(lgg, "execution", "header", "time")
+        self._resources = nested(lgg, "execution", "header", "resources")
+        self._error = nested(lgg, "execution", "header", "error")
+        #States
+        self._failed = nested(lgg, "execution", "status", "failed")
+        
         self.model = QStandardItemModel(self)
         #Adding sorting and filtering options
         self.proxy_model = QSortFilterProxyModel()
@@ -112,29 +128,17 @@ class ResultTable(QTableView):
         #Defining internal theme
         theme_name = self.cfg_session.index.get("internal_theme")
         #Defining style delegator
-        self.delegate = CustomDelegate(self.cfg_app, self)
+        self.delegate = CustomDelegate(self)
         self.theme = self.cfg_app.index.get("list_thems")[theme_name]
         _, _, self.tl_3, = self.theme["result-trafficlight"]
         self.delegate.updatePaint(theme_name)
         self.setItemDelegate(self.delegate)
         #Attribute to determine whether or not to update sizes headers
         self.updateTable = False
-
-        #Language
-        nested = parent.i18n.getNested
-        lgg = parent.lgg
-        #Headers
-        self._status = nested(lgg, "execution", "header", "status")
-        self._query = nested(lgg, "execution", "header", "query")
-        self._time = nested(lgg, "execution", "header", "time")
-        self._error = nested(lgg, "execution", "header", "error")
-        #States
-        self._failed = nested(lgg, "execution", "status", "failed")
         
     #Function to show a window with the cell information
     def showCellInfo(self, row, column):
         #Getting cell text
-
         index = self.model.index(row, column)
         cell_text = self.model.data(index, Qt.ItemDataRole.DisplayRole)
         #Obtaining global position
@@ -144,11 +148,11 @@ class ResultTable(QTableView):
         #Defining an attribute that references the parent tab
         self.tab_parent = self.parent().parent()
         #Showing tooltip with information
-        self.tootltip = MyTooltip(self)
-        self.tootltip.setParent(self.tab_parent)
-        self.tootltip.setText(cell_text)
-        self.tootltip.myShow(cell_rect)
-        self.tootltip.textContent.setFocus()
+        self.tooltip = MyTooltip(self)
+        self.tooltip.setParent(self.tab_parent)
+        self.tooltip.setText(cell_text)
+        self.tooltip.myShow(cell_rect)
+        self.tooltip.textContent.setFocus()
     
     #Function to apply custom size to columns
     def applyColumnSizes(self):
@@ -187,11 +191,13 @@ class ResultTable(QTableView):
         self.model.setHorizontalHeaderLabels(df.columns)
 
         #Differentiating between status and results
-        if list(df.columns) == [self._status, self._query, self._time, self._error]:
+        if df.columns.tolist() == [self._status, self._query, self._shape, self._time \
+                                , self._resources, self._error]:
+            
             self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
             self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
             #Activating traffic light
-            self.delegate.estatus = True
+            self.delegate.status = True
             #Adding data to the model
             for row in range(len(df)):
                 for col in range(len(df.columns)):
@@ -210,7 +216,7 @@ class ResultTable(QTableView):
             self.horizontalHeader().sectionResized.connect(self.updateColumnSizes)
         else:
             #Deactivating traffic light
-            self.delegate.estatus = False
+            self.delegate.status = False
             #Disconnecting header size modification signal
             try:
                 self.horizontalHeader().sectionResized.disconnect(self.updateColumnSizes)
@@ -220,13 +226,15 @@ class ResultTable(QTableView):
             #Changing mouse pointer to standby state
             self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
 
+            maxHeight = 30
             #Adding data to the model
             for row in range(len(df)):
                 for col in range(len(df.columns)):
                     item = QStandardItem(str(df.iloc[row, col]))
                     self.model.setItem(row, col, item)
+                    self.setRowHeight(row, maxHeight)
             self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-            self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+            #self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
 
             #Changing mouse pointer to default state
             self.app.restoreOverrideCursor()

@@ -131,7 +131,7 @@ class MainWindow(QMainWindow):
         #Setting Rec animation timer
         self.timerRec = QTimer(self)
         self.timerRec.setInterval(700)
-        self.timerRec.timeout.connect(self.animationWorker)
+        self.timerRec.timeout.connect(self.animationRec)
         self.animationR_state = False
         self.recordingLog = False
 
@@ -258,7 +258,7 @@ class MainWindow(QMainWindow):
   
         #Adding previous session
         if self.actualSession.sessionExists:
-            cont = 0
+            count = self.tabWidget.count() - 1
             #Creating all tabs from the previous session
             for key in self.actualSession.session.keys():
                 #Creating tab
@@ -266,11 +266,11 @@ class MainWindow(QMainWindow):
             #Loading information to the tab
             for key in self.tab_info.keys():
                 #Obtaining the values ​​of the open session
-                text_editor = self.actualSession.session.get(cont)["text_editor"]
-                text_params = self.actualSession.session.get(cont)["text_params"]
-                dict_paramsEtl = self.actualSession.session.get(cont)["dict_paramsEtl"]
-                origin = self.actualSession.session.get(cont)['origin']
-                data = self.actualSession.session.get(cont)["result_data"]
+                text_editor = self.actualSession.session.get(count)["text_editor"]
+                text_params = self.actualSession.session.get(count)["text_params"]
+                dict_paramsEtl = self.actualSession.session.get(count)["dict_paramsEtl"]
+                origin = self.actualSession.session.get(count)['origin']
+                data = self.actualSession.session.get(count)["result_data"]
                 #Adding values ​​in the newly created session
                 self.tab_info.get(key)["text_editor"].setPlainText(text_editor)
                 self.tab_info.get(key)["text_params"].setPlainText(text_params)
@@ -281,9 +281,9 @@ class MainWindow(QMainWindow):
                 #Changing the tab name
                 if origin != "":
                     nombre = origin.rsplit('/', 1)[-1]
-                    self.tabWidget.setTabText(cont, nombre)
+                    self.tabWidget.setTabText(count, nombre)
                 #Following
-                cont += 1
+                count += 1
         else:
             self.newScriptTab()
         
@@ -412,6 +412,7 @@ MainWindow.changeFontSizeResult = results_table_methods.changeFontSizeResult
 #==================================================================   
 #Linking functions focused on the execution of one or several queries
 #==================================================================
+MainWindow.getFullUsername = execute_methods.getFullUsername
 MainWindow.applySelectedDSN = execute_methods.applySelectedDSN
 MainWindow.connectingDSN = execute_methods.connectingDSN
 MainWindow.connectedDSN = execute_methods.connectedDSN
@@ -421,6 +422,7 @@ MainWindow.changeWordWrap = execute_methods.changeWordWrap
 MainWindow.verifyConn = execute_methods.verifyConn
 MainWindow.runQueries = execute_methods.runQueries
 MainWindow.animationWorker = execute_methods.animationWorker
+MainWindow.animationRec = execute_methods.animationRec
 MainWindow.workerFinished = execute_methods.workerFinished
 MainWindow.identifyQuery = execute_methods.identifyQuery
 MainWindow.identifyTable = execute_methods.identifyTable
@@ -433,6 +435,7 @@ MainWindow.processHistory = execute_methods.processHistory
 MainWindow.runQuery_to_file = execute_methods.runQuery_to_file
 MainWindow.runFile_to_lz = execute_methods.runFile_to_lz
 MainWindow.reportData = execute_methods.reportData
+MainWindow.reportLog = execute_methods.reportLog
 MainWindow.toFile = execute_methods.toFile
 MainWindow.toFile_save = execute_methods.toFile_save
 MainWindow.toFile_excelError = execute_methods.toFile_excelError

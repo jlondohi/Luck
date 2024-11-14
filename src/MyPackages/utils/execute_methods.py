@@ -1,5 +1,8 @@
 #Importing native packages
-import re, os, sys
+import re, os, sys, time, platform \
+    , ctypes, ctypes.wintypes
+#Importing pwd
+pwd = None
 import pandas as pd
 from datetime import datetime
 #Importing PyQt6 packages
@@ -16,8 +19,8 @@ from MyPackages import UploadDBWidget, Worker
 #-------------------------
 #Function to establish DSN
 def applySelectedDSN(self):
-    dsn = self.sender().text()
-    self.cfg_session.index["prede_dsn"] = dsn
+    self.dsn = self.sender().text()
+    self.cfg_session.index["prede_dsn"] = self.dsn
     #Requesting connection
     self.ConMan.start()
     #Requesting the tree of the dsn
@@ -28,25 +31,31 @@ def connectingDSN(self):
     nested = self.i18n.getNested
     lgg = self.lgg
     _sc_db = nested(lgg, "status-bar", "sc-db")
-    _dsn = self.cfg_session.index["prede_dsn"]
+    self.dsn = self.cfg_session.index["prede_dsn"]
 
-    self.lbl_status.setText(_sc_db.format(_dsn))
+    self.lbl_status.setText(_sc_db.format(self.dsn))
     self.bt_connect.setStyleSheet("background-color:#e81123;")
 
 #DSN function connected
 def connectedDSN(self, conn):
     #Language
-    _c_db = self.i18n.getNested(self.lgg, "status-bar", "c_db")
-    _nc_db = self.i18n.getNested(self.lgg, "status-bar", "nc-db")
-    _dsn = self.cfg_session.index["prede_dsn"]
+    nested = self.i18n.getNested
+    _c_db = nested(self.lgg, "status-bar", "c_db")
+    _nc_db = nested(self.lgg, "status-bar", "nc-db")
+    _dsnC = nested(self.lgg, "log-messages", "dsn-changed")
+    self.dsn = self.cfg_session.index["prede_dsn"]
 
     if conn:
         self.conn = conn
-        self.lbl_status.setText(_c_db.format(_dsn))
+        self.lbl_status.setText(_c_db.format(self.dsn))
         self.bt_connect.setStyleSheet("background-color:#16825d;")
         self.firstConexionSignal.emit()
+
+        #Bringing new connection to the log
+        if self.recordingLog:
+            print(f"\n[{_dsnC.upper()}]: {self.dsn}")
     else:
-        self.lbl_status.setText(_nc_db.format(_dsn))
+        self.lbl_status.setText(_nc_db.format(self.dsn))
         self.bt_connect.setStyleSheet("background-color:#e81123;")
 
 #Function to reconnect DSN
@@ -163,10 +172,12 @@ def runQueries(self, queries, cls="console"):
     self.worker.moveToThread(self.thread)
     #Multithreading Step 4: Connecting Signals and Slots
     self.thread.started.connect(self.worker.run)
-    self.worker.finished.connect(self.thread.quit)
-    self.worker.finished.connect(self.workerFinished)
     self.worker.status.connect(self.reportData)
     self.worker.inProcess.connect(self.processHistory)
+    self.worker.recInLog.connect(self.reportLog)
+    self.worker.finished.connect(self.thread.quit)
+    self.worker.finished.connect(self.workerFinished)
+    
     if cls == "console":
         self.worker.finished.connect(self.reportData)
     elif cls == "file":
@@ -204,7 +215,9 @@ def workerFinished(self, df):
     #Headers
     _status = nested(lgg, "execution", "header", "status")
     _query = nested(lgg, "execution", "header", "query")
+    _shape = nested(lgg, "execution", "header", "shape")
     _time = nested(lgg, "execution", "header", "time")
+    _resources = nested(lgg, "execution", "header", "resources")
     _error = nested(lgg, "execution", "header", "error")
 
     self.cursorIsWorking = False
@@ -214,7 +227,7 @@ def workerFinished(self, df):
     self.bt_working.setIcon(self.workerIcon1)
     self.bt_working.setStyleSheet("background-color: None;")
     #Determining the type of completion
-    if df.columns.tolist() == [_status, _query, _time, _error]:
+    if df.columns.tolist() == [_status, _query, _shape, _time, _resources, _error]:
         status = df.iloc[-1, 0]
         self.updateTrayIcon(status)
     else:
@@ -412,8 +425,8 @@ def processHistory(self, queries, params):
     lgg = self.lgg
     #Headers
     _type = nested(lgg, "tab-eco", "history", "type")
-    _typeU = nested(lgg, "tab-eco", "history", "typeU")
-    _typeB = nested(lgg, "tab-eco", "history", "typeB")
+    _typeU = nested(lgg, "tab-eco", "history", "type-u")
+    _typeB = nested(lgg, "tab-eco", "history", "type-b")
     _query = nested(lgg, "tab-eco", "history", "query")
     _time = nested(lgg, "tab-eco", "history", "time")
     _param = nested(lgg, "tab-eco", "history", "param")
@@ -431,7 +444,6 @@ def processHistory(self, queries, params):
     #Defining type
     cls = _typeB if len(queries.split(';')) > 1 else _typeU
     #Defining time
-
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     #Creating the new row
     new_row = {_type: [cls], _time: [now], _query:[str(queries)], _param:[str(params)]}
@@ -484,10 +496,21 @@ def runFile_to_lz(self):
     self.subirLz = UploadDBWidget(self)
     self.subirLz.show()
 
+#Function to report info in the log file
+def reportLog(self, data):
+    #Reporting in the log
+    if not self.recordingLog:
+        return
+    time.sleep(0.5)
+    print(data)
+    return
+
 #Function to report progress
 def reportData(self, data, tab_name):
     #Getting info from the specific tab
     tab_data = self.tab_info.get(tab_name)
+    
+    #Reporting message to results table
     if tab_data:
         tab_data['result_data'] = data.to_dict()
         result = tab_data['result']
@@ -631,6 +654,32 @@ def toFile_defaultSave(self, data, download_folder, msg_text):
         msg.setInformativeText(f"{exc}")
         msg.exec()
 
+#Function to obtain the user's full name
+def getFullUsername(self):
+    #Detecting the operating system   
+    if platform.system() == "Windows":
+        #Defining the buffer and its maximum size
+        buffer = ctypes.create_unicode_buffer(1024)
+        size = ctypes.wintypes.DWORD(len(buffer))
+        #Calling the Windows function to get the user's full name
+        if ctypes.windll.secur32.GetUserNameExW(3, buffer, ctypes.byref(size)):
+            return buffer.value
+        else:
+            return None
+
+    elif platform.system() in ["Linux", "Darwin"]:  #Darwin is the identifier for macOS        
+        try:
+            #Gets the current username
+            username = os.getlogin()
+            #Use the pwd module to find user information
+            user_info = pwd.getpwnam(username)
+            #Returns the full name field
+            return user_info.pw_gecos.split(',')[0]
+        except KeyError:
+            return None
+    else:
+        return None
+
 #Function to record or log recording
 def recLog(self):
     #Language
@@ -639,8 +688,9 @@ def recLog(self):
     #Labels
     _toFile5 = nested(lgg, "save-files", "toFile5")
     _save2 = nested(lgg, "save-files", "save2")
-    _logStarted = nested(lgg, "save-files", "log-started")
-    _logEnd = nested(lgg, "save-files", "log-end")
+    _logStarted = nested(lgg, "log-messages", "log-started")
+    _logEnd = nested(lgg, "log-messages", "log-end")
+    _user = nested(self.lgg, "log-messages", "user")
         
     now = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     #Starting rec animation
@@ -654,10 +704,17 @@ def recLog(self):
         ##Open the file to write logs
         self.log_file = open(fileName, 'w', encoding='utf-8')
 
-        # Redirect standard output to log file
+        #Redirect standard output to log file
         sys.stdout = self.log_file
-        print("="*40, f"{_logStarted} {now}", "="*40, sep="\n")
+        msg = f"{_logStarted} {now}"
+        leng = len(msg)
+        print("="*leng, msg, "="*leng, sep="\n")
 
+        #Indicating user
+        print(f"[{_user.upper()}]: ({self.user}) {self.getFullUsername()}")
+        #Indicating the DSN
+        print(f"[DSN]: {self.dsn}")
+        
         #Various modifications to the ecosystem
         self.animationR_state = True
         self.recordingLog = True
@@ -666,7 +723,9 @@ def recLog(self):
         self.actionRecLog.setText(nested(lgg, "sql", "end-log"))
     else:
         #Looking at the Log
-        print("="*40, f"{_logEnd} {now}", "="*40, sep="\n")
+        msg = f"{_logEnd} {now}"
+        leng = len(msg)
+        print("="*leng, msg, "="*leng, sep="\n")
         self.log_file.close()
 
         #Restoring various configurations
@@ -682,7 +741,7 @@ def recLog(self):
         self.actionRecLog.setText(nested(lgg, "sql", "start-log"))
 
 #Function to handle rec button animation
-def animationWorker(self):
+def animationRec(self):
     #Language
     nested = self.i18n.getNested
     lgg = self.lgg

@@ -103,7 +103,7 @@ def unsavedChanges(self, tab_name):
             return False
 
 #Function to display dialog box, save changes?
-def showDialogSavingChanges(self):
+def showDialogSavingChanges(self): 
     #Instantiating language
     nested = self.i18n.getNested
     lgg = self.lgg
@@ -111,8 +111,8 @@ def showDialogSavingChanges(self):
     dialogo = QMessageBox()
     dialogo.setWindowIcon(self.icon)
     dialogo.setIcon(QMessageBox.Icon.Question)
-    dialogo.setWindowTitle(nested(lgg, "tab-editor", "save1"))
-    dialogo.setText(nested(lgg, "tab-editor", "save2"))
+    dialogo.setWindowTitle(nested(lgg, "save-files", "saveE1"))
+    dialogo.setText(nested(lgg, "save-files", "saveE2"))
     dialogo.setStandardButtons(QMessageBox.StandardButton.Save 
                                | QMessageBox.StandardButton.Discard 
                                | QMessageBox.StandardButton.Cancel)

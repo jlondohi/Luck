@@ -7,9 +7,13 @@ from MyPackages.MyTitleBar import MyTitleBar
 ### Creating AboutWidget class
 #=============================
 class AboutWidget(QMainWindow):
-    def __init__(self, cfg_session, version):
+    def __init__(self, parent=None):
         super().__init__()
-        self.cfg_session = cfg_session
+        version = parent.version
+        self.cfg_session = parent.cfg_session
+        self.i18n = parent.i18n
+        self.lgg = parent.lgg
+        
         self.parentWindow = self.window()
         #Loading GUI
         uic.loadUi('Guis/About.ui', self)
@@ -21,6 +25,9 @@ class AboutWidget(QMainWindow):
         layout = original_fm.parentWidget().layout()
         layout.replaceWidget(original_fm, self.fm_title)      
         original_fm.deleteLater()
+
+        #Setting StyleSheet
+        self.fm_title.setStyleSheet(parent.dict_styleSheets["dark_theme"])
 
         #Modifying key data
         metadata = version.index.get("metadata")

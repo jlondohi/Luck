@@ -98,6 +98,7 @@ def ecosystemTab(self):
     resultLayout.setContentsMargins(0, 0, 0, 0)
     #Title
     self.tableDescribed = QLabel()
+    self.tableDescribed.setObjectName("lbl_tableDescribe")
     self.tableDescribed.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse | Qt.TextInteractionFlag.TextSelectableByKeyboard)
     resultLayout.addWidget(self.tableDescribed)
     #Tabla
@@ -118,6 +119,7 @@ def ecosystemTab(self):
     self.hitoricResult.setStyleSheet( self.dict_styledSheets["result_styler"] )
     self.hitoricResult.setFont( QFont(font["result-font"], font["result-size"]) )
     self.hitoricResult.sizeChanged.connect(lambda font: self.applyFontSize(font, "result"))
+    
     historyLayout.addWidget(self.hitoricResult)
     groupBoxHistory.setLayout(historyLayout)
     #Loading previous results

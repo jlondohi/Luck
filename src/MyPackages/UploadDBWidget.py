@@ -3,9 +3,11 @@ import os, sys, getpass
 
 from contextlib import contextmanager
 from PyQt6 import uic
-from PyQt6.QtWidgets import QMainWindow, QFileDialog, QLineEdit
+from PyQt6.QtWidgets import QMainWindow, QFileDialog \
+    , QLineEdit, QFrame
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
 
+from MyPackages.MyTitleBar import MyTitleBar
 #=======================
 ### Upload to LZ widget
 #=======================
@@ -15,16 +17,16 @@ class UploadDBThread(QThread):
     finished = pyqtSignal()
     error = pyqtSignal()
 
-    def __init__(self, path, tabla, mode, username, psw, dsn, hostname):
+    def __init__(self, parent = None):
         super().__init__()
-        self.path = path
-        self.tabla = tabla
-        self.mode = mode
+        self.path = parent.path
+        self.tabla = parent.tabla
+        self.mode = parent.mode
         #---
-        self.username = username
-        self.psw = psw
-        self.dsn = dsn
-        self.hostname = hostname
+        self.username = parent.username
+        self.psw = parent.psw
+        self.dsn = parent.dsn
+        self.hostname = parent.hostname
         self.logger = {}
         self.sp = None
         self.sp_created = False
@@ -77,11 +79,21 @@ class UploadDBWidget(QMainWindow):
         self.bt_ver.clicked.connect(self.seePass)
         self.bt_nover.clicked.connect(self.unseePass)
         self.bt_subir.clicked.connect(self.toLZ)
-        #Configuring window buttons
-        self.bt_minimize.clicked.connect(lambda: self.showMinimized())
-        self.bt_close.clicked.connect(self.myclose)
-        self.fm_title.mouseMoveEvent = self.mouseMoveEvent
-        self.fm_title.mouseClickEvent = self.mousePressEvent
+
+        #Loding lenguage
+        self.i18n = parent.i18n
+        self.lgg = parent.lgg
+
+        #Replacing title bar
+        self.parentWindow = parent.parentWindow
+        original_fm = self.findChild(QFrame, 'fm_title')
+        self.fm_title = MyTitleBar(self, menus=False)
+        self.fm_title.setObjectName("fm_title")
+        layout = original_fm.parentWidget().layout()
+        layout.replaceWidget(original_fm, self.fm_title)
+        original_fm.deleteLater()
+        self.fm_title.setStyleSheet(parent.dict_styleSheets["dark_theme"])
+        
         #Global variables
         self.file_path = ""
         self.logger = {}
@@ -193,8 +205,7 @@ class UploadDBWidget(QMainWindow):
 
             #Running upload
             self.lbl_estado.setText(self._starting)
-            self.thread = UploadDBThread(self.file_path, self.tabla, self.mode
-                                        , self.username, self.psw, self.dsn, self.hostname)
+            self.thread = UploadDBThread(self)
             self.thread.update_status.connect(self.updateStatus)
             self.thread.finished.connect(self.onFinished)
             self.thread.error.connect(self.onError)
