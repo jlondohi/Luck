@@ -405,6 +405,8 @@ def createPMenu(self):
     self.actionStopRun.triggered.connect(self.stopWorker)
     self.actionRecLog.triggered.connect(self.recLog)
     
+    self.actionFile_to_lz.setDisabled(True)
+    
     #AI Menu Actions
     self.actionAnalize.triggered.connect(self.aiQueryAnalizer)
     self.actionFluffAnalize.triggered.connect(self.sqlfluffAnalizer)

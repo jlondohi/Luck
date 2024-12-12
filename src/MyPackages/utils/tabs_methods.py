@@ -25,11 +25,11 @@ def closeTab(self, tab_index):
                 self.removeTabWidgets(tab_name)
                 self.tabWidget.removeTab(tab_index)
                 #Saving session
-                self.actualSession.saveSesion(self.tab_info)
+                self.actualSession.saveSession(self.tab_info)
                 return None
             else:
                 #Saving session
-                self.actualSession.saveSesion(self.tab_info)
+                self.actualSession.saveSession(self.tab_info)
                 return None
         #Answer "Discard"
         elif answer == QMessageBox.StandardButton.Discard:
@@ -37,14 +37,14 @@ def closeTab(self, tab_index):
             self.removeTabWidgets(tab_name)
             self.tabWidget.removeTab(tab_index)
             #Save session
-            self.actualSession.saveSesion(self.tab_info)
+            self.actualSession.saveSession(self.tab_info)
             return None
     else:
         #Close the tab without asking
         self.removeTabWidgets(tab_name)
         self.tabWidget.removeTab(tab_index)
         #Save session
-        self.actualSession.saveSesion(self.tab_info)
+        self.actualSession.saveSession(self.tab_info)
         return None
 
 #Function to remove tabs from the list

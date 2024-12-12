@@ -1,11 +1,11 @@
-from openai import OpenAI
-
+#from openai import OpenAI
+OpenAI = None
 #=============================================
 #Creating functions related to AI in general
 #=============================================
 def aiQueryAnalizer(self):
     #Saving the session
-    self.actualSession.saveSesion(self.tab_info)
+    self.actualSession.saveSession(self.tab_info)
     #Taking the query
     query = self.identifyQuery()
     if query == "":
@@ -39,7 +39,7 @@ def aiQueryAnalizer(self):
 
 def sqlfluffAnalizer(self):
     #Saving the session
-    self.actualSession.saveSesion(self.tab_info)
+    self.actualSession.saveSession(self.tab_info)
     #Setting query
     self.fluffAnalizer.query = self.identifyQuery()
     #Starting analyzer

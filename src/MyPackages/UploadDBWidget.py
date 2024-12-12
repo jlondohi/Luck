@@ -1,6 +1,10 @@
-import os, sys, getpass
-#from sparky_bc import Sparky
 
+try:
+    from sparky_bc import Sparky
+except:
+    Sparky = None
+
+import os, sys, getpass
 from contextlib import contextmanager
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow, QFileDialog \
@@ -19,7 +23,7 @@ class UploadDBThread(QThread):
 
     def __init__(self, parent = None):
         super().__init__()
-        self.path = parent.path
+        self.file_path = parent.file_path
         self.tabla = parent.tabla
         self.mode = parent.mode
         #---
@@ -32,7 +36,6 @@ class UploadDBThread(QThread):
         self.sp_created = False
         #---
         self.original_stdout = sys.stdout
-        Sparky = None
 
         #cultating and Instanciando Sparky
         sys.stdout = open(os.devnull, 'w')
@@ -51,7 +54,7 @@ class UploadDBThread(QThread):
     def run(self):
         #Redirecting sys.stdout to os.devnull
         sys.stdout = open(os.devnull, 'w')
-        for path in self.path:
+        for path in self.file_path:
             try:
                 self.sp.subir_csv(path=path, nombre_tabla=self.tabla, modo=self.mode)
             except:
@@ -78,7 +81,7 @@ class UploadDBWidget(QMainWindow):
         self.bt_abrir.clicked.connect(self.openFile)
         self.bt_ver.clicked.connect(self.seePass)
         self.bt_nover.clicked.connect(self.unseePass)
-        self.bt_subir.clicked.connect(self.toLZ)
+        self.bt_subir.clicked.connect(self.toDB)
 
         #Loding lenguage
         self.i18n = parent.i18n
@@ -173,16 +176,20 @@ class UploadDBWidget(QMainWindow):
     def seePass(self):
         self.bt_nover.show()
         self.bt_ver.hide()
-        self.qle_password.setEchoMode(QLineEdit.Normal) 
+        self.qle_password.setEchoMode(QLineEdit.EchoMode.Normal) 
     
     #Function to stop seeing the password
     def unseePass(self):
         self.bt_ver.show()
         self.bt_nover.hide()
-        self.qle_password.setEchoMode(QLineEdit.Password)
+        self.qle_password.setEchoMode(QLineEdit.EchoMode.Password)
     
-    #Climb to the LIGHT
-    def toLZ(self):
+    #Upload to DB
+    def toDB(self):
+        #Interrupting if null
+        if not self.file_path:
+            return
+
         #Getting the values ​​of each widget
         self.tabla = self.qle_tabla.text()
         self.username = getpass.getuser()
@@ -230,15 +237,6 @@ class UploadDBWidget(QMainWindow):
                 self.lbl_estado.setText(", ".join(map(str, last_row)))
                 #status_text = f"{str(logger.info)}\n{str(logger.warning)}\n{str(logger.error)}\n{str(logger.critical)}"
                 #self.lbl_status.setText( self.status_text )
-
-    #Function to move the window
-    def mouseMoveEvent(self, event):
-        if event.buttons() == Qt.MouseButton.LeftButton:
-            if self.click_position:
-                self.move(self.pos() + event.globalPosition().toPoint() - self.click_position)
-                self.click_position = event.globalPosition().toPoint()
-                event.accept()
-        super().mouseMoveEvent(event)
 
     #Click position grabber, this is global
     def mousePressEvent(self, event):

@@ -71,9 +71,8 @@ class MyTooltip(QMainWindow):
 
     #Function to enter and format text within the tooltip
     def setText(self, text):
-        self.text = text.replace("\\n", "<br>")
-        self.textContent.setHtml(self.text)
-        self.textContent.setStyleSheet(f"color: {self.text_color};")
+        self.text = text.replace("\n", "<br>")
+        self.textContent.setHtml(f"<div style='white-space: pre-wrap; color: {self.text_color};'>{self.text}</div>")
         #Calculating text size and adjusting the window
         fm = QFontMetrics(self.textContent.font())
         text_width = fm.horizontalAdvance(text)

@@ -65,6 +65,58 @@ class CustomDelegate(QStyledItemDelegate):
         #Painting the content
         super().paint(painter, option, index)
 
+class SoftLoadTableModel(QAbstractTableModel):
+    def __init__(self, df, parent=None, chunk_size=100):
+        super().__init__(parent)
+        self._df = df
+        self.chunk_size = chunk_size
+        self.loaded_rows = min(chunk_size, len(df))
+
+    def rowCount(self, parent=None):
+        return self.loaded_rows
+
+    def columnCount(self, parent=None):
+        return len(self._df.columns)
+
+    def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
+        if role == Qt.ItemDataRole.DisplayRole:
+            if orientation == Qt.Orientation.Horizontal:
+                return self._df.columns[section]
+            elif orientation == Qt.Orientation.Vertical:
+                return str(section + 1)
+        return None
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        row, col = index.row(), index.column()
+
+        if role == Qt.ItemDataRole.DisplayRole:
+            if row < self.loaded_rows:
+                # Formatea las variables según sea necesario
+                value = self._df.iat[row, col]
+                return f"{value:.2f}" if isinstance(value, float) else str(value)
+
+        elif role == Qt.ItemDataRole.TextAlignmentRole:
+            # Alinea numéricos a la derecha y texto a la izquierda
+            return Qt.AlignmentFlag.AlignRight if isinstance(self._df.iat[row, col], (int, float)) else Qt.AlignmentFlag.AlignLeft
+
+        return None
+
+    def fetchMore(self, parent=None):
+        rows_to_load = min(self.chunk_size, len(self._df) - self.loaded_rows)
+        if rows_to_load <= 0:
+            return
+
+        self.beginInsertRows(QModelIndex(), self.loaded_rows, self.loaded_rows + rows_to_load - 1)
+        self.loaded_rows += rows_to_load
+        self.endInsertRows()
+
+    def canFetchMore(self, parent=None):
+        return self.loaded_rows < len(self._df)
+    
+
 class ResultTable(QTableView):
     #Signs
     dfChanged = pyqtSignal(pd.DataFrame)
@@ -171,77 +223,28 @@ class ResultTable(QTableView):
                 sizes[i] = header.sectionSize(i)
             self.cfg_session.index["result_geo"] = sizes
 
-    #Function to load data from pd.DataFrame
     def loadData(self, df, backup=True):
-        self.updateTable = False
+        self.setModel(self.proxy_model)
         #Storing a copy of the original DataFrame
         if backup:
             self._df = df.copy()
+
         #Cleaning the model
-        self.model.clear()
-        self.model.setColumnCount(len(df.columns))
-        self.model.setRowCount(len(df))
+        #self.model.clear()
         
-        #Reconnecting and restarting the proxy model
-        self.proxy_model.invalidate()
+        # Cargar modelo de datos con `SoftLoadTableModel`
+        self.model = SoftLoadTableModel(df, parent=self, chunk_size=500)
+        self.proxy_model.setSourceModel(self.model)
         self.setModel(self.proxy_model)
-        self.proxy_model.setFilterKeyColumn(-1)
-        self.proxy_model.setFilterRegularExpression("")
 
-        #Setting column names in the model
-        self.model.setHorizontalHeaderLabels(df.columns)
+        # Configurar encabezados
+        self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
+        self.model.layoutChanged.emit()
 
-        #Differentiating between status and results
-        if df.columns.tolist() == [self._status, self._query, self._shape, self._time \
-                                , self._resources, self._error]:
-            
-            self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-            self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Interactive)
-            #Activating traffic light
-            self.delegate.status = True
-            #Adding data to the model
-            for row in range(len(df)):
-                for col in range(len(df.columns)):
-                    item = QStandardItem(str(df.iloc[row, col]))
-                    self.model.setItem(row, col, item)
-            
-            #Showing the background of the table
-            self.scrollToBottom()
-            #Modifying sizes
-            self.applyColumnSizes()
-            self.updateTable = True
-            #Checking the status of the last row, in case of error show message
-            if df.iloc[-1][self._status] == self._failed:
-                self.showCellInfo(len(df) - 1, len(df.columns) - 1)
-            #Connecting header size modification signal
-            self.horizontalHeader().sectionResized.connect(self.updateColumnSizes)
-        else:
-            #Deactivating traffic light
-            self.delegate.status = False
-            #Disconnecting header size modification signal
-            try:
-                self.horizontalHeader().sectionResized.disconnect(self.updateColumnSizes)
-            except TypeError:
-                pass
-            
-            #Changing mouse pointer to standby state
-            self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
-
-            maxHeight = 30
-            #Adding data to the model
-            for row in range(len(df)):
-                for col in range(len(df.columns)):
-                    item = QStandardItem(str(df.iloc[row, col]))
-                    self.model.setItem(row, col, item)
-                    self.setRowHeight(row, maxHeight)
-            self.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-            #self.verticalHeader().setSectionResizeMode(QHeaderView.ResizeMode.ResizeToContents)
-
-            #Changing mouse pointer to default state
-            self.app.restoreOverrideCursor()
-
-        #Emmiting dfChanged signal
-        self.dfChanged.emit(df)
+        # Restaurar delegado y conectores
+        self.delegate.updatePaint(self.cfg_session.index.get("internal_theme"))
+        self.setItemDelegate(self.delegate)
+        self.horizontalHeader().sectionResized.connect(self.updateColumnSizes)
 
     #Function to detect double clicking on a cell
     def mouseDoubleClickEvent(self, event):

@@ -1,12 +1,13 @@
 #Ignoring specific folders
 src/Guis/Resources/Other Resources
-noFunctional/
+eggs/
 Lib/
 Scripts/
 Include/
 Basurero/
 dist/
 build/
+build_ptgd/
 .venv/
 .github/
 *__pycache__
@@ -17,6 +18,8 @@ pyvenv.cfg
 *.spec
 Luck.exe
 Luck.bat
+pyarmor.error.log
+*/Luck-Debug.log
 
 #Do not ignore these files
 #!install_env.bat

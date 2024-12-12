@@ -255,14 +255,18 @@ class MainWindow(QMainWindow):
         #Adding the ecosystem tab
         self.disguisiFrame()
         self.ecosystemTab()
-  
+        lag = self.tabWidget.count()
         #Adding previous session
         if self.actualSession.sessionExists:
-            count = self.tabWidget.count() - 1
-            #Creating all tabs from the previous session
+            #Creating all tabs from the previous session without info yet
             for key in self.actualSession.session.keys():
+                #Omitting the "version" key
+                if key == "version":
+                    continue
                 #Creating tab
                 self.newScriptTab()
+
+            count = 0
             #Loading information to the tab
             for key in self.tab_info.keys():
                 #Obtaining the values ​​of the open session
@@ -271,6 +275,7 @@ class MainWindow(QMainWindow):
                 dict_paramsEtl = self.actualSession.session.get(count)["dict_paramsEtl"]
                 origin = self.actualSession.session.get(count)['origin']
                 data = self.actualSession.session.get(count)["result_data"]
+                
                 #Adding values ​​in the newly created session
                 self.tab_info.get(key)["text_editor"].setPlainText(text_editor)
                 self.tab_info.get(key)["text_params"].setPlainText(text_params)
@@ -280,10 +285,13 @@ class MainWindow(QMainWindow):
                 self.tab_info.get(key)["result"].loadData(pd.DataFrame(data))
                 #Changing the tab name
                 if origin != "":
-                    nombre = origin.rsplit('/', 1)[-1]
-                    self.tabWidget.setTabText(count, nombre)
+                    name = origin.rsplit('/', 1)[-1]
+                    self.tabWidget.setTabText(count+lag, name)
                 #Following
                 count += 1
+            #If the size is 1 then there are no tabs, only the version info
+            if len(self.actualSession.session.keys()) == 1:
+                self.newScriptTab()
         else:
             self.newScriptTab()
         

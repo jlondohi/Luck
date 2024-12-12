@@ -2,6 +2,7 @@
 #Importing native packages
 import os, sys, platform, subprocess, tempfile, winreg \
     , string, random, base64, getpass, socket
+from datetime import datetime
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 #Importing PyQt6 packages
@@ -44,7 +45,7 @@ def prepareFramework(self):
     #Defining the folders to create
     ##Path and folder of the session
     sesion_path = os.path.join(tempfile.gettempdir(), "Luck", 'sesion')
-    self.cfg_user.index['ruta_temp_sesion'] = sesion_path
+    self.cfg_user.index['ruta_temp_session'] = sesion_path
     os.makedirs(sesion_path) if not os.path.exists(sesion_path) else None
     ##Path and data folder
     if platform.system() == 'Windows':
@@ -260,11 +261,12 @@ def closeEvent(self, event):
     #Saving settings when closing the window
     self.cfg_session.save()
     #Saving session
-    self.actualSession.saveSesion(self.tab_info)
+    self.actualSession.saveSession(self.tab_info)
     #Saving log
     if self.recordingLog:
         self.recLog()
     #Closing
+    print(f"Luck ended well {datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")}")
     event.accept()
 
 #Function to open SQL files
@@ -314,14 +316,14 @@ def openBlockFiles(self, dialog=True, fileNames=[]):
             count += 1
             with open(fileName, 'r', encoding='utf-8') as file:
                 content = file.read()
-                combined_countent += \
+                combined_content += \
                     "--"+"#"*40 + "\n" \
                     + "--#- Bloque {}: {}".format(count, str(fileName).rsplit('/', 1)[-1]) \
                     + "\n" + "--"+"#"*40 + "\n"*2 \
-                    + countent \
+                    + content \
                     + "\n"*2
         
-        #Saving combined countent to a file in downloads
+        #Saving combined content to a file in downloads
         temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), 'combined_script.sql')
         #Checking which file does not exist
         count = 1
@@ -330,7 +332,7 @@ def openBlockFiles(self, dialog=True, fileNames=[]):
             count += 1
         #Saving file
         with open(temp_file, 'w', encoding='utf-8') as temp:
-            temp.write(combined_countent)
+            temp.write(combined_content)
         #Changing mouse pointer to default state
         self.app.restoreOverrideCursor()
         #Concatenated loading
@@ -349,16 +351,16 @@ def openBlockFilesP(self, dialog=True, fileNames=[]):
     if fileNames:
         #Changing mouse pointer to standby state
         self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
-        combined_countent = ""
+        combined_content = ""
         #Opening files in order
         count = 0
         for fileName in fileNames:
             count += 1
             with open(fileName, 'r', encoding='utf-8') as file:
-                countent = file.read()
-                combined_countent += f", {countent}"
+                content = file.read()
+                combined_content += f", {content}"
         
-        #Saving combined countent to a file in downloads
+        #Saving combined content to a file in downloads
         temp_file = os.path.join(self.cfg_user.index.get("ruta_data"), 'combined_params.sqlp')
         #Checking which file does not exist
         count = 1
@@ -367,7 +369,7 @@ def openBlockFilesP(self, dialog=True, fileNames=[]):
             count += 1
         #Saving file
         with open(temp_file, 'w', encoding='utf-8') as temp:
-            temp.write(combined_countent)
+            temp.write(combined_content)
         
         #Changing mouse pointer to default state
         self.app.restoreOverrideCursor()
@@ -394,7 +396,7 @@ def reloadETL(self):
         #Updating parameters
         self.paramSearcher()
         #Save session
-        self.actualSession.saveSesion(self.tab_info)
+        self.actualSession.saveSession(self.tab_info)
 
 #Function to save SQL files
 def saveFileAS(self):

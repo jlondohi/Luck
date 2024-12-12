@@ -50,7 +50,7 @@ es:
     lfsr: Bajar tamaño font resultados
     pt: Tab siguiente
     nt: Tab anterior
-    ww: Word wrap
+    ww: Ajuste de línea
   sql:
     sel-dsn: Seleccionar DSN
     con-dsn: Conectar/Recnectar DSN
@@ -126,8 +126,11 @@ es:
     c_db: Conectado con {}
     update-tree: Actualizando arbol ...
     updated-tree: Arbol actualizado
+    update-db: Actualizando DB ...
+    updated-db: DB actualizada
     log-started: Grabación del log iniciada
     log-end: Grabación del log finalizada
+    unex-error: Error inesperado
   tab-editor:
     new: Nuevo
     pht-editor: Editor
@@ -145,6 +148,10 @@ es:
       time: Hora
       query: Consulta
       param: Parámetros
+    tree:
+      copy: Copiar tabla
+      update: Actualizar DB
+      update-all: Actualizar todo
   open-file:
     open1: Abrir
     open2: Abrir archivo

@@ -2,10 +2,9 @@ from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtCore import Qt, pyqtSignal
 
-#================================================================== ============================
+#==================================================================
 ###Find and replace widget
-#================================================================== ============================
-
+#==================================================================
 class SearchWidget(QMainWindow):
     #Defining signals
     endSearching = pyqtSignal()

@@ -15,12 +15,22 @@ from MyPackages import ResultTable, MyTreeView
 #================================================================== ===================
 #Function to update the tree
 def downloadTree(self, force = False):
+    #Do not execute if the worker is working
+    if self.cursorIsWorking:
+        return
+    
+    #Veryfying connection
+    msg = self.verifyConn()
+    if msg == None:
+        return None
+        
     #Instantiating language
     nested = self.i18n.getNested
     lgg = self.lgg
 
-    if self.firstConexionSignal:
+    if not force and self.firstConexionSignal:
         self.firstConexionSignal.disconnect(self.downloadTree)
+    
     #Obtaining reference data   
     if self.actualSession.sessionTreeExists:
         _date = self.actualSession.tree.get("date")
@@ -32,23 +42,62 @@ def downloadTree(self, force = False):
 
     #Only runs once every so often, unless forced
     #Check if the current date is greater than one week after the saved date
-    if (now > last + delta) or (force):
-        self.lbl_status.setText(nested(lgg, "status", "update-tree"))
-        #Downloading the tables
-        databases = pd.read_sql("SHOW DATABASES;", self.conn).iloc[:,0].to_list()
-        #Creating complete object to save locally
-        tree = {}
-        for database in databases:
-            table = pd.read_sql(f"SHOW TABLES IN {database};", self.conn).iloc[:,0].to_list()
-            tree[database] = table
-        localTree = {}
-        localTree["date"] = now.strftime('%Y-%m-%d')
-        localTree["tree"] = tree
-        self.actualSession.saveSesionTree(localTree)
+    if (now > last + delta) or force:
+        self.lbl_status.setText(nested(lgg, "status-bar", "update-tree"))
         
-        #Sending the data to the tree
-        self.dataBaseTree.loadData(tree)
-        self.lbl_status.setText(nested(lgg, "status", "updated-tree"))
+        #Creating cursor for queries
+        cursor = self.conn.cursor()
+        #Downloading the databases
+        try:
+            cursor.execute("SHOW DATABASES;")
+            databases = [row[0] for row in cursor.fetchall()]
+        except Exception as e:
+            self.lbl_status.setText(self.nested(self.lgg, "status-bar", "unex-error"))
+            return
+
+        #Creating objects to save locally
+        tree = {}
+        expanded_tree = {}
+
+        #Downloading tables per database
+        for database in databases:
+            try:
+                cursor.execute(f"SHOW TABLES IN {database};")
+                tables = [row[0] for row in cursor.fetchall()]
+            except Exception as e:
+                tables = []
+            tree[database] = tables
+
+        #Downloading statistics by table
+        for database, tables in tree.items():
+            if not tables:
+                continue
+            for table in tables:
+                try:
+                    #cursor.execute(f"SHOW TABLE STATS {database}.{table}")
+                    #result = cursor.fetchall()
+                    result = None
+                    if result:
+                        rows = result[0][1]  #Rows
+                        size = result[0][2]  #Size
+                    else:
+                        rows, size = None, None
+                except Exception as e:
+                    rows, size = None, None
+                finally:
+                    if database not in expanded_tree:
+                        expanded_tree[database] = {}
+                    expanded_tree[database][table] = [rows, size]
+
+        #Save the tree locally
+        localTree = {
+            "date": now.strftime('%Y-%m-%d'),
+            "tree": expanded_tree,
+        }
+        self.actualSession.saveSessionTree(localTree)
+        #Send the data to the visual tree
+        self.dataBaseTree.loadData(localTree)
+        self.lbl_status.setText(nested(lgg, "status-bar", "updated-tree"))
 
 #Function that creates a new tab in the window
 def ecosystemTab(self):
@@ -87,7 +136,7 @@ def ecosystemTab(self):
     groupBoxTree.setLayout(treeLayout)
     #Loading data stored in the system
     if self.actualSession.sessionTreeExists:
-        _tree = self.actualSession.tree.get("tree")
+        _tree = self.actualSession.tree
         #Sending the data to the tree
         self.dataBaseTree.loadData(_tree)
     
@@ -149,9 +198,5 @@ def ecosystemTab(self):
 
     #Changing mouse pointer to default state
     self.app.restoreOverrideCursor()
-
-
-
-
         
 

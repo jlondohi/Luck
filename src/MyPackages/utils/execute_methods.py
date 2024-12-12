@@ -149,7 +149,8 @@ def runQueries(self, queries, cls="console"):
     list_ = []
     set_revisar = set(re.findall(r'\{([^{}]*)\}', queries))
     for key in set_revisar:
-        if not text_params[f"{{{key}}}"]:
+        value = text_params.get(f"{{{key}}}", None)
+        if value is None:
             list_ += [f"{{{key}}}"]
     if len(list_) > 0:
         #Handling message
@@ -306,7 +307,7 @@ def identifyTable(self):
 ##Find the inputs to run query between ";"
 def runShortTask(self):
     #Saving session
-    self.actualSession.saveSesion(self.tab_info)
+    self.actualSession.saveSession(self.tab_info)
     #Verifying connection
     if not self.cursorIsWorking:
         msg = self.verifyConn()
@@ -326,7 +327,7 @@ def runLongTask(self):
         return None
 
     #Save session
-    self.actualSession.saveSesion(self.tab_info)
+    self.actualSession.saveSession(self.tab_info)
 
     if not self.cursorIsWorking:
         #Verifying connection
@@ -448,11 +449,11 @@ def processHistory(self, queries, params):
     #Creating the new row
     new_row = {_type: [cls], _time: [now], _query:[str(queries)], _param:[str(params)]}
     new_row = pd.DataFrame(new_row)
-    #Adding to existing dataframe
-    historial  = pd.concat([new_row, prev], ignore_index = True ).reset_index(drop=True)
+    #Adding to existing dataframe. Maintain maximum 100 rows
+    historial  = pd.concat([new_row, prev.iloc[0:99,:]], ignore_index = True ).reset_index(drop=True)
     self.actualSession.history  = historial
     #Watching
-    self.actualSession.saveSesionHistory()
+    self.actualSession.saveSessionHistory()
     #Showing
     self.hitoricResult.loadData(historial)
 

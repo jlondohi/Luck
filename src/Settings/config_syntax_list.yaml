@@ -25,6 +25,7 @@ command_format:
 - EXPLAIN
 - FLOAT
 - FOREIGN
+- FORMATTED
 - FROM
 - FULL
 - GRANT

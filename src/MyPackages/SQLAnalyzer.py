@@ -1,4 +1,5 @@
-import sqlfluff
+#import sqlfluff
+sqlfluff = None
 from PyQt6.QtCore import QThread, pyqtSignal
 
 #=============================================================

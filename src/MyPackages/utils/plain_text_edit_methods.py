@@ -338,11 +338,21 @@ def paramDefiner(self):
         cursor_position = tab_data['text_params'].textCursor().position()
         if cursor_position >= 0:
             #Find updated parameters in the PARAMETERS text
-            regex = r"'{([^{}']*)}': ('[^']*'|\"[^\"]*\"|\d+),"
+            regex = r"'{([^{}']*)}': ('[^']*'|\"[^\"]*\"|\d+\.\d+|\d+),"
             coincidencias = re.findall(regex, tab_data['text_params'].toPlainText() + ",")
             #Update the dict_paramsEtl dictionary of the tab
             for clave, valor in coincidencias:
-                tab_data['dict_paramsEtl']["{" + "{}".format(clave) + "}"] = eval(valor)
+                #Check if the value is wrapped in quotes
+                if valor.startswith(("'", "\"")) and valor.endswith(("'", "\"")):
+                    #Treat it as a string, so we remove the quotes
+                    valor = valor.strip("'\"")
+                elif re.match(r"^\d+\.\d+$", valor):  #Float
+                    valor = float(valor)
+                elif valor.isdigit():  #Integer
+                    valor = int(valor)
+                
+                #Update the dictionary with the correct type
+                tab_data['dict_paramsEtl']["{" + "{}".format(clave) + "}"] = valor
 
 #Defining function that updates display in text_parm
 def updateTextParm(self, tab_name):

@@ -282,7 +282,7 @@ class Worker(QObject):
                 f"\n  [{self._type.upper()}]: {_type}\n  [{self._status.upper()}]: {tuple[4]}"
         if tuple[4] == self._failed:
             log_entry = log_entry + f"\n  [{self._error.upper()}]:\n{error}"
-        log_entry = log_entry + f"\n  [{self._msgT.upper()}]: {tuple[5]}"
+        log_entry = log_entry + f"\n  [{self._msgT.upper()}]: {tuple[6]}"
         
         #Sending Message
         self.recInLog.emit(log_entry)

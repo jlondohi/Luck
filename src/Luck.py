@@ -7,8 +7,8 @@
 # Version: Beta. Do not share or distribute.
 #================================================================== 
 
-import sys, ctypes
-
+import sys, os, ctypes
+from datetime import datetime
 #Importing own PyQt6 packages
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt
@@ -25,6 +25,18 @@ try:
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 except Exception as exc:
     print("Error: {0}".format(exc))
+
+#Redirecting terminal
+log_file = "Luck-Debug.log"
+if os.path.exists(log_file):
+    with open(log_file, "r") as file:
+        lineas = file.readlines()
+        if len(lineas) > 1000:
+            #If it has more than 1000 lines, we delete the file
+            os.remove(log_file)
+log_file = open(log_file, "w")
+sys.stdout = log_file
+print(f"Luck Started {datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")}")
 
 #============================
 #Start the application window
