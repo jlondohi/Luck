@@ -94,6 +94,7 @@ pyinstaller --onedir --optimize=2 --windowed --noupx --strip --icon="%ICON_PATH%
 --hidden-import=Crypto.Cipher ^
 --hidden-import=Crypto.Cipher.AES ^
 --hidden-import=Crypto.Util.Padding ^
+--hidden-import=Crypto.Util.Padding.pad ^
 --hidden-import=Crypto.Util.Padding.unpad ^
 --hidden-import=datetime ^
 --hidden-import=datetime.timedelta ^

