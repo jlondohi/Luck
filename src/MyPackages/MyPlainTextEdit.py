@@ -1,31 +1,32 @@
 from PyQt6.QtWidgets import QApplication, QTextEdit \
     , QPlainTextEdit, QCompleter
 from PyQt6.QtGui import QTextCursor, QColor \
-    , QFont, QPainter, QTextFormat, QPalette, QPen \
-    , QTextOption
+    , QFont, QPainter, QTextFormat, QPalette, QPen
 from PyQt6.QtCore import Qt, pyqtSignal, QRect \
-    , QRect, QStringListModel, QTimer, QPoint
+    , QRect, QStringListModel, QTimer
 from MyPackages import LineNumberArea
+
+#Importing SyntaxHighlighter as Class
+from MyPackages.MySyntaxHighlighter import MySyntaxHighlighter
 
 #==================================================
 ### Creating a custom QPlainTextEdit class
 #==================================================
 class MyPlainTextEdit(QPlainTextEdit):
-    #Signs
+    #Personalized signals
     sizeChanged = pyqtSignal(QFont)
     focusIn = pyqtSignal()
     focusOut = pyqtSignal()
-    #Slots
-    widgetType = "" # "Editor" u other
+    #Personalized slots
+    widgetType = "" # "Editor", "Param" or other
 
     multiCursor_list = []
     multiCursorEnabled = False
-    Searched_word = None
+    searched_word = None
 
-    def __init__(self, cfg_session, cfg_app, autoComplete_list):
+    def __init__(self, cfg_session, cfg_app, syntax_list, autoComplete_list):
         super().__init__()
         self.app = QApplication.instance()
-
         #Area for line numbering
         self.lineNumberArea = LineNumberArea(self)
         self.setViewportMargins(self.lineNumberAreaWidth(), 0, 0, 0)
@@ -56,7 +57,14 @@ class MyPlainTextEdit(QPlainTextEdit):
         self.blinkState = True
         #Definitions for syntax
         self.context_list = []
-        
+        #Adding SQL syntax highlighting.
+        # PENDING: It don't need the same highlighter for Params
+        # if self.widgetType == "Editor":
+        self.highlighter = MySyntaxHighlighter(  self.document(), cfg_session, cfg_app, syntax_list )
+        #Establish tabulation width to about 4 spaces
+        tab_width = self.fontMetrics().horizontalAdvance('\t') / 2
+        self.setTabStopDistance(tab_width)
+
     #Function to update the general theme presentation
     def updateSettings(self, cfg_session, cfg_app):
         self.cfg_session = cfg_session
@@ -113,7 +121,6 @@ class MyPlainTextEdit(QPlainTextEdit):
             if (self.previousLine != currentLine) or (update):
                 self.previousLine = currentLine
                 #Determining selection
-
                 extraSelections = []
                 selection = QTextEdit.ExtraSelection()
                 selection.format.setBackground(self.lineColor)
@@ -208,7 +215,7 @@ class MyPlainTextEdit(QPlainTextEdit):
             cursor = self.cursorForPosition(event.pos())
             self.setTextCursor(cursor)
         super().mousePressEvent(event)
-
+    
     #Defining event for when special keys are pressed
     def keyPressEvent(self, event):
         key = event.key()
@@ -247,7 +254,7 @@ class MyPlainTextEdit(QPlainTextEdit):
                 return
         
         #If multicursor is active
-        #-----------------------------
+        #------------------------
         if self.multiCursorEnabled:
             self.startMultiCursor()
 
@@ -359,7 +366,7 @@ class MyPlainTextEdit(QPlainTextEdit):
                     cursor.movePosition(QTextCursor.MoveOperation.Left, QTextCursor.MoveMode.KeepAnchor)
                     self.multiCursor_list[i] = cursor
                 return
-            #Shift + Tab (Desidentar)
+            #Shift + Tab (Desidentify)
             elif key == Qt.Key.Key_Backtab:
                 for cursor in self.multiCursor_list:
                     self.unindentLine(cursor)
@@ -370,7 +377,7 @@ class MyPlainTextEdit(QPlainTextEdit):
             #Tab (identify)
             elif key == Qt.Key.Key_Tab:
                 for cursor in self.multiCursor_list:
-                    cursor.insertText(" " * 4)
+                    cursor.insertText("\t")
                 return        
             #Right
             elif key == Qt.Key.Key_Right:
@@ -500,7 +507,8 @@ class MyPlainTextEdit(QPlainTextEdit):
                 if cursor.hasSelection():
                     self.indentSelection()
                 else:
-                    cursor.insertText(" " * 4)
+                    # cursor.insertText(" " * 4)
+                    cursor.insertText("\t")
                 return
             #Inserting automatic opening and closing characters
             elif char in char_map:
@@ -561,7 +569,7 @@ class MyPlainTextEdit(QPlainTextEdit):
         #Moving through each block
         for _ in range(start_block, end_block + 1):
             cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
-            cursor.insertText(" " * 4)
+            cursor.insertText("\t")
             cursor.movePosition(QTextCursor.MoveOperation.NextBlock)
         cursor.endEditBlock()
   
@@ -575,9 +583,8 @@ class MyPlainTextEdit(QPlainTextEdit):
         #Moving through each block
         for _ in range(start_block, end_block + 1):
             cursor.movePosition(QTextCursor.MoveOperation.StartOfBlock)
-            for _ in range(4):
-                line_text = cursor.block().text()
-                cursor.deleteChar() if line_text.startswith(" ") else None
+            line_text = cursor.block().text()
+            cursor.deleteChar() if line_text.startswith("\t") else None
             cursor.movePosition(QTextCursor.MoveOperation.NextBlock)
         cursor.endEditBlock()
 
@@ -590,12 +597,11 @@ class MyPlainTextEdit(QPlainTextEdit):
         line_text = cursor.block().text()
         cursor.beginEditBlock()
         count = 0
-        if line_text.startswith(" "):
-            for _ in range(4):
-                line_text = cursor.block().text()
-                if line_text.startswith(" "):
-                    cursor.deleteChar()
-                    count += 1
+        if line_text.startswith("\t"):
+            line_text = cursor.block().text()
+            if line_text.startswith("\t"):
+                cursor.deleteChar()
+                count += 1
         elif line_text.startswith("\t"):
             cursor.deleteChar()
         cursor.endEditBlock()
@@ -732,8 +738,8 @@ class MyPlainTextEdit(QPlainTextEdit):
                     painter.drawLine(rect.topRight(), rect.bottomRight())
         ##Multicursor not active
         else:
-            #Coloring self.Searched_word
-            if hasattr(self, 'Searched_word') and self.Searched_word:
+            #Coloring self.searched_word
+            if hasattr(self, 'searched_word') and self.searched_word:
                 doc = self.document()
                 cursor = QTextCursor(doc)
                 color = QColor(self.theme["other_colors"]["searching"])
@@ -741,7 +747,7 @@ class MyPlainTextEdit(QPlainTextEdit):
                 painter.setBrush(color)
 
                 while not cursor.isNull() and not cursor.atEnd():
-                    cursor = doc.find(self.Searched_word, cursor)
+                    cursor = doc.find(self.searched_word, cursor)
                     if not cursor.isNull():
                         start = cursor.selectionStart()
                         end = cursor.selectionEnd()
@@ -761,7 +767,7 @@ class MyPlainTextEdit(QPlainTextEdit):
                         painter.drawRoundedRect(selection_rect, 2, 2)
         
         #Indifferent to multicursor state
-        ##Drawing the bottom yellow tilde at context_list positions
+        ##PENDING. Drawing the bottom yellow tilde at context_list positions
         painter.setPen(QPen(QColor("yellow"), 1, Qt.PenStyle.SolidLine))  # Yellow color for the tilde
 
         if len(self.context_list) > 0:

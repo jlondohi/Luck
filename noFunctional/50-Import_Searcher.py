@@ -50,6 +50,23 @@ imports = collect_all_imports(directory_path)
 imports_sd = list(set(imports))
 lista_ord = sorted(imports_sd, key=len)
 
-# Imprimir los imports encontrados
+# Creando la lista de imports ocultos
+imports_pkg = []
 for imp in lista_ord:
-    print(imp)
+    #Importando los paquetes espefificos
+    if imp.startswith("import "):
+        val = imp.replace("import ", "").strip()
+    elif imp.startswith("from "):
+        val = imp.replace("from ", "").replace(" import ", ".").strip()      
+    
+    #Debo importar tambien los padres.
+    val2 = []
+    for i in val.split("."):
+        val2.append(i)
+        imports_pkg.append(f"--hidden-import={".".join(val2)} ^")
+
+#Organizando la lista final
+imports_pkg = list(set(imports_pkg))
+print("\n"*4)
+for i in imports_pkg:
+    print(i)

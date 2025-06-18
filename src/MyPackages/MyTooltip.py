@@ -1,8 +1,9 @@
 #Importing PyQt6 packages
 import math
+from functools import partial
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow, QApplication
-from PyQt6.QtGui import QFontMetrics, QIcon, QKeySequence
+from PyQt6.QtGui import QFontMetrics, QIcon
 from PyQt6.QtCore import Qt, pyqtSignal, QTimer
 
 #========================================================
@@ -18,7 +19,6 @@ class MyTooltip(QMainWindow):
 
         #Language
         self.nested = parent.i18n.getNested
-        self.lgg = parent.lgg
 
         uic.loadUi('Guis/Tooltip.ui', self)
         self.setWindowFlags(Qt.WindowType.Tool)
@@ -26,14 +26,14 @@ class MyTooltip(QMainWindow):
         self.setWindowOpacity(1)
         self.initWindow()
         self.bt_copiar.clicked.connect(self.toClipBoard)
-        self.bt_copiar.setToolTip(self.nested(self.lgg, "tooltips", "ttp7"))
+        self.bt_copiar.setToolTip(self.nested("tooltips", "ttp7"))
         self.bt_fijar.clicked.connect(self.toFix)
-        self.bt_fijar.setToolTip(self.nested(self.lgg, "tooltips", "ttp8"))
+        self.bt_fijar.setToolTip(self.nested("tooltips", "ttp8"))
         self.fm_tooltip.mouseMoveEvent = self.mouseMoveEvent_fm
         #Creating a timer to alert you about the error message
         self.showTimer = QTimer()
         self.showTimer.setInterval(5000)
-        self.showTimer.timeout.connect(lambda: self.leaveEvent(None))
+        self.showTimer.timeout.connect(partial(self.leaveEvent, None))
         #Creating a timer to flash and attract attention
         self.blinkTimer = QTimer()
         self.blinkTimer.setInterval(400)

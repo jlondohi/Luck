@@ -1,5 +1,4 @@
 #Importing native packages
-import pandas as pd
 from datetime import datetime, timedelta
 
 #Importing PyQt6 packages
@@ -26,7 +25,6 @@ def downloadTree(self, force = False):
         
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     if not force and self.firstConexionSignal:
         self.firstConexionSignal.disconnect(self.downloadTree)
@@ -38,12 +36,12 @@ def downloadTree(self, force = False):
         _date = "2024-03-13"
     last = datetime.strptime(_date, '%Y-%m-%d').date()
     now = datetime.now().date()
-    delta = timedelta(days = self.cfg_user.index.get("Days until next tree update"))
+    delta = timedelta(days = self.cfg_user.index.get("tree-update-in"))
 
     #Only runs once every so often, unless forced
     #Check if the current date is greater than one week after the saved date
     if (now > last + delta) or force:
-        self.lbl_status.setText(nested(lgg, "status-bar", "update-tree"))
+        self.lbl_status.setText(nested("status-bar", "update-tree"))
         
         #Creating cursor for queries
         cursor = self.conn.cursor()
@@ -52,7 +50,7 @@ def downloadTree(self, force = False):
             cursor.execute("SHOW DATABASES;")
             databases = [row[0] for row in cursor.fetchall()]
         except Exception as e:
-            self.lbl_status.setText(self.nested(self.lgg, "status-bar", "unex-error"))
+            self.lbl_status.setText(self.nested("status-bar", "unex-error"))
             return
 
         #Creating objects to save locally
@@ -97,13 +95,12 @@ def downloadTree(self, force = False):
         self.actualSession.saveSessionTree(localTree)
         #Send the data to the visual tree
         self.dataBaseTree.loadData(localTree)
-        self.lbl_status.setText(nested(lgg, "status-bar", "updated-tree"))
+        self.lbl_status.setText(nested("status-bar", "updated-tree"))
 
 #Function that creates a new tab in the window
 def ecosystemTab(self):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     #Changing mouse pointer to standby state
     self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
@@ -121,12 +118,12 @@ def ecosystemTab(self):
     
     #Tree Widget
     #-----------
-    groupBoxTree = QGroupBox(nested(lgg, "tab-eco", "db"))
+    groupBoxTree = QGroupBox(nested("tab-eco", "db"))
     treeLayout = QVBoxLayout()
     treeLayout.setContentsMargins(0, 0, 0, 0)
     #Search
     self.treeSearchBar = QLineEdit()
-    self.treeSearchBar.setPlaceholderText(nested(lgg, "tab-eco", "searh-table"))
+    self.treeSearchBar.setPlaceholderText(nested("tab-eco", "searh-table"))
     treeLayout.addWidget(self.treeSearchBar)
     #Tree
     self.dataBaseTree = MyTreeView(self)
@@ -142,7 +139,7 @@ def ecosystemTab(self):
     
     #Results tab widget
     #--------------------------
-    groupBoxResult = QGroupBox(nested(lgg, "tab-eco", "table-strctr"))
+    groupBoxResult = QGroupBox(nested("tab-eco", "table-strctr"))
     resultLayout = QVBoxLayout()
     resultLayout.setContentsMargins(0, 0, 0, 0)
     #Title
@@ -155,13 +152,14 @@ def ecosystemTab(self):
     self.dbtResult.setStyleSheet( self.dict_styledSheets["result_styler"] )
     self.dbtResult.setFont( QFont(font["result-font"], font["result-size"]) )
     self.dbtResult.sizeChanged.connect(lambda font: self.applyFontSize(font, "result"))
+    
     self.dataBaseTree.describeReady.connect(self.dbtResult.loadData)
     resultLayout.addWidget(self.dbtResult)
     groupBoxResult.setLayout(resultLayout)
 
     #History Table Widget
     #-------------------------
-    groupBoxHistory = QGroupBox(nested(lgg, "tab-eco", "history", "header"))
+    groupBoxHistory = QGroupBox(nested("tab-eco", "history", "header"))
     historyLayout = QVBoxLayout()
     historyLayout.setContentsMargins(0, 0, 0, 0)
     self.hitoricResult = ResultTable(self)
@@ -189,10 +187,10 @@ def ecosystemTab(self):
     layoutTab.addWidget(splitter_h)
             
     #Adding and activating the new tab
-    self.tabWidget.addTab(tab_new, nested(lgg, "tab-eco", "eco"))
+    self.tabWidget.addTab(tab_new, nested("tab-eco", "eco"))
     self.tabWidget.setCurrentIndex(0)
     
-    #Setting splitter sizes
+    #PENDING. Setting splitter sizes
     # geo = self.cfg_session.index.get('splitter_geo')
     # splitter_h.setSizes([int(self.screen_width*geo[0]), int(self.screen_width*geo[1])])
 

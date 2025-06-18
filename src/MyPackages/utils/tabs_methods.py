@@ -1,6 +1,5 @@
 import os
 #Importing PyQt6 packages
-
 from PyQt6.QtWidgets import QMessageBox
 #=============================================
 #Creating functions related to tabs in general
@@ -11,7 +10,7 @@ def closeTab(self, tab_index):
     #The tab is not closable if it is "Log" or "Ecosystem"
     tab_text = self.tabWidget.tabText(tab_index)
     if ( tab_text.startswith("Log") or
-        tab_text == self.i18n.getNested(self.lgg, "tab-eco", "eco") ):
+        tab_text == self.i18n.getNested("tab-eco", "eco") ):
         return None
 
     #Check for unsaved changes
@@ -55,15 +54,6 @@ def removeTabWidgets(self, tab_name):
         self.list_Qtexts.remove(tab_data['text_editor'])
         self.list_Qtexts.remove(tab_data['text_params'])
         self.list_QTable.remove(tab_data['result'])
-        #Remove associated syntax highlighters
-        syntax_highlighter_etl = self.syntax_highlighter_dict.pop(
-                tab_data['text_editor'], None)
-        if syntax_highlighter_etl:
-            del syntax_highlighter_etl
-        syntax_highlighter_param = self.syntax_highlighter_dict.pop(
-                tab_data['text_params'], None)
-        if syntax_highlighter_param:
-            del syntax_highlighter_param
 
 #Function to remove Qtexts from the list
 def removeWidgetsText(self, tab_name):
@@ -75,7 +65,7 @@ def removeWidgetsText(self, tab_name):
         self.list_QTable.remove(tab_data['result'])
 
 #Function to determine unsaved changes        
-def unsavedChanges(self, tab_name):       
+def unsavedChanges(self, tab_name):
     tab_data = self.tab_info.get(tab_name)
     #If the Script is completely blank, it is allowed to continue
     if tab_data['text_editor'].toPlainText().strip() in ["", " "]:
@@ -106,13 +96,12 @@ def unsavedChanges(self, tab_name):
 def showDialogSavingChanges(self): 
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     dialogo = QMessageBox()
     dialogo.setWindowIcon(self.icon)
     dialogo.setIcon(QMessageBox.Icon.Question)
-    dialogo.setWindowTitle(nested(lgg, "save-files", "saveE1"))
-    dialogo.setText(nested(lgg, "save-files", "saveE2"))
+    dialogo.setWindowTitle(nested("save-files", "saveE1"))
+    dialogo.setText(nested("save-files", "saveE2"))
     dialogo.setStandardButtons(QMessageBox.StandardButton.Save 
                                | QMessageBox.StandardButton.Discard 
                                | QMessageBox.StandardButton.Cancel)

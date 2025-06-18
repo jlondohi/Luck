@@ -1,6 +1,6 @@
 #import sqlfluff
 sqlfluff = None
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QThread
 
 #=============================================================
 ### Creating a connection manager (Execution in second thread)

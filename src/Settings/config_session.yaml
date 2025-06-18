@@ -7,10 +7,10 @@ prede_font:
     result-size: 9
 worldWrap: false
 prede_geo:
-- 0.0632
-- 0.0889
-- 0.8799
-- 0.8
+- 0.10
+- 0.10
+- 0.60
+- 0.80
 result_geo:
 - 70
 - 70
@@ -19,11 +19,12 @@ result_geo:
 - 70
 - 70
 splitter_geo:
-- 0.7
-- 0.3
-- 0.8
-- 0.2
+- 0.55
+- 0.45
+- 0.80
+- 0.20
 splitter_geo_eco:
 - 0.33
 - 0.33
-prede_dsn: Excel Files
+prede_dsn: IMPALA_PROD
+path: null

@@ -10,9 +10,8 @@ from .SessionHandler import SessionHandler
 from .Worker import Worker
 from .ConnectionManager import ConnectionManager
 from .SQLAnalyzer import SQLAnalyzer
-
 from .MyPlainTextEdit import MyPlainTextEdit
 from .MyTooltip import MyTooltip
 from .MyTitleBar import MyTitleBar
-from .MySyntaxHighlighter import MySyntaxHighlighter
 from .MyTreeView import MyTreeView
+from .Updater import Updater

@@ -1,6 +1,8 @@
+import ctypes
+from functools import partial
 from PyQt6.QtWidgets import QFrame, QHBoxLayout \
     , QPushButton, QSpacerItem, QSizePolicy, QLabel
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, QEvent
 from PyQt6.QtGui import QGuiApplication, QIcon \
     , QPixmap
 
@@ -44,20 +46,34 @@ class MyTitleBar(QFrame):
     def __init__(self, parent=None, menus=True):
         super().__init__(parent)
         self.parent = parent
+        self.parentWindow = self.window()
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setMouseTracking(True)
         self.setFixedHeight(30)
-        
         self.creatingBottons(menus)
         self.drag_position = None
         self.gui = QGuiApplication.instance()
-        self.parentWindow = self.parent.parentWindow
-
+        #Restoring windows (default)
+        self.updateMaximizeRestoreButtons()   
+        
     #Function to capture the mouse click
     def mousePressEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
             self.drag_position = event.globalPosition().toPoint() - self.parent.frameGeometry().topLeft()
             event.accept()
+        elif event.button() == Qt.MouseButton.RightButton:
+            # Mostrar el menú del sistema de Windows
+            self.showSystemMenu(event.globalPosition().toPoint())
+            event.accept()
+        else:
+            super().mousePressEvent(event)
+    
+    def showSystemMenu(self, pos):
+        #It only works in Windows
+        if hasattr(ctypes, "windll"):
+            hwnd = int(self.parent.winId())
+            # 0x313 is the command to show the system menu
+            ctypes.windll.user32.PostMessageW(hwnd, 0x313, 0, (pos.y() << 16) | pos.x())
 
     #Function to capture the double mouse click
     def mouseDoubleClickEvent(self, event):
@@ -82,27 +98,55 @@ class MyTitleBar(QFrame):
                 self.parent.move(event.globalPosition().toPoint() - self.drag_position)
                 event.accept()
 
+    #Function to handle the bar buttons
+    def updateMaximizeRestoreButtons(self, *args):
+        if self.parentWindow.isMaximized():
+            self.bt_normalize.show()
+            self.bt_maximize.hide()
+        else:
+            self.bt_normalize.hide()
+            self.bt_maximize.show()     
+    
     #Function that minimizes the window
     def minimizeWindow(self):
         self.parent.showMinimized()
     
     #Function to restore the window (from maximized to normal size)
     def restoreWindow(self):
-        if not self.parentWindow.isMaximized():
-            return
         self.parentWindow.showNormal()
-        #Updating title bar buttons
-
-        self.bt_normalize.hide()
-        self.bt_maximize.show()
+        self.updateMaximizeRestoreButtons()
     
-    #Function that maximazes the window
+    # #Function that maximazes the window   
     def maximizeWindow(self):
-        if self.parentWindow.isMaximized():
-            return
         self.parentWindow.showMaximized()
-        self.bt_normalize.show()
-        self.bt_maximize.hide()
+        self.updateMaximizeRestoreButtons()
+    
+    #PENDING - It is sought that the bar behaves like the native
+    def event(self, event):
+        # Esto permite que Windows reconozca la barra como la barra de título
+        if event.type() == QEvent.Type.NativeGesture:
+            return super().event(event)
+        if event.type() == QEvent.Type.MouseButtonDblClick:
+            return super().event(event)
+        if event.type() == QEvent.Type.MouseButtonPress:
+            return super().event(event)
+        if event.type() == QEvent.Type.MouseMove:
+            return super().event(event)
+        if event.type() == QEvent.Type.HoverMove:
+            return super().event(event)
+        return super().event(event)
+
+    #PENDING - It is sought that the bar behaves like the native
+    def nativeEvent(self, eventType, message):
+        # Solo funciona en Windows
+        if eventType == "windows_generic_MSG":
+            from ctypes import windll, byref, c_long
+            msg = message.__int__()
+            # 0x84 = WM_NCHITTEST
+            if msg.message == 0x84:
+                # 0x2 = HTCAPTION
+                return True, 0x2
+        return False, 0    
     
     #Function to create taskbar menus and buttons
     def creatingBottons(self, menus):
@@ -125,24 +169,23 @@ class MyTitleBar(QFrame):
         #----------------
         #Instantiating language
         nested = self.parent.i18n.getNested
-        lgg = self.parent.lgg
 
-        self.bt_file = TitleMenuButton(nested(lgg, "header", "file"))
+        self.bt_file = TitleMenuButton(nested("header", "file"))
         self.layout.addWidget(self.bt_file)
         
         if menus:
-            self.bt_edit = TitleMenuButton(nested(lgg, "header", "edit"))
+            self.bt_edit = TitleMenuButton(nested("header", "edit"))
             self.layout.addWidget(self.bt_edit)
-            self.bt_select = TitleMenuButton(nested(lgg, "header", "select"))
+            self.bt_select = TitleMenuButton(nested("header", "select"))
             self.layout.addWidget(self.bt_select)
-            self.bt_view = TitleMenuButton(nested(lgg, "header", "view"))
+            self.bt_view = TitleMenuButton(nested("header", "view"))
             self.layout.addWidget(self.bt_view)
-            self.bt_sql = TitleMenuButton(nested(lgg, "header", "sql"))
+            self.bt_sql = TitleMenuButton(nested("header", "sql"))
             self.layout.addWidget(self.bt_sql)
-            self.bt_ai = TitleMenuButton(nested(lgg, "header", "ai"))
+            self.bt_ai = TitleMenuButton(nested("header", "ai"))
             self.bt_ai.setEnabled(False) #At some point, It'll be true.
             self.layout.addWidget(self.bt_ai)
-            self.bt_help = TitleMenuButton(nested(lgg, "header", "help"))
+            self.bt_help = TitleMenuButton(nested("header", "help"))
             self.layout.addWidget(self.bt_help)
         
         self.layout.addSpacerItem(spacer1)
@@ -157,13 +200,13 @@ class MyTitleBar(QFrame):
             
             self.layout.addWidget(Bar())
             self.bt_light = TitleWindowButton("", "Guis/Resources/light.png")
-            self.bt_light.setToolTip(nested(lgg, "tooltips", "ttp1"))
+            self.bt_light.setToolTip(nested("tooltips", "ttp1"))
             self.bt_light.setShortcut("F12")
             self.bt_light.clicked.connect(self.parent.lightenFrame)
             self.layout.addWidget(self.bt_light)
             
             self.bt_dark = TitleWindowButton("", "Guis/Resources/dark.png")
-            self.bt_dark.setToolTip(nested(lgg, "tooltips", "ttp2"))
+            self.bt_dark.setToolTip(nested("tooltips", "ttp2"))
             self.bt_dark.setShortcut("F12")
             self.bt_dark.hide()
             self.bt_dark.clicked.connect(self.parent.darkenFrame)
@@ -171,14 +214,14 @@ class MyTitleBar(QFrame):
             
             self.layout.addWidget(Bar())
             self.bt_panelize = TitleWindowButton("", "Guis/Resources/panelize.png")
-            self.bt_panelize.setToolTip(nested(lgg, "tooltips", "ttp3"))
+            self.bt_panelize.setToolTip(nested("tooltips", "ttp3"))
             self.bt_panelize.setShortcut("F11")
             self.bt_panelize.clicked.connect(self.parent.panelizeFrame)
             self.layout.addWidget(self.bt_panelize)
             self.bt_panelize.hide()
             
             self.bt_expand = TitleWindowButton("", "Guis/Resources/expand.png")
-            self.bt_expand.setToolTip(nested(lgg, "tooltips", "ttp4"))
+            self.bt_expand.setToolTip(nested("tooltips", "ttp4"))
             self.bt_expand.clicked.connect(self.parent.expandFrame)
             self.layout.addWidget(self.bt_expand)
         
@@ -197,7 +240,8 @@ class MyTitleBar(QFrame):
         self.layout.addWidget(self.bt_maximize)
         
         self.bt_close = TitleWindowButton("", "Guis/Resources/close.png")
-        self.bt_close.clicked.connect(lambda: self.parent.close())
+        self.bt_close.clicked.connect(partial(self.parent.close))
+        
         self.bt_close.setObjectName("bt_close")
         self.layout.addWidget(self.bt_close)
 

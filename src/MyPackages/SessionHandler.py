@@ -1,11 +1,12 @@
-import os, pickle
+import os, pickle, tempfile
 
 #==================================================================
 ### Creating a session handler to load and save system configuration
 #==================================================================
 class SessionHandler:
     def __init__(self, parent):
-        self.path = parent.cfg_user.index['ruta_temp_session']
+        self.path = parent.cfg_session.index.get('path')
+        self.path = os.path.join(tempfile.gettempdir(), 'Luck', 'session') if self.path is None else self.path
         self.user = parent.user
         self.version = parent.version.index.get("version")
         self.session = None
@@ -28,6 +29,12 @@ class SessionHandler:
         if self.sessionHistoryExists:
             self.history = self.loadSessionHistory()
         
+        #Language
+        nested = parent.i18n.getNested
+        #MSGs
+        self._errorS = nested("log-messages", "error-save")
+        self._errorL = nested("log-messages", "error-load")
+        
     #Function to load the session
     def loadSession(self):
         try:
@@ -49,6 +56,7 @@ class SessionHandler:
         try:
             tree = pickle.load(open(self.sessionTreePath, "rb"))
         except Exception as exc:
+            print(f"{self._errorL}: {exc}")
             self.sessionTreeExists = False
             return None
         else:
@@ -59,6 +67,7 @@ class SessionHandler:
         try:
             history = pickle.load(open(self.sessionHistoryPath, "rb"))
         except Exception as exc:
+            print(f"{self._errorL}: {exc}")
             self.sessionHistoryExists = False
             return None
         else:
@@ -84,6 +93,7 @@ class SessionHandler:
         try:
             pickle.dump(session, open(self.sessionPath, "wb"))
         except Exception as exc:
+            print(f"{self._errorS}: {exc}")
             self.sessionExists = False
         else:
             self.sessionExists = True
@@ -93,6 +103,7 @@ class SessionHandler:
         try:
             pickle.dump(object, open(self.sessionTreePath, "wb"))
         except Exception as exc:
+            print(f"{self._errorS}: {exc}")
             self.sessionTreeExists = False
         else:
             self.sessionTreeExists = True
@@ -105,13 +116,15 @@ class SessionHandler:
             else:
                 pickle.dump(object, open(self.sessionHistoryPath, "wb"))
         except Exception as exc:
+            print(f"{self._errorS}: {exc}")
             self.sessionHistoryExists = False
         else:
             self.sessionHistoryExists = True
     
-    #Function to verify version
+    #Function to verify version compatibility
     def checkVersion(self, version):
-
+        if version is None:
+            return False
         majorS, minorS, _ = map(int, version.split('.'))
         majorA, minorA, _ = map(int, self.version.split('.'))
         versionS = majorS*100 + minorS
@@ -122,9 +135,9 @@ class SessionHandler:
         #Old apps versions are not compatible with new sessions
         elif versionA < versionS:
             return False
-        #New apss versions are comptaible with some old sessions
+        #Apss versions are comptaible with some old sessions
         elif versionA > versionS:
-            if versionS >= 62:
+            if versionS >= 63:
                 return True
             else:
                 return False

@@ -1,17 +1,17 @@
-import re, time
-import pandas as pd
+import re
+import polars as pl
 from datetime import datetime
 from MyPackages import JulHelper
 from PyQt6.QtCore import pyqtSignal, QObject
-
+from MyPackages.utils import polars_methods as pm
 #==============================================================================
 ### Creating Worker (Execution in second thread)
 #==============================================================================
 #Creating the Worker class
 class Worker(QObject):
     #Creating worker signals
-    status = pyqtSignal(pd.DataFrame, object)
-    finished = pyqtSignal(pd.DataFrame, object)
+    status = pyqtSignal(pl.DataFrame, object)
+    finished = pyqtSignal(pl.DataFrame, object)
     recInLog = pyqtSignal(object)
     inProcess = pyqtSignal(str, dict)
     _stop = False
@@ -28,46 +28,46 @@ class Worker(QObject):
 
         #Language
         self.nested = parent.i18n.getNested
-        self.lgg = parent.lgg
         #Headers
-        self._status = self.nested(self.lgg, "execution", "header", "status")
-        self._query = self.nested(self.lgg, "execution", "header", "query")
-        self._shape = self.nested(self.lgg, "execution", "header", "shape")
-        self._time = self.nested(self.lgg, "execution", "header", "time")
-        self._resources = self.nested(self.lgg, "execution", "header", "resources")
-        self._error = self.nested(self.lgg, "execution", "header", "error")
+        self._status = self.nested("execution", "header", "status")
+        self._query = self.nested("execution", "header", "query")
+        self._shape = self.nested("execution", "header", "shape")
+        self._time = self.nested("execution", "header", "time")
+        self._resources = self.nested("execution", "header", "resources")
+        self._error = self.nested("execution", "header", "error")
         #States
-        self._running = self.nested(self.lgg, "execution", "status", "running")
-        self._executed = self.nested(self.lgg, "execution", "status", "executed")
-        self._failed = self.nested(self.lgg, "execution", "status", "failed")
+        self._running = self.nested("execution", "status", "running")
+        self._executed = self.nested("execution", "status", "executed")
+        self._failed = self.nested("execution", "status", "failed")
         #Msgs
-        self._msg0 = self.nested(self.lgg, "execution", "msgs", "msg0")
-        self._msg1 = self.nested(self.lgg, "execution", "msgs", "msg1")
-        self._msg2 = self.nested(self.lgg, "execution", "msgs", "msg2")
-        self._msg3 = self.nested(self.lgg, "execution", "msgs", "msg3")
-        self._msg4 = self.nested(self.lgg, "execution", "msgs", "msg4")
-        self._msg5 = self.nested(self.lgg, "execution", "msgs", "msg5")
+        self._msg0 = self.nested("execution", "msgs", "msg0")
+        self._msg1 = self.nested("execution", "msgs", "msg1")
+        self._msg2 = self.nested("execution", "msgs", "msg2")
+        self._msg3 = self.nested("execution", "msgs", "msg3")
+        self._msg4 = self.nested("execution", "msgs", "msg4")
+        self._msg5 = self.nested("execution", "msgs", "msg5")
         #Type
-        self._msgI = self.nested(self.lgg, "execution", "msgs", "msgI")
-        self._msgBE = self.nested(self.lgg, "execution", "msgs", "msgBE")
-        self._msgF = self.nested(self.lgg, "execution", "msgs", "msgF")
-        self._msgT = self.nested(self.lgg, "execution", "msgs", "msgT")
+        self._msgI = self.nested("execution", "msgs", "msgI")
+        self._msgBE = self.nested("execution", "msgs", "msgBE")
+        self._msgF = self.nested("execution", "msgs", "msgF")
+        self._msgT = self.nested("execution", "msgs", "msgT")
         #Others
-        self._type = self.nested(self.lgg, "tab-eco", "history", "type")
-        self._queryFile = self.nested(self.lgg, "sql", "query-file")
+        self._type = self.nested("tab-eco", "history", "type")
+        self._queryFile = self.nested("sql", "query-file")
 
     #Long-term ans short-term tasks will be executed here.
     def run(self):
         #Creating the base that will emit the status in different stages
         #Note: This table is larger than what might be shown. Some things still need to be developed
-        data_status = pd.DataFrame({
-                        self._status: pd.Series(dtype=str),
-                        self._query: pd.Series(dtype=str),
-                        self._shape: pd.Series(dtype=str),
-                        self._time: pd.Series(dtype=str),
-                        self._resources: pd.Series(dtype=str),
-                        self._error: pd.Series(dtype=str)
-                                })
+        new_row = pl.DataFrame({
+            self._status: pl.Series([], dtype=pl.String),
+            self._query: pl.Series([], dtype=pl.String),
+            self._shape: pl.Series([], dtype=pl.String),
+            self._time: pl.Series([], dtype=pl.String),
+            self._resources: pl.Series([], dtype=pl.String),
+            self._error: pl.Series([], dtype=pl.String)
+        })
+        data_status = new_row
         data = None
         #Sending queries to the history table
         self.inProcess.emit(self.queries, self.params)
@@ -76,10 +76,16 @@ class Worker(QObject):
             self.queries = JulHelper.cleanQ(self.queries+";", self.params)
         except Exception as exc:
             #Managing general message
-            data_status.loc[0, self._status] = self._failed
-            data_status.loc[0, self._query] = self._msg1
-            data_status.loc[0, self._time] = "NA"
-            data_status.loc[0, self._error] = str(exc)
+            new_row = pl.DataFrame({
+                self._status: [self._failed],
+                self._query: [self._msg1],
+                self._shape: [""],
+                self._time: ["NA"],
+                self._resources: [""],
+                self._error: [str(exc)]
+            })
+            data_status = new_row
+            #Emitting status
             self.finished.emit(data_status, self.tab_name)
             return None
 
@@ -96,15 +102,21 @@ class Worker(QObject):
             start=datetime.now()
             strNow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             #Stopping process in case of null query
-            if queries_list[0] =='':
+            if queries_list[0] == '':
                 return
             #Executing
             try:
                 #Preparing status base
-                data_status.loc[0, self._status] = self._running
-                data_status.loc[0, self._query] = queries_list[0]
-                data_status.loc[0, self._time] = f"{self._msg2}: "+str(datetime.now().strftime("%H:%M:%S"))
-                data_status.loc[0, self._error] = ""
+                new_row = pl.DataFrame({
+                    self._status: [self._running],
+                    self._query: [queries_list[0]],
+                    self._shape: [""],
+                    self._time: [f"{self._msg2}: "+str(datetime.now().strftime("%H:%M:%S"))],
+                    self._resources: [""],
+                    self._error: [""]
+                })
+                data_status = new_row
+                #Emitting status
                 self.status.emit(data_status, self.tab_name)
                 #Download database
                 if self.cls == "console":
@@ -112,33 +124,50 @@ class Worker(QObject):
                     self.cursor.execute(queries_list[0])
                     description = self.cursor.description
                     if description:
+                        #Fetching data
                         rows = self.cursor.fetchmany(self.fetch)
-                        data = pd.DataFrame.from_records(rows, columns=[desc[0] for desc in description])
-                    else:               
+                        #Creating DataFrame
+                        column_names = [desc[0] for desc in description]
+                        columns = zip(*rows)
+                        _dict = dict(zip(column_names, columns))
+                        data = pl.DataFrame(_dict)
+                    else:
                         #Execution time
                         now = datetime.now()
                         delta = now - start
                         delta = str( int(delta.total_seconds()) )+f" {self._msg0}" 
                         #Handling message
-                        data_status.loc[0, self._status] = self._executed
-                        data_status.loc[0, self._query] = queries_list[0]
-                        data_status.loc[0, self._time] = delta
-                        data_status.loc[0, self._error] = ""
+                        new_row = pl.DataFrame({
+                            self._status: [self._executed],
+                            self._query: [queries_list[0]],
+                            self._shape: [""],
+                            self._time: [delta],
+                            self._resources: [""],
+                            self._error: [""]
+                        })
+                        data_status = new_row
+                        #Emitting status
                         self.finished.emit(data_status, self.tab_name)
                         self.toLog((self.cursor, strNow, queries_list[0], self.cls, self._executed, "", delta))
                         return None
                 elif self.cls=="file":
                     self.cursor = self.conn.cursor()
-                    data = pd.read_sql(queries_list[0], self.conn)
+                    data = pl.read_database(queries_list[0], self.conn)
                     #Execution time
                     now = datetime.now()
                     delta = now - start
                     delta = str( int(delta.total_seconds()) )+f" {self._msg0}"
                     #Handling message
-                    data_status.loc[0, self._status] = self._msg3
-                    data_status.loc[0, self._query] = self._msg4
-                    data_status.loc[0, self._time] = delta  
-                    data_status.loc[0, self._error] = ""
+                    new_row = pl.DataFrame({
+                        self._status: [self._msg3],
+                        self._query: [self._msg4],
+                        self._shape: [""],
+                        self._time: [delta],
+                        self._resources: [""],
+                        self._error: [""]
+                    })
+                    data_status = new_row
+                    #Emitting status
                     self.status.emit(data_status, self.tab_name)
                     #Note: this is the only one that does not have a return   
             except TypeError as exc:
@@ -147,10 +176,16 @@ class Worker(QObject):
                 delta = now - start
                 delta = str( int(delta.total_seconds()) )+f" {self._msg0}"
                 #Handling message
-                data_status.loc[0, self._status] = self._executed
-                data_status.loc[0, self._query] = queries_list[0]
-                data_status.loc[0, self._time] = delta  
-                data_status.loc[0, self._error] = ""
+                new_row = pl.DataFrame({
+                    self._status: [self._executed],
+                    self._query: [queries_list[0]],
+                    self._shape: [""],
+                    self._time: [delta],
+                    self._resources: [""],
+                    self._error: [""]
+                })
+                data_status = new_row
+                #Emitting status
                 self.finished.emit(data_status, self.tab_name)
                 self.toLog((self.cursor, strNow, queries_list[0], self.cls, self._executed, "", delta))
                 return None
@@ -164,14 +199,16 @@ class Worker(QObject):
                     exc = re.search(r'AnalysisException(.*)', str(exc)).group(1).strip()
                     exc = exc[1:][:-27]
                 #Handling message
-                data_status.loc[0, self._status] = self._failed
-                data_status.loc[0, self._query] = queries_list[0]
-                data_status.loc[0, self._time] = delta
-                #Replacing error message in case of stop by the user
-                if self._stop:
-                    data_status.loc[0, self._error] = self._msg5
-                else:
-                    data_status.loc[0, self._error] = str(exc)
+                error_msg = self._msg5 if self._stop else str(exc)
+                new_row = pl.DataFrame({
+                    self._status: [self._failed],
+                    self._query: [queries_list[0]],
+                    self._shape: [""],
+                    self._time: [delta],
+                    self._resources: [""],
+                    self._error: [error_msg]
+                })
+                data_status = new_row
                 self.finished.emit(data_status, self.tab_name)
                 self.toLog((self.cursor, strNow, queries_list[0], self.cls, self._failed, str(exc), delta))
                 return None
@@ -183,17 +220,23 @@ class Worker(QObject):
                 delta = now - start
                 delta = str( int(delta.total_seconds()) )+f" {self._msg0}"
                 #Handling message
-                data_status.loc[0, self._status] = self._executed
-                data_status.loc[0, self._query] = queries_list[0]
-                data_status.loc[0, self._time] = delta
-                data_status.loc[0, self._error] = ""
+                new_row = pl.DataFrame({
+                    self._status: [self._executed],
+                    self._query: [queries_list[0]],
+                    self._shape: [""],
+                    self._time: [delta],
+                    self._resources: [""],
+                    self._error: [""]
+                })
+                data_status = new_row
+                #Emitting status
                 self.status.emit(data_status, self.tab_name)
                 #Emitting completion signal
                 self.finished.emit(data, self.tab_name)
                 self.toLog((self.cursor, strNow, queries_list[0], self.cls, self._executed, "", delta))
                 return None
         #Executing each query
-        elif len(queries_list)>1:
+        elif len(queries_list) > 1:
             #Running queries or queries
             self.cursor = self.conn.cursor()
             count =- 1
@@ -206,10 +249,17 @@ class Worker(QObject):
                 start = datetime.now()
                 strNow = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 #Preparing status base
-                data_status.loc[count, self._status] = self._running
-                data_status.loc[count, self._query] = query
-                data_status.loc[count, self._time] = f"{self._msg2}: "+str(start.strftime("%H:%M:%S"))
-                data_status.loc[count, self._error] = ""
+                data_status = pm.replace_row(
+                    data_status,
+                    count,
+                    {   self._status: self._running,
+                        self._query: query,
+                        self._shape: "",
+                        self._time: f"{self._msg2}: "+str(start.strftime("%H:%M:%S")),
+                        self._resources: "",
+                        self._error: "" }
+                )
+                #Emitting status
                 self.status.emit(data_status, self.tab_name)
                 #Flag to end the process
                 if self._stop:
@@ -218,8 +268,13 @@ class Worker(QObject):
                     delta = now - start
                     delta = str( int(delta.total_seconds()) )+f" {self._msg0}"
                     #Ending message
-                    data_status.loc[count, self._status] = self._failed
-                    data_status.loc[count, self._error] = self._msg5
+                    data_status = pm.replace_row(
+                        data_status,
+                        count,
+                        {   self._status: self._failed,
+                            self._error: self._msg5  }
+                    )
+                    #Emitting status
                     self.finished.emit(data_status, self.tab_name)
                     self.toLog((self.cursor, strNow, query, self._msgBE, self._failed, self._msg5, delta))
                     break
@@ -231,8 +286,12 @@ class Worker(QObject):
                         exc = exc[1:][:-27]
                     #Handling the error
                     msg = self._msg5 if self._stop else str(exc)
-                    data_status.loc[count, self._status] = self._failed
-                    data_status.loc[count, self._error] = msg
+                    data_status = pm.replace_row(
+                        data_status,
+                        count,
+                        {   self._status: self._failed,
+                            self._error: msg  }
+                    )
                     #Execution time
                     now = datetime.now()
                     delta = now - start
@@ -247,12 +306,16 @@ class Worker(QObject):
                     delta = now - start
                     delta = str( int(delta.total_seconds()) )+f" {self._msg0}"
                     #Managing state
-                    data_status.loc[count, self._status] = self._executed
-                    data_status.loc[count, self._time] = delta
+                    data_status = pm.replace_row(
+                        data_status,
+                        count,
+                        {   self._status: self._executed,
+                            self._time: delta  }
+                    )
                     self.toLog((self.cursor, strNow, query, self._msgBE, self._executed, "", delta))
             self.finished.emit(data_status, self.tab_name)
             return
- 
+   
     #Function to terminate the process, whether in block or not.    
     def killProcess(self):
         self._stop = True
@@ -286,4 +349,3 @@ class Worker(QObject):
         
         #Sending Message
         self.recInLog.emit(log_entry)
-

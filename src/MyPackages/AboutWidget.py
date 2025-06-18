@@ -12,7 +12,6 @@ class AboutWidget(QMainWindow):
         version = parent.version
         self.cfg_session = parent.cfg_session
         self.i18n = parent.i18n
-        self.lgg = parent.lgg
         
         self.parentWindow = self.window()
         #Loading GUI

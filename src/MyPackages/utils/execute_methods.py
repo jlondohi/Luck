@@ -1,9 +1,13 @@
 #Importing native packages
 import re, os, sys, time, platform \
     , ctypes, ctypes.wintypes
-#Importing pwd
-pwd = None
-import pandas as pd
+#Trying to import pwd only on Linux
+if sys.platform != "win32":
+    import pwd
+else:
+    pwd = None
+
+import polars as pl
 from datetime import datetime
 #Importing PyQt6 packages
 from PyQt6.QtWidgets import QFileDialog, QMessageBox
@@ -29,8 +33,7 @@ def applySelectedDSN(self):
 def connectingDSN(self):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
-    _sc_db = nested(lgg, "status-bar", "sc-db")
+    _sc_db = nested("status-bar", "sc-db")
     self.dsn = self.cfg_session.index["prede_dsn"]
 
     self.lbl_status.setText(_sc_db.format(self.dsn))
@@ -40,9 +43,9 @@ def connectingDSN(self):
 def connectedDSN(self, conn):
     #Language
     nested = self.i18n.getNested
-    _c_db = nested(self.lgg, "status-bar", "c_db")
-    _nc_db = nested(self.lgg, "status-bar", "nc-db")
-    _dsnC = nested(self.lgg, "log-messages", "dsn-changed")
+    _c_db = nested("status-bar", "c-db")
+    _nc_db = nested("status-bar", "nc-db")
+    _dsnC = nested("log-messages", "dsn-changed")
     self.dsn = self.cfg_session.index["prede_dsn"]
 
     if conn:
@@ -87,8 +90,8 @@ def verifyConn(self):
         msg = QMessageBox()
         msg.setWindowIcon(self.icon)
         msg.setIcon(QMessageBox.Icon.Critical)
-        msg.setWindowTitle(self.i18n.getNested(self.lgg, "execution", "msgs", "msgE"))
-        msg.setText(self.i18n.getNested(self.lgg, "execution", "msgs", "msg6"))
+        msg.setWindowTitle(self.i18n.getNested("execution", "msgs", "msgE"))
+        msg.setText(self.i18n.getNested("execution", "msgs", "msg6"))
         msg.exec()
         return None
 
@@ -97,19 +100,21 @@ def verifyConn(self):
 def runQueries(self, queries, cls="console"):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Headers
-    _status = nested(lgg, "execution", "header", "status")
-    _query = nested(lgg, "execution", "header", "query")
-    _time = nested(lgg, "execution", "header", "time")
-    _error = nested(lgg, "execution", "header", "error")
+    _status = nested("execution", "header", "status")
+    _query = nested("execution", "header", "query")
+    _shape = nested("execution", "header", "shape")
+    _time = nested("execution", "header", "time")
+    _resources = nested("execution", "header", "resources")
+    _error = nested("execution", "header", "error")
+    
     #States
-    _running = nested(lgg, "execution", "status", "running")
-    _executed = nested(lgg, "execution", "status", "executed")
-    _failed = nested(lgg, "execution", "status", "failed")
+    _running = nested("execution", "status", "running")
+    _executed = nested("execution", "status", "executed")
+    _failed = nested("execution", "status", "failed")
     #Msgs
-    _msg7 = nested(lgg, "execution", "msgs", "msg7")
-    _msg8 = nested(lgg, "execution", "msgs", "msg8")
+    _msg7 = nested("execution", "msgs", "msg7")
+    _msg8 = nested("execution", "msgs", "msg8")
 
     #First verifying that it contains at least one text
     if not bool(re.search(r'[a-zA-Z]', queries)):
@@ -119,13 +124,16 @@ def runQueries(self, queries, cls="console"):
     if not self.tabWidget:
         return None
     
-    ##Creating the DataFrame with the specified dtypes
-    data_status = pd.DataFrame({
-                                _status: pd.Series(dtype=str),
-                                _query: pd.Series(dtype=str),
-                                _time: pd.Series(dtype=str),
-                                _error: pd.Series(dtype=str)
-                            })
+    ##Creating the DataFrame with the specified dtypes   
+    new_row = pl.DataFrame({
+        _status: pl.Series([], dtype=pl.String),
+        _query: pl.Series([], dtype=pl.String),
+        _shape: pl.Series([], dtype=pl.String),
+        _time: pl.Series([], dtype=pl.String),
+        _resources: pl.Series([], dtype=pl.String),
+        _error: pl.Series([], dtype=pl.String)
+    })
+    data_status = new_row
     
     #Taking the parameters
     #----------------------
@@ -138,10 +146,16 @@ def runQueries(self, queries, cls="console"):
         text_params = eval( "{"+text_params.toPlainText()+"}" )
     except Exception as exc:
         #Handling message
-        data_status.loc[0, _status] = _failed
-        data_status.loc[0, _query] = _msg7
-        data_status.loc[0, _time] = "NA"
-        data_status.loc[0, _error] = str(exc)
+        new_row = pl.DataFrame({
+            _status: [_failed],
+            _query: [_msg7],
+            _shape: [""],
+            _time: ["NA"],
+            _resources: [""],
+            _error: [str(exc)]
+        })
+        data_status = new_row
+        #Reporting the error
         self.reportData(data_status, tab_name)
         return None
     
@@ -154,10 +168,15 @@ def runQueries(self, queries, cls="console"):
             list_ += [f"{{{key}}}"]
     if len(list_) > 0:
         #Handling message
-        data_status.loc[0, _status] = _failed
-        data_status.loc[0, _query] = _msg7
-        data_status.loc[0, _time] = "NA"
-        data_status.loc[0, _error] = f"{_msg8}: {list_}"
+        data_status = pl.DataFrame({
+            _status: [_failed],
+            _query: [_msg7],
+            _shape: [""],
+            _time: ["NA"],
+            _resources: [""],
+            _error: [f"{_msg8}: {list_}"]
+        })
+        #Reporting the error
         self.reportData(data_status, tab_name)
         return None
 
@@ -168,7 +187,7 @@ def runQueries(self, queries, cls="console"):
     #Multithreading Step 2: Creating a worker object
     ##This must contain the queries and parameters
     self.worker = Worker(queries, text_params, tab_name, cls, self)
-    self.worker.fetch = self.cfg_user.index.get("Fetch limit")
+    self.worker.fetch = self.cfg_user.index.get("fetch-limit")
     #Multithreading Step 3: Moving Worker to Thread
     self.worker.moveToThread(self.thread)
     #Multithreading Step 4: Connecting Signals and Slots
@@ -212,24 +231,24 @@ def animationWorker(self):
 def workerFinished(self, df):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Headers
-    _status = nested(lgg, "execution", "header", "status")
-    _query = nested(lgg, "execution", "header", "query")
-    _shape = nested(lgg, "execution", "header", "shape")
-    _time = nested(lgg, "execution", "header", "time")
-    _resources = nested(lgg, "execution", "header", "resources")
-    _error = nested(lgg, "execution", "header", "error")
+    _status = nested("execution", "header", "status")
+    _query = nested("execution", "header", "query")
+    _shape = nested("execution", "header", "shape")
+    _time = nested("execution", "header", "time")
+    _resources = nested("execution", "header", "resources")
+    _error = nested("execution", "header", "error")
 
     self.cursorIsWorking = False
-    self.lbl_status.setText(nested(lgg, "status-bar", "end"))
+    self.lbl_status.setText(nested("status-bar", "end"))
     #Finishing the working animation
     self.animationTimer.stop()
     self.bt_working.setIcon(self.workerIcon1)
     self.bt_working.setStyleSheet("background-color: None;")
     #Determining the type of completion
-    if df.columns.tolist() == [_status, _query, _shape, _time, _resources, _error]:
-        status = df.iloc[-1, 0]
+    if df.columns == [_status, _query, _shape, _time, _resources, _error]:
+        status = "1"
+        # status = df.item(-1, _status)
         self.updateTrayIcon(status)
     else:
         self.updateTrayIcon("executed")
@@ -350,8 +369,8 @@ def runLongTask(self):
         #Asking the user if they are sure
         msg = QMessageBox(self)
         msg.setWindowIcon(self.icon)
-        msg.setWindowTitle(self.i18n.getNested(self.lgg, "execution", "msgs", "msgBE"))
-        msg.setText(self.i18n.getNested(self.lgg, "execution", "msgs", "msg9"))
+        msg.setWindowTitle(self.i18n.getNested("execution", "msgs", "msgBE"))
+        msg.setText(self.i18n.getNested("execution", "msgs", "msg9"))
         msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         msg.setDefaultButton(QMessageBox.StandardButton.Yes)
         answer = msg.exec()
@@ -400,13 +419,13 @@ def runAssist(self):
         #Performing a check if it is count by ingestion
         if action.text() == "Count by ingestion":
             try:
-                ingestions = pd.read_sql("DESCRIBE {};".format(table), self.conn)
+                ingestions = pl.read_database("DESCRIBE {};".format(table), self.conn)
             except Exception as exc:
                 return None
             else:
                 #Getting the intakes
                 allowed_elements = ['ingestion_year', 'ingestion_month', 'ingestion_day']
-                filtered_list = [element for element in list(ingestions.name.values) if element in allowed_elements]
+                filtered_list = [element for element in ingestions["name"].to_list() if element in allowed_elements]
                 #Modifying the final list
                 ingestions = sorted(filtered_list, reverse=True)
             if len(ingestions)>0:
@@ -423,23 +442,22 @@ def runAssist(self):
 def processHistory(self, queries, params):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Headers
-    _type = nested(lgg, "tab-eco", "history", "type")
-    _typeU = nested(lgg, "tab-eco", "history", "type-u")
-    _typeB = nested(lgg, "tab-eco", "history", "type-b")
-    _query = nested(lgg, "tab-eco", "history", "query")
-    _time = nested(lgg, "tab-eco", "history", "time")
-    _param = nested(lgg, "tab-eco", "history", "param")
+    _type = nested("tab-eco", "history", "type")
+    _typeU = nested("tab-eco", "history", "type-u")
+    _typeB = nested("tab-eco", "history", "type-b")
+    _query = nested("tab-eco", "history", "query")
+    _time = nested("tab-eco", "history", "time")
+    _param = nested("tab-eco", "history", "param")
 
     #Creating history structure if it does not exist
     if not self.actualSession.sessionHistoryExists:
-        prev = pd.DataFrame({
-            _type: pd.Series(dtype=str),
-            _time: pd.Series(dtype=str),
-            _query: pd.Series(dtype=str),
-            _param: pd.Series(dtype=str)
-                        })
+        prev = pl.DataFrame({
+            _type: pl.Series([], dtype=pl.String),
+            _time: pl.Series([], dtype=pl.String),
+            _query: pl.Series([], dtype=pl.String),
+            _param: pl.Series([], dtype=pl.String)
+        })
     else:
         prev = self.actualSession.history
     #Defining type
@@ -447,11 +465,15 @@ def processHistory(self, queries, params):
     #Defining time
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     #Creating the new row
-    new_row = {_type: [cls], _time: [now], _query:[str(queries)], _param:[str(params)]}
-    new_row = pd.DataFrame(new_row)
-    #Adding to existing dataframe. Maintain maximum 100 rows
-    historial  = pd.concat([new_row, prev.iloc[0:99,:]], ignore_index = True ).reset_index(drop=True)
-    self.actualSession.history  = historial
+    new_row = pl.DataFrame({
+        _type: [cls],
+        _time: [now],
+        _query: [str(queries)],
+        _param: [str(params)]
+    })
+    #Concatenate the new record and the previous ones, and limit 100 rows
+    historial = new_row.vstack(prev.slice(0, 99))
+    self.actualSession.history = historial
     #Watching
     self.actualSession.saveSessionHistory()
     #Showing
@@ -510,25 +532,23 @@ def reportLog(self, data):
 def reportData(self, data, tab_name):
     #Getting info from the specific tab
     tab_data = self.tab_info.get(tab_name)
-    
     #Reporting message to results table
     if tab_data:
-        tab_data['result_data'] = data.to_dict()
+        tab_data['result_data'] = data
         result = tab_data['result']
         result.loadData(data)
 
 #Function to save the file (csv or xlsx)
-def toFile(self, data: pd.DataFrame):
+def toFile(self, data: pl.DataFrame):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Labels
-    _toFile1 = nested(lgg, "save-files", "toFile1")
-    _toFile2 = nested(lgg, "save-files", "toFile2")
-    _toFile3 = nested(lgg, "save-files", "toFile3")
-    _toFile4 = nested(lgg, "save-files", "toFile4")
-    _save2 = nested(lgg, "save-files", "save2")
-    _saveM3 = nested(lgg, "save-files", "saveM3")
+    _toFile1 = nested("save-files", "toFile1")
+    _toFile2 = nested("save-files", "toFile2")
+    _toFile3 = nested("save-files", "toFile3")
+    _toFile4 = nested("save-files", "toFile4")
+    _save2 = nested("save-files", "save2")
+    _saveM3 = nested("save-files", "saveM3")
 
     #Getting current date and time
     now = datetime.now()
@@ -554,7 +574,7 @@ def toFile(self, data: pd.DataFrame):
         return
     
     if cls == f"{_toFile4} (*.xlsx)":
-        if data.shape[0] > 999995: #Excel does not support more than a million rows
+        if data.height > 999995: #Excel does not support more than a million rows
             self.toFile_excelError(data, fileName, download_folder)
         else:
             self.toFile_save(data, fileName, download_folder, file_type='excel')
@@ -566,16 +586,16 @@ def toFile(self, data: pd.DataFrame):
 def toFile_save(self, data, fileName, download_folder, file_type='csv', sep=","):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Labels
-    _save1 = nested(lgg, "save-files", "save1")
-    _saveM4 = nested(lgg, "save-files", "saveM4")
-    _saveM4 = nested(lgg, "save-files", "saveM4")
+    _save1 = nested("save-files", "save1")
+    _saveM4 = nested("save-files", "saveM4")
+    _saveM4 = nested("save-files", "saveM4")
     
     try:
         #Changing mouse pointer to standby state
         self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
         if file_type == 'excel':
+            data = data.to_pandas()
             data.to_excel(fileName, index=False, engine='xlsxwriter')
         else:
             data.to_csv(fileName, sep=sep, index=False, encoding="utf-8")
@@ -597,11 +617,10 @@ def toFile_save(self, data, fileName, download_folder, file_type='csv', sep=",")
 def toFile_excelError(self, data, fileName, download_folder):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Labels
-    _saveM1 = nested(lgg, "save-files", "saveM1")
-    _error1 = nested(lgg, "save-files", "error1")
-    _error3 = nested(lgg, "save-files", "error3")
+    _saveM1 = nested("save-files", "saveM1")
+    _error1 = nested("save-files", "error1")
+    _error3 = nested("save-files", "error3")
 
     try:
         #Changing mouse pointer to standby state
@@ -625,11 +644,10 @@ def toFile_excelError(self, data, fileName, download_folder):
 def toFile_defaultSave(self, data, download_folder, msg_text):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Labels
-    _saveM2 = nested(lgg, "save-files", "saveM2")
-    _error2 = nested(lgg, "save-files", "error2")
-    _error4 = nested(lgg, "save-files", "error4")
+    _saveM2 = nested("save-files", "saveM2")
+    _error2 = nested("save-files", "error2")
+    _error4 = nested("save-files", "error4")
 
     try:
         #Changing mouse pointer to standby state
@@ -668,7 +686,7 @@ def getFullUsername(self):
         else:
             return None
 
-    elif platform.system() in ["Linux", "Darwin"]:  #Darwin is the identifier for macOS        
+    elif platform.system() in ["Linux", "Darwin"]:  #Darwin is the identifier for macOS
         try:
             #Gets the current username
             username = os.getlogin()
@@ -685,13 +703,12 @@ def getFullUsername(self):
 def recLog(self):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Labels
-    _toFile5 = nested(lgg, "save-files", "toFile5")
-    _save2 = nested(lgg, "save-files", "save2")
-    _logStarted = nested(lgg, "log-messages", "log-started")
-    _logEnd = nested(lgg, "log-messages", "log-end")
-    _user = nested(self.lgg, "log-messages", "user")
+    _toFile5 = nested("save-files", "toFile5")
+    _save2 = nested("save-files", "save2")
+    _logStarted = nested("log-messages", "log-started")
+    _logEnd = nested("log-messages", "log-end")
+    _user = nested("log-messages", "user")
         
     now = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     #Starting rec animation
@@ -720,8 +737,8 @@ def recLog(self):
         self.animationR_state = True
         self.recordingLog = True
         self.timerRec.start()
-        self.bt_log.setToolTip(nested(lgg, "tooltips", "ttp6"))
-        self.actionRecLog.setText(nested(lgg, "sql", "end-log"))
+        self.bt_log.setToolTip(nested("tooltips", "ttp6"))
+        self.actionRecLog.setText(nested("sql", "end-log"))
     else:
         #Looking at the Log
         msg = f"{_logEnd} {now}"
@@ -737,17 +754,16 @@ def recLog(self):
         
         self.timerRec.stop()
         self.bt_log.setIcon(self.recIcon1)
-        self.lbl_status.setText(nested(lgg, "status-bar", "log-end"))
-        self.bt_log.setToolTip(nested(lgg, "tooltips", "ttp5"))
-        self.actionRecLog.setText(nested(lgg, "sql", "start-log"))
+        self.lbl_status.setText(nested("status-bar", "log-end"))
+        self.bt_log.setToolTip(nested("tooltips", "ttp5"))
+        self.actionRecLog.setText(nested("sql", "start-log"))
 
 #Function to handle rec button animation
 def animationRec(self):
     #Language
     nested = self.i18n.getNested
-    lgg = self.lgg
     #Indicating the start of recording
-    self.lbl_status.setText(nested(lgg, "status-bar", "log-started"))
+    self.lbl_status.setText(nested("status-bar", "log-started"))
     #Exchanging icon according to status
     if self.animationR_state:
         self.bt_log.setIcon(self.recIcon2)

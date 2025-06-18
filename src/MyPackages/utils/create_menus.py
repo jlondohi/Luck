@@ -1,4 +1,5 @@
 import pyodbc
+from functools import partial
 #Importing PyQt6 packages
 from PyQt6.QtWidgets import QMenu
 from PyQt6.QtGui import QAction, QActionGroup, QKeySequence
@@ -9,69 +10,68 @@ from PyQt6.QtGui import QAction, QActionGroup, QKeySequence
 def createPMenu(self):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     #1. Creating all actions
     #-----------------------
     #File menu actions
-    self.actionNew = QAction(nested(lgg, "file", "new"), self)
-    self.actionOpen = QAction(nested(lgg, "file", "open"), self)
-    self.actionOpenBlock = QAction(nested(lgg, "file", "open-block"), self)
-    self.actionReload = QAction(nested(lgg, "file", "reload"), self)
-    self.actionSave = QAction(nested(lgg, "file", "save"), self)
-    self.actionSaveAs = QAction(nested(lgg, "file", "save-as"), self)
-    self.actionOpenP = QAction(nested(lgg, "file", "open-param"), self)
-    self.actionOpenBlockP = QAction(nested(lgg, "file", "open-param-block"), self)
-    self.actionSaveP = QAction(nested(lgg, "file", "save-param"), self)
-    self.actionSaveAsP = QAction(nested(lgg, "file", "save-param-as"), self)
+    self.actionNew = QAction(nested("file", "new"), self)
+    self.actionOpen = QAction(nested("file", "open"), self)
+    self.actionOpenBlock = QAction(nested("file", "open-block"), self)
+    self.actionReload = QAction(nested("file", "reload"), self)
+    self.actionSave = QAction(nested("file", "save"), self)
+    self.actionSaveAs = QAction(nested("file", "save-as"), self)
+    self.actionOpenP = QAction(nested("file", "open-param"), self)
+    self.actionOpenBlockP = QAction(nested("file", "open-param-block"), self)
+    self.actionSaveP = QAction(nested("file", "save-param"), self)
+    self.actionSaveAsP = QAction(nested("file", "save-param-as"), self)
     
     #Edit Menu Actions
-    self.actionSearch = QAction(nested(lgg, "edit", "search"), self)
-    self.actionReplace = QAction(nested(lgg, "edit", "replace"), self)
-    self.actionComment  = QAction(nested(lgg, "edit", "comment"), self)
-    self.actionSuperComment  = QAction(nested(lgg, "edit", "super-com"), self)
+    self.actionSearch = QAction(nested("edit", "search"), self)
+    self.actionReplace = QAction(nested("edit", "replace"), self)
+    self.actionComment  = QAction(nested("edit", "comment"), self)
+    self.actionSuperComment  = QAction(nested("edit", "super-com"), self)
     
     #Select menu actions
-    self.actionGoStartDocument = QAction(nested(lgg, "select", "go-ini"), self)
-    self.actionGoEndDocument = QAction(nested(lgg, "select", "go-end"), self)
-    self.actionPrevQuery = QAction(nested(lgg, "select", "prev-q"), self)
-    self.actionNextQuery = QAction(nested(lgg, "select", "next-q"), self)
-    self.actionSelectToPrevQuery = QAction(nested(lgg, "select", "stpq"), self)
-    self.actionSelectToNextQuery = QAction(nested(lgg, "select", "stnq"), self)
-    self.actionPrevBlock = QAction(nested(lgg, "select", "prev-block"), self)
-    self.actionNextBlock = QAction(nested(lgg, "select", "next-block"), self)
-    self.actionSelNextOcurrence = QAction(nested(lgg, "select", "snexo"), self)
-    self.actionAddCursorToLinesEnd = QAction(nested(lgg, "select", "acel"), self)
-    self.actionAddCursorToLinesStart = QAction(nested(lgg, "select", "acsl"), self)
-    self.actionAddCursorAbove = QAction(nested(lgg, "select", "ac-above"), self)
-    self.actionAddCursorBelow= QAction(nested(lgg, "select", "ac-below"), self)
+    self.actionGoStartDocument = QAction(nested("select", "go-ini"), self)
+    self.actionGoEndDocument = QAction(nested("select", "go-end"), self)
+    self.actionPrevQuery = QAction(nested("select", "prev-q"), self)
+    self.actionNextQuery = QAction(nested("select", "next-q"), self)
+    self.actionSelectToPrevQuery = QAction(nested("select", "stpq"), self)
+    self.actionSelectToNextQuery = QAction(nested("select", "stnq"), self)
+    self.actionPrevBlock = QAction(nested("select", "prev-block"), self)
+    self.actionNextBlock = QAction(nested("select", "next-block"), self)
+    self.actionSelNextOcurrence = QAction(nested("select", "snexo"), self)
+    self.actionAddCursorToLinesEnd = QAction(nested("select", "acel"), self)
+    self.actionAddCursorToLinesStart = QAction(nested("select", "acsl"), self)
+    self.actionAddCursorAbove = QAction(nested("select", "ac-above"), self)
+    self.actionAddCursorBelow= QAction(nested("select", "ac-below"), self)
 
     #View menu actions
-    self.actionSizeEditor_up = QAction(nested(lgg, "view", "ifse"), self)
-    self.actionSizeEditor_down = QAction(nested(lgg, "view", "lfse"), self)
-    self.actionSizeResult_up = QAction(nested(lgg, "view", "ifsr"), self)
-    self.actionSizeResult_down = QAction(nested(lgg, "view", "lfsr"), self)
-    self.actionPreviousTab = QAction(nested(lgg, "view", "pt"), self)
-    self.actionNextTab = QAction(nested(lgg, "view", "nt"), self)
-    self.actionWordWrap = QAction(nested(lgg, "view", "ww"), self)
+    self.actionSizeEditor_up = QAction(nested("view", "ifse"), self)
+    self.actionSizeEditor_down = QAction(nested("view", "lfse"), self)
+    self.actionSizeResult_up = QAction(nested("view", "ifsr"), self)
+    self.actionSizeResult_down = QAction(nested("view", "lfsr"), self)
+    self.actionPreviousTab = QAction(nested("view", "pt"), self)
+    self.actionNextTab = QAction(nested("view", "nt"), self)
+    self.actionWordWrap = QAction(nested("view", "ww"), self)
     self.actionWordWrap.setCheckable(True)
 
     #SQL Menu Actions
-    self.actionConnectDSN = QAction(nested(lgg, "sql", "con-dsn"), self)
-    self.actionStopRun = QAction(nested(lgg, "sql", "stop-run"), self)
-    self.actionRun = QAction(nested(lgg, "sql", "run-query"), self)
-    self.actionRunAll = QAction(nested(lgg, "sql", "run-all"), self)
-    self.actionQuery_to_file = QAction(nested(lgg, "sql", "query-file"), self)
-    self.actionFile_to_lz = QAction(nested(lgg, "sql", "ufftlz"), self)
-    self.actionRecLog = QAction(nested(lgg, "sql", "start-log"), self)
+    self.actionConnectDSN = QAction(nested("sql", "con-dsn"), self)
+    self.actionStopRun = QAction(nested("sql", "stop-run"), self)
+    self.actionRun = QAction(nested("sql", "run-query"), self)
+    self.actionRunAll = QAction(nested("sql", "run-all"), self)
+    self.actionQuery_to_file = QAction(nested("sql", "query-file"), self)
+    self.actionFile_to_lz = QAction(nested("sql", "ufftlz"), self)
+    self.actionRecLog = QAction(nested("sql", "start-log"), self)
 
     #AI Menu Actions
-    self.actionAnalize = QAction(nested(lgg, "ai", "analize-query1"), self)
-    self.actionFluffAnalize = QAction(nested(lgg, "ai", "analize-query2"), self)
+    self.actionAnalize = QAction(nested("ai", "analize-query1"), self)
+    self.actionFluffAnalize = QAction(nested("ai", "analize-query2"), self)
     
     #Help menu actions
-    self.actionAbout = QAction(nested(lgg, "help", "about"), self)
-    self.actionUpdate = QAction(nested(lgg, "help", "update"), self)
+    self.actionAbout = QAction(nested("help", "about"), self)
+    self.actionUpdate = QAction(nested("help", "update"), self)
     
     #2. Creating their respective shortCut
     #---------------------------------
@@ -200,10 +200,10 @@ def createPMenu(self):
     self.menuSelect.addSeparator()
     
     self.menuView = QMenu(self)
-    self.menuTheme = QMenu(nested(lgg, "view", "theme"), self)
-    self.menuFont = QMenu(nested(lgg, "view", "font", "main"), self)
-    self.menuFontEditor = QMenu(nested(lgg, "view", "font", "font-editor"), self)
-    self.menuFontResult = QMenu(nested(lgg, "view", "font", "font-result"), self)
+    self.menuTheme = QMenu(nested("view", "theme"), self)
+    self.menuFont = QMenu(nested("view", "font", "main"), self)
+    self.menuFontEditor = QMenu(nested("view", "font", "font-editor"), self)
+    self.menuFontResult = QMenu(nested("view", "font", "font-result"), self)
     self.menuView.addMenu(self.menuTheme)
     self.menuView.addMenu(self.menuFont)
     self.menuFont.addMenu(self.menuFontEditor)
@@ -221,9 +221,9 @@ def createPMenu(self):
     self.menuView.addAction(self.actionWordWrap)
     
     self.menuSQL = QMenu(self)
-    self.menuSelectDSN = QMenu(nested(lgg, "sql", "sel-dsn"), self)
-    self.menuAssistant = QMenu(nested(lgg, "sql", "assistant"), self)
-    self.menuPlantillas = QMenu(nested(lgg, "sql", "tmplts"), self)
+    self.menuSelectDSN = QMenu(nested("sql", "sel-dsn"), self)
+    self.menuAssistant = QMenu(nested("sql", "assistant"), self)
+    self.menuPlantillas = QMenu(nested("sql", "tmplts"), self)
     self.menuSQL.addMenu(self.menuSelectDSN)
     self.menuSQL.addAction(self.actionConnectDSN)
     self.menuSQL.addSeparator()
@@ -251,18 +251,18 @@ def createPMenu(self):
     #----------------------------------------------
     #Creating submenus to select dsn
     try:
-        dsn_dict = pyodbc.dataSources()
+        dict_dsn = pyodbc.dataSources()
     except:
-        dsn_dict = {"None":nested(lgg, "msgs", "msg1")}
+        dict_dsn = {"None":nested("msgs", "msg1")}
     
     dsnGroup = QActionGroup(self)
     dsnGroup.setExclusive(True)
     count = 0
-    for _dsn in sorted(dsn_dict.keys()):
+    for _dsn in sorted(dict_dsn.keys()):
         count += 1
         action_dsn = QAction(_dsn, self)
         action_dsn.setCheckable(True)
-        action_dsn.setToolTip(dsn_dict.get(_dsn, ""))
+        action_dsn.setToolTip(dict_dsn.get(_dsn, ""))
         dsnGroup.addAction(action_dsn)
         action_dsn.triggered.connect(self.applySelectedDSN)
         self.menuSelectDSN.addAction(action_dsn)
@@ -343,30 +343,30 @@ def createPMenu(self):
     self.actionShowPlantillas.setShortcut("F7")
     self.centralwidget.addAction(self.actionShowAsistente)
     self.centralwidget.addAction(self.actionShowPlantillas)
-    self.actionShowAsistente.triggered.connect(lambda: self.showMenu("assistant"))
-    self.actionShowPlantillas.triggered.connect(lambda: self.showMenu("tmplts"))
+    self.actionShowAsistente.triggered.connect(partial(self.showMenu, "assistant"))
+    self.actionShowPlantillas.triggered.connect(partial(self.showMenu, "tmplts"))
     
     #5. Linking buttons, menus and actions
     #-----------------------------------------
-    self.fm_title.bt_file.clicked.connect(lambda: self.showMenu("file"))
-    self.fm_title.bt_edit.clicked.connect(lambda: self.showMenu("edit"))
-    self.fm_title.bt_select.clicked.connect(lambda: self.showMenu("select"))
-    self.fm_title.bt_view.clicked.connect(lambda: self.showMenu("view"))
-    self.fm_title.bt_sql.clicked.connect(lambda: self.showMenu("sql"))
-    self.fm_title.bt_ai.clicked.connect(lambda: self.showMenu("ai"))
-    self.fm_title.bt_help.clicked.connect(lambda: self.showMenu("help"))
+    self.fm_title.bt_file.clicked.connect(partial(self.showMenu, "file"))
+    self.fm_title.bt_edit.clicked.connect(partial(self.showMenu, "edit"))
+    self.fm_title.bt_select.clicked.connect(partial(self.showMenu, "select"))
+    self.fm_title.bt_view.clicked.connect(partial(self.showMenu, "view"))
+    self.fm_title.bt_sql.clicked.connect(partial(self.showMenu, "sql"))
+    self.fm_title.bt_ai.clicked.connect(partial(self.showMenu, "ai"))
+    self.fm_title.bt_help.clicked.connect(partial(self.showMenu, "help"))
 
     #MenuFile Actions
-    self.actionNew.triggered.connect(lambda: self.newScriptTab(""))
+    self.actionNew.triggered.connect(partial(self.newScriptTab, ""))
     self.actionReload.triggered.connect(self.reloadETL)
-    self.actionOpen.triggered.connect(lambda: self.openFile(True))
-    self.actionOpenBlock.triggered.connect(lambda: self.openBlockFiles(True))
-    self.actionSave.triggered.connect(lambda: self.savingChanges("", "save"))
-    self.actionSaveAs.triggered.connect(lambda: self.savingChanges("", "saveAs"))
-    self.actionOpenP.triggered.connect(lambda: self.openFileP(True))
-    self.actionOpenBlockP.triggered.connect(lambda: self.openBlockFilesP(True))
-    self.actionSaveP.triggered.connect(lambda: self.savingChangesP("", "save"))
-    self.actionSaveAsP.triggered.connect(lambda: self.savingChangesP("", "saveAs"))
+    self.actionOpen.triggered.connect(partial(self.openFile, True))
+    self.actionOpenBlock.triggered.connect(partial(self.openBlockFiles, True))
+    self.actionSave.triggered.connect(partial(self.savingChanges, "", "save"))
+    self.actionSaveAs.triggered.connect(partial(self.savingChanges, "", "saveAs"))
+    self.actionOpenP.triggered.connect(partial(self.openFileP, True))
+    self.actionOpenBlockP.triggered.connect(partial(self.openBlockFilesP, True))
+    self.actionSaveP.triggered.connect(partial(self.savingChangesP, "", "save"))
+    self.actionSaveAsP.triggered.connect(partial(self.savingChangesP, "", "saveAs"))
 
     #Edit actions
     self.actionSearch.triggered.connect(self.searchText)
@@ -377,24 +377,24 @@ def createPMenu(self):
     #Select actions
     self.actionGoStartDocument.triggered.connect(self.goToStartOfDocument)
     self.actionGoEndDocument.triggered.connect(self.goToEndOfDocument)
-    self.actionPrevQuery.triggered.connect(lambda: self.specialFind(";", False))
-    self.actionNextQuery.triggered.connect(lambda: self.specialFind(";", True))
+    self.actionPrevQuery.triggered.connect(partial(self.specialFind, ";", False))
+    self.actionNextQuery.triggered.connect(partial(self.specialFind, ";", True))
     self.actionSelectToNextQuery.triggered.connect(self.selectUpToNextQuery)
     self.actionSelectToPrevQuery.triggered.connect(self.selectUpToPreviousQuery)
-    self.actionPrevBlock.triggered.connect(lambda: self.specialFind("--#-", False))
-    self.actionNextBlock.triggered.connect(lambda: self.specialFind("--#-", True))
+    self.actionPrevBlock.triggered.connect(partial(self.specialFind, "--#-", False))
+    self.actionNextBlock.triggered.connect(partial(self.specialFind, "--#-", True))
     self.actionSelNextOcurrence.triggered.connect(self.addNextOccurrence)
-    self.actionAddCursorToLinesEnd.triggered.connect(lambda: self.addCursorsToLineBorders(_start=False))
-    self.actionAddCursorToLinesStart.triggered.connect(lambda: self.addCursorsToLineBorders(_start=True))
-    self.actionAddCursorAbove.triggered.connect(lambda: self.addCursorToAboveBelow(_above=True))
-    self.actionAddCursorBelow.triggered.connect(lambda: self.addCursorToAboveBelow(_above=False))
+    self.actionAddCursorToLinesEnd.triggered.connect(partial(self.addCursorsToLineBorders, _start=False))
+    self.actionAddCursorToLinesStart.triggered.connect(partial(self.addCursorsToLineBorders, _start=True))
+    self.actionAddCursorAbove.triggered.connect(partial(self.addCursorToAboveBelow, _above=True))
+    self.actionAddCursorBelow.triggered.connect(partial(self.addCursorToAboveBelow, _above=False))
 
     #View
     self.actionWordWrap.triggered.connect(self.changeWordWrap)
-    self.actionSizeEditor_up.triggered.connect(lambda: self.changeEtlFontSize(1))
-    self.actionSizeEditor_down.triggered.connect(lambda: self.changeEtlFontSize(-1))
-    self.actionSizeResult_up.triggered.connect(lambda: self.changeFontSizeResult(1))
-    self.actionSizeResult_down.triggered.connect(lambda: self.changeFontSizeResult(-1))
+    self.actionSizeEditor_up.triggered.connect(partial(self.changeEtlFontSize, 1))
+    self.actionSizeEditor_down.triggered.connect(partial(self.changeEtlFontSize, -1))
+    self.actionSizeResult_up.triggered.connect(partial(self.changeFontSizeResult, 1))
+    self.actionSizeResult_down.triggered.connect(partial(self.changeFontSizeResult, -1))
 
     #menuSQL actions
     self.actionConnectDSN.triggered.connect(self.ConMan.start)

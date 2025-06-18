@@ -1,17 +1,15 @@
 #Importing native packages
-import os, sys
-import warnings, getpass
-import pandas as pd
+import os, sys, getpass
+import polars as pl
+from functools import partial
 
-#Disabling pandas related warnings and untested DBAPI2 connection
-warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy connectable")
 #Importing PyQt6 packages
 from PyQt6 import uic
 from PyQt6.QtWidgets import QMainWindow, QApplication \
     , QMenu, QSystemTrayIcon, QFrame
 from PyQt6.QtGui import QAction, QIcon, QKeySequence \
     , QShortcut, QGuiApplication
-from PyQt6.QtCore import Qt , QPoint, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt , QPoint, QTimer, pyqtSignal, QEvent
 #Importing custom classes and methods
 from MyPackages import YamlHandler, SessionHandler, ConnectionManager \
     , SQLAnalyzer, MyTitleBar
@@ -39,6 +37,12 @@ class MainWindow(QMainWindow):
             self.current_param = tab_data['text_params']
             self.current_result = tab_data['result']
 
+    def changeEvent(self, event):
+        super().changeEvent(event)
+        if event.type() == QEvent.Type.WindowStateChange:
+            if hasattr(self, "MyTitleBar"):
+                self.MyTitleBar.updateMaximizeRestoreButtons()
+    
     def __init__(self):
         super().__init__()
         self.user = getpass.getuser()
@@ -47,7 +51,7 @@ class MainWindow(QMainWindow):
         self.parentWindow = self.window()
 
         #Loading Settings
-        #-----------------     
+        #-----------------
         self.version = YamlHandler("Settings/version.yaml")
         self.cfg_user = YamlHandler("Settings/config_user.yaml")
         self.cfg_app = YamlHandler("Settings/config_app.yaml")
@@ -58,9 +62,9 @@ class MainWindow(QMainWindow):
         self.autoComplete_list = YamlHandler("Settings/config_autocomplete_list.yaml")
 
         #Preparing language
-        self.i18n = YamlHandler("Settings/config_i18n.yaml")
         self.lgg = "es"
-
+        self.i18n = YamlHandler(f"i18n/{self.lgg}.yaml")
+        
         self.dict_styleSheets  = {}
         self.dict_styledSheets = {}
         self.prepareFramework()
@@ -92,7 +96,6 @@ class MainWindow(QMainWindow):
         self.num_Rtab = 0  #Class variable to identify the results tabs
 
         self.result_tab_name = None
-        self.syntax_highlighter_dict = {}
         self.list_Qtexts = []
         self.list_QTable = []
         self.dict_splitters = {'h':[] , 'v':[] }
@@ -100,7 +103,7 @@ class MainWindow(QMainWindow):
         self.tab_info = {}
         self.searchWidget_dict = {}
         self.cursorIsWorking = False
-        self.fetch = self.cfg_user.index.get("Fetch limit")
+        self.fetch = self.cfg_user.index.get("fetch-limit")
 
         #Rescaling Settings
         self.draggable = False
@@ -144,8 +147,8 @@ class MainWindow(QMainWindow):
         #Creating system tray menu
         trayMenu = QMenu()
         #Adding actions to menu
-        stopEjec = QAction(self.i18n.getNested(self.lgg, "sql", "stop-run"), self)
-        quitAction = QAction(self.i18n.getNested(self.lgg, "file", "close"), self)
+        stopEjec = QAction(self.i18n.getNested("sql", "stop-run"), self)
+        quitAction = QAction(self.i18n.getNested("file", "close"), self)
         trayMenu.addAction(stopEjec)
         trayMenu.addAction(quitAction)
         ##Connect actions to corresponding methods
@@ -194,7 +197,7 @@ class MainWindow(QMainWindow):
         self.firstConexionSignal.connect(self.downloadTree)
         #Connection with analyzer
         self.fluffAnalizer = SQLAnalyzer()
-        self.fluffAnalizer.finished.connect(lambda: print("..."))
+        self.fluffAnalizer.finished.connect(partial(print, "..."))
         #Connection with the worker
         ##Moved to executeM due to large
 
@@ -282,7 +285,7 @@ class MainWindow(QMainWindow):
                 self.tab_info.get(key)["dict_paramsEtl"] = dict_paramsEtl
                 self.tab_info.get(key)['origin'] = origin
                 self.tab_info.get(key)["result_data"] = data
-                self.tab_info.get(key)["result"].loadData(pd.DataFrame(data))
+                self.tab_info.get(key)["result"].loadData(pl.DataFrame(data))
                 #Changing the tab name
                 if origin != "":
                     name = origin.rsplit('/', 1)[-1]
@@ -390,6 +393,8 @@ MainWindow.captureThemeFormat = plain_text_edit_methods.captureThemeFormat
 MainWindow.applyThemeFormat = plain_text_edit_methods.applyThemeFormat
 MainWindow.applySplitH = plain_text_edit_methods.applySplitH
 MainWindow.applySplitV = plain_text_edit_methods.applySplitV
+MainWindow.findSpecialEntries = plain_text_edit_methods.findSpecialEntries
+MainWindow.parenthesisSearching = plain_text_edit_methods.parenthesisSearching
 MainWindow.paramSearcher = plain_text_edit_methods.paramSearcher
 MainWindow.paramDefiner = plain_text_edit_methods.paramDefiner
 MainWindow.updateTextParm = plain_text_edit_methods.updateTextParm

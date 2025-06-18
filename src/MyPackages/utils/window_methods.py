@@ -11,7 +11,7 @@ from PyQt6.QtGui import  QCursor, QDragEnterEvent, QDropEvent \
     , QScreen
 from PyQt6.QtCore import Qt
 #Importing custom classes and methods
-from MyPackages import AboutWidget
+from MyPackages import AboutWidget, Updater
 
 #================================================================== =======================
 #Creating functions related to the main window
@@ -40,13 +40,33 @@ def stopIconTimer(self):
 
 #Preparing frameworks
 def prepareFramework(self):
-    #Preparing specific folders in temporary path
-    #------------------------------------------------
-    #Defining the folders to create
+    #Preparing specific folders in session path, temporary path or home path
+    #-----------------------------------------------------------------------
+    nested = self.i18n.getNested
     ##Path and folder of the session
-    sesion_path = os.path.join(tempfile.gettempdir(), "Luck", 'sesion')
-    self.cfg_user.index['ruta_temp_session'] = sesion_path
-    os.makedirs(sesion_path) if not os.path.exists(sesion_path) else None
+    temp_path = os.path.join(tempfile.gettempdir(), 'Luck', 'session')
+    sesion_path = self.cfg_session.index.get('path', '')
+    if sesion_path and not os.path.exists(sesion_path):
+        #Creating the temporary folder if it does not exist
+        try:
+            os.makedirs(sesion_path)
+        except:
+            #Creating the Luck folder in the temporary folder
+            os.makedirs(temp_path) if not os.path.exists(temp_path) else None
+            self.cfg_session.index['path'] = temp_path
+    elif sesion_path and os.access(sesion_path, os.R_OK | os.W_OK):
+        print(nested("log-messages", "error-session"))
+    elif not sesion_path:
+        #Creating the Luck folder in the temporary folder
+        try:
+            os.makedirs(temp_path) if not os.path.exists(temp_path) else None
+        except:
+            #If it fails, it will create the Luck folder in the user's home directory
+            home_path = os.path.join(os.path.expanduser('~'), 'session')
+            os.makedirs(home_path) if not os.path.exists(home_path) else None
+            #Creating the session folder inside Luck
+            self.cfg_session.index['path'] = home_path
+    
     ##Path and data folder
     if platform.system() == 'Windows':
         #Will try to get the downloads folder from the registry
@@ -96,7 +116,6 @@ def dragEnterEvent(self, event: QDragEnterEvent):
 def dropEvent(self, event:QDropEvent):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     data = event.mimeData()
     final_list = self.prepareUrlsDrop(data, (".sql"))
@@ -110,15 +129,15 @@ def dropEvent(self, event:QDropEvent):
             msg = QMessageBox()
             msg.setWindowIcon(self.icon)
             msg.setIcon(QMessageBox.Icon.Critical)  
-            msg.setWindowTitle(nested(lgg, "msgs", "msg2"))
-            msg.setText(nested(lgg, "msgs", "msg3"))
+            msg.setWindowTitle(nested("msgs", "msg2"))
+            msg.setText(nested("msgs", "msg3"))
             msg.exec()
         return None
     elif len(final_list) > 1:
         msg = QMessageBox(self)
         msg.setWindowIcon(self.icon)
-        msg.setWindowTitle(nested(lgg, "open-file", "open1"))
-        msg.setText(nested(lgg, "open-file", "open3"))
+        msg.setWindowTitle(nested("open-file", "open1"))
+        msg.setText(nested("open-file", "open3"))
         msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         msg.setDefaultButton(QMessageBox.StandardButton.Yes)
         answer = msg.exec()
@@ -135,7 +154,6 @@ def dropEvent(self, event:QDropEvent):
 def dropEventParam(self, event:QDropEvent):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     data = event.mimeData()
     final_list = self.prepareUrlsDrop(data, (".sqlp", ".txt"))
@@ -149,15 +167,15 @@ def dropEventParam(self, event:QDropEvent):
             msg = QMessageBox()
             msg.setWindowIcon(self.icon)
             msg.setIcon(QMessageBox.Icon.Critical)  
-            msg.setWindowTitle(nested(lgg, "msgs", "msg2"))  
-            msg.setText(nested(lgg, "msgs", "msg3"))
+            msg.setWindowTitle(nested("msgs", "msg2"))  
+            msg.setText(nested("msgs", "msg3"))
             msg.exec()
         return None
     elif len(final_list)>1:
         msg = QMessageBox(self)
         msg.setWindowIcon(self.icon)
-        msg.setWindowTitle(nested(lgg, "open-file", "openP1"))
-        msg.setText(nested(lgg, "open-file", "openP2"))
+        msg.setWindowTitle(nested("open-file", "openP1"))
+        msg.setText(nested("open-file", "openP2"))
         msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
         msg.setDefaultButton(QMessageBox.StandardButton.Yes)
         answer = msg.exec()
@@ -273,12 +291,11 @@ def closeEvent(self, event):
 def openFile(self, dialog=True, fileNames=[]):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     if dialog:
         fileNames, _ = QFileDialog.getOpenFileNames(
-            self, nested(lgg, "open-file", "open2")
-            , '', f'{nested(lgg, "open-file", "openSQL")} (*.sql)')
+            self, nested("open-file", "open2")
+            , '', f'{nested("open-file", "openSQL")} (*.sql)')
     if fileNames:
         for fileName in fileNames:
             self.newScriptTab(fileName)
@@ -287,12 +304,11 @@ def openFile(self, dialog=True, fileNames=[]):
 def openFileP(self, dialog=True, fileName=''):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     if dialog:
         fileName, _ = QFileDialog.getOpenFileName(
-            self, nested(lgg, "open-file", "open2")
-            , '', f"{nested(lgg, "open-file", "openP3")} (*.sqlp *.txt)")
+            self, nested("open-file", "open2")
+            , '', f"{nested("open-file", "openP3")} (*.sqlp *.txt)")
     if fileName:
         self.addParmScriptTab(fileName)
 
@@ -300,12 +316,11 @@ def openFileP(self, dialog=True, fileName=''):
 def openBlockFiles(self, dialog=True, fileNames=[]):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     if dialog:
         fileNames, _ = QFileDialog.getOpenFileNames(
-            self, nested(lgg, "open-file", "open2")
-            , '', f'{nested(lgg, "open-file", "openSQL")} (*.sql)')
+            self, nested("open-file", "open2")
+            , '', f'{nested("open-file", "openSQL")} (*.sql)')
     if fileNames:
         #Changing mouse pointer to standby state
         self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
@@ -342,12 +357,11 @@ def openBlockFiles(self, dialog=True, fileNames=[]):
 def openBlockFilesP(self, dialog=True, fileNames=[]):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     if dialog:
         fileNames, _ = QFileDialog.getOpenFileNames(
-            self, nested(lgg, "open-file", "open2")
-            , '', f'{nested(lgg, "open-file", "openSQL")} (*.sqlp *.txt)')
+            self, nested("open-file", "open2")
+            , '', f'{nested("open-file", "openSQL")} (*.sqlp *.txt)')
     if fileNames:
         #Changing mouse pointer to standby state
         self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
@@ -375,7 +389,7 @@ def openBlockFilesP(self, dialog=True, fileNames=[]):
         self.app.restoreOverrideCursor()
         #Concatenated loading
         self.addParmScriptTab(temp_file)
-        self.paramSearcher()
+        # self.findSpecialEntries()
 
 #Function to reload the ETL
 def reloadETL(self):
@@ -393,8 +407,8 @@ def reloadETL(self):
         archivo = open(origin, "r" , encoding='utf-8')
         text_editor.setPlainText( archivo.read() )
         archivo.close()
-        #Updating parameters
-        self.paramSearcher()
+        #Updating parenthesis and parameters
+        # self.findSpecialEntries()
         #Save session
         self.actualSession.saveSession(self.tab_info)
 
@@ -402,11 +416,10 @@ def reloadETL(self):
 def saveFileAS(self):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     fileName, _ = QFileDialog.getSaveFileName(
-        self, nested(lgg, "save-files", "save2")
-        , '', f'{nested(lgg, "save-files", "toFile6")} (*.sql)')
+        self, nested("save-files", "save2")
+        , '', f'{nested("save-files", "toFile6")} (*.sql)')
     if fileName:
         return fileName
     else: 
@@ -416,11 +429,10 @@ def saveFileAS(self):
 def saveFilePAS(self):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     fileName, _ = QFileDialog.getSaveFileName(
-        self, nested(lgg, "save-files", "save2")
-        , '', f'{nested(lgg, "save-files", "toFile7")} (*.sqlp)')
+        self, nested("save-files", "save2")
+        , '', f'{nested("save-files", "toFile7")} (*.sqlp)')
     if fileName:
         return fileName
     else: 
@@ -431,40 +443,79 @@ def showAcercaDe(self):
     self.aboutOfWindow = AboutWidget(self)
     self.aboutOfWindow.show()
 
-#Software update
-def startUpdate(self):
-    #Instantiating language
-    nested = self.i18n.getNested
-    lgg = self.lgg
+#Decompose version
+def decomposeVersion(version:str):
+    #Closing early
+    if not version:
+        return
+    #Eliminating V from the version, if applied
+    version = version.lower()
+    if version.startswith('v'):
+        version = version[1:]
+    #Transforming the version entered
+    major, minor, patch = map(int, version.split('.'))
+    return major, minor, patch
 
-    #Version file URL in OneDrive
-    download_url = self.version.index.get("download_url")
+#Function to compare versions
+#True if the current version is lower
+def compareVersion(WebVersion, currentVersion):
+    majorW, minorW, pathW = decomposeVersion(WebVersion)
+    majorC, minorC, pathC = decomposeVersion(currentVersion)
+    versionW = majorW*10000 + minorW*100 + pathW
+    versionC = majorC*10000 + minorC*100 + pathC
+    #Comparing
+    return True if versionW > versionC else False
+
+#Software update
+def startUpdate(self, silent=False):
+    #Language
+    nested = self.i18n.getNested
+
+    #Instantiating updater
+    updater = Updater(self)
+    updater.server_url = self.version.index.get("download_url")
     current_version = self.version.index.get("version")
     
-    #Creating a QMessageBox instance to display the error message
-    msg = QMessageBox()
-    msg.setWindowIcon(self.icon)
-    msg.setIcon(QMessageBox.Icon.Information)  
-    msg.setWindowTitle(nested(lgg, "update-app", "update1"))  
-    msg.setText(f"{nested(lgg, "update-app", "update2")}: v{current_version}")
-    msg.exec()
+    #Requesting official version in repo (web)
+    try:
+        web_version = updater.checkForUpdate()
+    except:
+        web_version = '0.0.0'
+    else:
+        if web_version.startswith('error'):
+            print(web_version)
+            web_version = '0.0.0'
 
-    # try:
-    #     #Descargar el archivo de versión desde OneDrive
-    #     response = requests.get(download_url, verify=False)
-    #     print(response.status_code)
-    #     if response.status_code == 200:
-    #         latest_version = response.text.strip()
-    #         if latest_version > current_version:
-    #             print(f"New version available: {latest_version}")
-    #             # Aquí puedes implementar la lógica para descargar la nueva versión
-    #         else:
-    #             print("You are using the latest version.")
-    #     else:
-    #         print("Failed to check for updates.")
-    # except Exception as exc:
-    #     print(f"An error occurred: {exc}")
+    #Comparing versions
+    outdated = compareVersion(web_version, current_version)
+    #Ending early
+    if silent and not outdated:
+            return
 
+    #Creating message according to the case
+    if outdated:
+        msg = QMessageBox()
+        msg.setWindowIcon(self.icon)
+        msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setWindowTitle(nested("update-app", "title2"))
+        msg.setText(f"{web_version}")
+        msg.setText(f"{nested("update-app", "outdated")}: {web_version}")
+        answer = msg.exec()
+        #Downloading or discarding
+        if answer == QMessageBox.StandardButton.Yes:
+            #Downloading the update
+            web_version = updater.downloadUpdate()
+        elif answer == QMessageBox.StandardButton.No:
+            return
+    else:
+        msg = QMessageBox()
+        msg.setWindowIcon(self.icon)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setWindowTitle(nested("update-app", "title1"))
+        msg.setText(f"{web_version}")
+        msg.setText(f"{nested("update-app", "update")}: v{web_version}")
+        msg.exec()
 
 def disguiseFrame(self):
     info2 = "KP5wSd9foRj+c9puxDUr8JKuH0l4hnDnRlMDceF7wybYLKOTsqHZBPcri94nHTup1Gns3mOx3jgHpiUXBdxtRqZOCpWFzFyTSUzrAJLkMvHE0eeA7c/MUCAoMtKTt/VP1qb3+zcidaYp4XsUkxwc1euqPPVavMpbfZX8HOgQSHislTG8dogfPnKnOLbeL6BzWqNypjo0KWywOYyCLgcbs8m6P6dWpPKoaewRfcDkmRPtE33XPnMjI5bXiG8hkiJTVXHStkesCcI2ftu8BmrQ54+JLlgtJ6QxA2en3r8OlgG13yHZIvOCKPCZkqVEbk+pA7weyiwP1UE3sY1zQumwvQOIyPvPYX4s4NLtyjOnJtTUs3Z7nhs5uisAB1PYAfEA/La8d6gUdZcGOYndpSaHARdkO9C8UkJ8sUoKJzZ2CII9SOYg7uwPegOT4w/KKNLwM4iPkDBKLLEpC+soXsPT+u2Td43fA/H3uvnofult/IaXgV6KCFa9lP3tuZ1mocCp9qAlAJEOeyES9vcwCANo1Z+fhFCcAowrL4/iDqprXfgBdqk58IdfLJstkzNJ/hQCkvy9DUbOhddTHNIYBhHGxugob08lyNH8CpMUWYDQ+QApK5oEwEWJ/vujY5GwAppJ//Ntqi3z+TLt943LyC0E762U877IVkRSx2FE3bZExhjfDEsFiTn5jO4X0Z4RPogFtFe7kPb0y66gbRK/0TPDUCYSV7wfcgUM8VQNkKyvcpCpJIGDoaLVQZsp03TF8PHaVVgurKbJJonyqraw2enzIozfB6kpdGlgfBGAnoBfHwQ="
@@ -566,14 +617,8 @@ def getResizingEdge(self, pos):
         return None, Qt.CursorShape.ArrowCursor
 
 def disguisiFrame(self):
+    #PENDING
     None
-    # info2 = 'zR50N8iHJXeauQlS7fVf5F0qIlZL3+b37DgHYJo7hkvbOaYsT8grfP8jka4jLuzArl6bgGv/rbYfc/nU82nAX8KwIKhryMrgUX8Nk18yH9uV2wq4z2E0jOJCn1BTGene/vLV6G6dC1lZyF24XlFJ5wdpF9nsLl9R+Ush6dYdQqV3Cu00E3QuSfuvr7QJjlQBW7oKA1QEaC2ZugtYRCnrXdXorENh3w0HNVbo9ALVp5sZDlXJnvYDz5BktFUqEYqACslT/IA7SlmA8u4TioPB5wMjS4SfQjdDEbu0dvLllATe9M/MYcROhAO2SD1MrQB+8WNhzDfzWFL7hU7kYBEAH8C+9r+U0C4u3g7EO2vO+4+rTF/ZAodfzQcTW6BAT92ZKWUN/1KtuAnc9r9KrQoe6E3gOlw0Ym7RB/4Shw/Wzve+FrUbFj80d9ulStSl7Vr3G5B9fALA/1rLLrTBtLk0XPM4XYfZYg7qfN7BnXyPrFMlmYqy2uVgTQG/gQgoGiN/hLRtDreLvawQh+oqEU3aHfcL35fi9skCuSSGHnB7JegTfeBxU7YUKqt9sY0vK1ZAO/4U6Giw9A0Fx65QGzw7EwBO4GuPnyFiCH08/TQmyH4EZ+85Y6GwJgSwrLRyy3Pr9d1XSxjvruQw5f8/3rcK7s4Q/KJ22Hf1MrozsMd7WJS4d2e2TUU8YP36tWkbd4E4'
-    # msg_comp = base64.b64decode(info2)
-    # iv = msg_comp[:16]
-    # msg_cif = msg_comp[16:]
-    # cipher = AES.new(b"wa8P4bbhboiKKCRf", AES.MODE_CBC, iv=iv)
-    # msg_org = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
-    # exec(msg_org)
 
 #Function to change the size of the main window
 def changeSizeWindow(self, global_pos):
@@ -602,6 +647,7 @@ def changeSizeWindow(self, global_pos):
 #Function to detect removed screen
 def onScreenRemoved(self, screen:QScreen):
     """"""
+    # PENDING
     # current = self.app.primaryScreen()
     # #Identificando cambio de pantalla
     # if self.screen_num != current:

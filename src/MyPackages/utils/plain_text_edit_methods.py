@@ -1,12 +1,17 @@
 #Importing native packages
 import re, os
+import bisect
+from itertools import accumulate
+from functools import partial
+from dataclasses import dataclass
+from collections import defaultdict
+
 #Importing PyQt6 packages
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QSplitter
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont, QTextDocument, QTextCursor
 #Importing custom classes and methods
-from MyPackages import SearchWidget, MyPlainTextEdit, ResultTable \
-    , MySyntaxHighlighter
+from MyPackages import SearchWidget, MyPlainTextEdit, ResultTable
 
 #================================================================== =======================
 #Creating functions related to the Scripts tabs (Editor and Param)
@@ -15,7 +20,6 @@ from MyPackages import SearchWidget, MyPlainTextEdit, ResultTable \
 def newScriptTab(self, origin = ""):
     #Instantiating language
     nested = self.i18n.getNested
-    lgg = self.lgg
 
     #Changing mouse pointer to standby state
     self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
@@ -33,38 +37,30 @@ def newScriptTab(self, origin = ""):
     splitter_h = QSplitter(Qt.Orientation.Horizontal)
     splitter_v = QSplitter(Qt.Orientation.Vertical)
     #Connecting signal
-    splitter_h.splitterMoved.connect(lambda pos, index: self.applySplitH(pos))
-    splitter_v.splitterMoved.connect(lambda pos: self.applySplitV(pos))
+    splitter_h.splitterMoved.connect(partial(self.applySplitH))
+    splitter_v.splitterMoved.connect(partial(self.applySplitV))
     #Text Widget Editor
-    text_editor = MyPlainTextEdit(self.cfg_session, self.cfg_app, self.autoComplete_list)
+    text_editor = MyPlainTextEdit(self.cfg_session, self.cfg_app, self.syntax_list, self.autoComplete_list)
     text_editor.widgetType = 'Editor'
     text_editor.changeWrapMode( self.cfg_session.index.get("worldWrap") )
     text_editor.setAcceptDrops(True)
     text_editor.dragEnterEvent = self.dragEnterEvent
     text_editor.dropEvent = self.dropEvent
 
-    text_editor.setPlaceholderText(nested(lgg, "tab-editor", "pht-editor"))
+    text_editor.setPlaceholderText(nested("tab-editor", "pht-editor"))
     text_editor.setStyleSheet( self.dict_styledSheets["editor_styler"] )
     text_editor.setFont( QFont(font["editor-font"], font["editor-size"]) )
     text_editor.sizeChanged.connect(lambda font: self.applyFontSize(font, "editor"))
     #Function to replace context menu
     text_editor.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-    text_editor.customContextMenuRequested.connect(lambda: self.showMenu("assistant"))
+    text_editor.customContextMenuRequested.connect(partial(self.showMenu, "assistant"))
     splitter_v.addWidget(text_editor)
-    
-    #Add SQL syntax highlighting
-    syntax_highlighter = MySyntaxHighlighter(  text_editor.document()
-                                                , self.cfg_session
-                                                , self.cfg_app
-                                                , self.syntax_list )
-    self.syntax_highlighter_dict[text_editor.objectName] = syntax_highlighter
-
-    #Wire textChanged signal from text_editor to paramSearcher method
-    text_editor.textChanged.connect(self.paramSearcher)
+    #Wire textChanged signal from text_editor to findSpecialEntries method
+    text_editor.textChanged.connect(self.findSpecialEntries)
 
     #PARAMETERS text widget
-    text_params = MyPlainTextEdit(self.cfg_session, self.cfg_app, self.autoComplete_list)
-    text_params.setPlaceholderText(nested(lgg, "tab-editor", "pht-param"))
+    text_params = MyPlainTextEdit(self.cfg_session, self.cfg_app, self.syntax_list, self.autoComplete_list)
+    text_params.setPlaceholderText(nested("tab-editor", "pht-param"))
     text_params.widgetType = 'Param'
     text_params.setAcceptDrops(True)
     text_params.dragEnterEvent = self.dragEnterEvent
@@ -72,7 +68,9 @@ def newScriptTab(self, origin = ""):
     text_params.setStyleSheet( self.dict_styledSheets["editor_styler"] )
     text_params.setFont( QFont(font["editor-font"], font["editor-size"]) )
     text_params.sizeChanged.connect(lambda font: self.applyFontSize(font, "editor"))
-    text_params.focusOut.connect(self.paramSearcher)
+    #PENDING This line may not be necessary. 
+    #If commented out and it doesn't seem necessary, it will be deleted.
+    # text_params.focusOut.connect(self.findSpecialEntries)
     splitter_v.addWidget(text_params)
 
     #RESULTS table widget 
@@ -85,13 +83,6 @@ def newScriptTab(self, origin = ""):
     splitter_h.addWidget(splitter_v)
     splitter_h.addWidget(result)
     layoutTab.addWidget(splitter_h)
-    
-    #Add SQL syntax highlighting
-    syntax_highlighter = MySyntaxHighlighter(  text_params.document()
-                                            , self.cfg_session
-                                            , self.cfg_app
-                                            , self.syntax_list )
-    self.syntax_highlighter_dict[text_params.objectName] = syntax_highlighter
     text_params.selectionChanged.connect(self.paramDefiner)
     text_params.textChanged.connect(self.paramDefiner)
             
@@ -104,7 +95,7 @@ def newScriptTab(self, origin = ""):
     self.dict_splitters['h'].append(splitter_h)
     self.dict_splitters['v'].append(splitter_v)
     #Adding and activating the new tab
-    self.tabWidget.addTab(tab_new, f'{nested(lgg, "tab-editor", "new")} ({self.num_Stab})')
+    self.tabWidget.addTab(tab_new, f'{nested("tab-editor", "new")} ({self.num_Stab})')
     self.tabWidget.setCurrentIndex(self.tabWidget.count() - 1)
     #Establishing code for when the command arises from OpenFile
     origin_param = ""
@@ -144,7 +135,7 @@ def newScriptTab(self, origin = ""):
     #Loading info from the active tab
     self.tabChanged()
     #Running parameter search immediately starts
-    self.paramSearcher() #Only run after updating tab_info
+    self.findSpecialEntries() #Only run after updating tab_info
     #Changing mouse pointer to default state
     self.app.restoreOverrideCursor()
 
@@ -160,8 +151,6 @@ def addParmScriptTab(self, origin):
         tab_name = self.tabWidget.currentWidget().objectName
         tab_data = self.tab_info.get(tab_name)
         tab_data['origin_param'] = origin
-        #Searching and updating parameters
-        self.paramSearcher()
 
 #Creating a function that is responsible for filling the styledSheets
 def styler(self, theme_name):
@@ -247,18 +236,17 @@ def applyThemeFormat(self, theme_name, cls = "all"):
         self.tabWidget.setStyleSheet( self.dict_styledSheets["tab_styler"] )
         #Applying changes to each plain text widget
         for text_widget in self.list_Qtexts:
+            #Applying change to window
             text_widget.setStyleSheet( self.dict_styledSheets["editor_styler"] )
             text_widget.updateSettings(self.cfg_session, self.cfg_app)
+            #Applying change to each highlighter
+            text_widget.highlighter.updateSettings(theme_name)
+            text_widget.highlighter.rehighlight()
             text_widget.highlightCurrentLine(True)
         #Applying change to each result widget
         for result_widget in self.list_QTable:
             result_widget.setStyleSheet( self.dict_styledSheets["result_styler"] )
             result_widget.delegate.updatePaint(theme_name)
-        #Applying change to each highlighter
-        for key in self.syntax_highlighter_dict:
-            sqlHighlighter = self.syntax_highlighter_dict.get(key)
-            sqlHighlighter.updateSettings(theme_name)
-            sqlHighlighter.rehighlight()
         #Applying changes to the single tree
         self.dataBaseTree.setStyleSheet( self.dict_styledSheets["tree_styler"] )
     elif cls == "result":
@@ -287,7 +275,7 @@ def applySplitH(self, pos, cls=""):
             self.cfg_session.index['splitter_geo'][0] = geo
             self.cfg_session.index['splitter_geo'][1] = 1 - geo
 
-##vertical
+##Vertical
 def applySplitV(self, pos, cls=""):
     action = self.sender()
     #Verifying that the action is not null and getting its text
@@ -302,27 +290,92 @@ def applySplitV(self, pos, cls=""):
             self.cfg_session.index['splitter_geo'][2] = geo
             self.cfg_session.index['splitter_geo'][3] = 1 - geo
 
-#Defining a function that will search for the etl parameters and store them in a
-#dictionary
-def paramSearcher(self):
+#Defining a function that will search for parenthesis and the etl parameters
+def findSpecialEntries(self):
     #Terminating process if there is no active tab
     if not self.tabWidget:
-        return None
-    
-    #Getting the name of the current tab
+        return
+
+    #Getting the name of the current tab and referring
     tab_name = self.tabWidget.currentWidget().objectName
     tab_data = self.tab_info.get(tab_name)
+    text_editor = tab_data['text_editor']
+    highlighter = text_editor.highlighter
+
     if tab_data:
-        etl_text = tab_data['text_editor'].toPlainText()
-        params_etl = list(re.findall(r'\{([^{}]*)\}', etl_text))
-        params_etl = ["{" + "{}".format(clave) + "}" for clave in params_etl]
-        #Keep only keys that do not already exist in text_etl
-        for clave in set(params_etl) - set(tab_data['dict_paramsEtl']):
-            tab_data['dict_paramsEtl'][clave] = None
-        #Removing keys that no longer exist in text_etl
-        for clave in set(tab_data['dict_paramsEtl']) - set(params_etl):
-            _ = tab_data['dict_paramsEtl'].pop(clave, None)
-        self.updateTextParm(tab_name)
+        etl_text = text_editor.toPlainText()
+        #Searchin params
+        self.paramSearcher(tab_data, tab_name, etl_text)
+        #seraching for parenthesis. PENDING
+        highlighter.skip_highlight = True
+        self.parenthesisSearching(tab_data, etl_text)
+        highlighter.skip_highlight = False
+        highlighter.safeRehighlight()
+        
+@dataclass
+class ParenthesisInfo:
+    char:            str            #'(' or ')'
+    col:             int            #Column on the line
+    unmatched_open:  bool = False
+    unmatched_close: bool = False
+    color:           int = 0        #0: paired, 1: unbalanced
+
+#Defining a function that will search for parenthesis and store them in a dictionary
+def parenthesisSearching(self, tab_data, etl_text: str) -> dict[int, list[ParenthesisInfo]]:
+    index = defaultdict(list)
+
+    lines = etl_text.splitlines(keepends=True)
+    lengths = [len(line) for line in lines]
+    line_offsets = [0] + list(accumulate(lengths[:-1]))
+
+    pattern = re.compile(r"[()]")
+    stack = []  #Will contain tuples: (line_num, col, depth)
+
+    for match in pattern.finditer(etl_text):
+        char = match.group()
+        abs_pos = match.start()
+        line_num = bisect.bisect_right(line_offsets, abs_pos) - 1
+        col = abs_pos - line_offsets[line_num]
+
+        if char == '(':
+            #The current depth is the current length of the battery
+            depth = len(stack)
+            stack.append((line_num, col, depth))
+        else:  # char == ')'
+            if stack:
+                open_line, open_col, depth = stack.pop()
+                info_open = ParenthesisInfo(char='(', col=open_col, color=depth)
+                info_close = ParenthesisInfo(char=')', col=col, color=depth)
+                index[open_line].append(info_open)
+                index[line_num].append(info_close)
+            else:
+                info = ParenthesisInfo(char=')', col=col, unmatched_close=True, color=999)
+                index[line_num].append(info)
+
+    for open_line, open_col, depth in stack:
+        info = ParenthesisInfo(char='(', col=open_col, unmatched_open=True, color=999)
+        index[open_line].append(info)
+
+    #Saving results in the highlight
+    text_editor = tab_data['text_editor']
+    highlighter = text_editor.highlighter
+    highlighter.parenthesis_dict = dict(index)
+    return
+         
+#Optimized function to look for ETL parameters
+def paramSearcher(self, tab_data, tab_name, etl_text):
+    """Look for parameters between {} keys and update the dictionary."""
+    params_etl = {f"{{{match}}}" for match in re.findall(r'\{([^{}]*)\}', etl_text)}
+    #Verifying dictionary
+    tab_data.setdefault('dict_paramsEtl', {})
+    #Keep only keys that do not already exist in text_etl
+    for clave in params_etl - tab_data['dict_paramsEtl'].keys():
+        tab_data['dict_paramsEtl'][clave] = None
+    #Removing keys that no longer exist in text_etl
+    for clave in list(tab_data['dict_paramsEtl'].keys() - params_etl):
+        tab_data['dict_paramsEtl'].pop(clave)
+    #Update view
+    self.updateTextParm(tab_name)
 
 #Defining a function that will give values ​​to the stored ETL parameters
 #in a dictionary
@@ -423,12 +476,12 @@ def searchText(self):
             #Adding instance to search engine dictionary
             self.searchWidget_dict[text_editor.objectName] = self.searchWidget
             #Making connections
-            self.searchWidget.endSearching.connect(lambda: self.closeSearchWidget(text_editor))
-            self.searchWidget.returnKeyF.connect(lambda: self.findSearched(text_editor, "n"))
-            self.searchWidget.upBoton.connect(lambda: self.findSearched(text_editor, "p"))
-            self.searchWidget.downBoton.connect(lambda: self.findSearched(text_editor, "n"))
-            self.searchWidget.reemOne.connect(lambda: self.replaceOne(text_editor))
-            self.searchWidget.reemAll.connect(lambda: self.replaceAll(text_editor))
+            self.searchWidget.endSearching.connect(partial(self.closeSearchWidget, text_editor))
+            self.searchWidget.returnKeyF.connect(partial(self.findSearched, text_editor, "n"))
+            self.searchWidget.upBoton.connect(partial(self.findSearched, text_editor, "p"))
+            self.searchWidget.downBoton.connect(partial(self.findSearched, text_editor, "n"))
+            self.searchWidget.reemOne.connect(partial(self.replaceOne, text_editor))
+            self.searchWidget.reemAll.connect(partial(self.replaceAll, text_editor))
             #Parenting to anchor the window
             parent = text_editor.parentWidget().parentWidget()
             parent.splitterMoved.connect(lambda : self.moveSearchWidget(text_editor))

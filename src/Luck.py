@@ -35,7 +35,7 @@ if os.path.exists(log_file):
             #If it has more than 1000 lines, we delete the file
             os.remove(log_file)
 log_file = open(log_file, "w")
-sys.stdout = log_file
+sys.stdout = log_file #PENDING COMMENT or UNCOMMENT IN DEBUG
 print(f"Luck Started {datetime.now().strftime("[%Y-%m-%d %H:%M:%S]")}")
 
 #============================

@@ -1,6 +1,6 @@
-version: "0.62.4"
+version: "0.63.0"
 release_date: "Soon..."
-download_url: "https://github.com/jlondohi/Luck"
+download_url: "Soon..."
 checksum: "hash -> SHA256"
 dependencies:
   cloudera_odbc_driver: ">=2.6"

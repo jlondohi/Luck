@@ -11,6 +11,7 @@ list_thems:
       command_format:
       - '#009055'
       - false
+      - true
       comment_format:
       - '#0172b4'
       - true
@@ -20,20 +21,12 @@ list_thems:
       operator_format:
       - '#7c368f'
       - false
+      - true
       parameter_format:
       - '#ff8e01'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -42,9 +35,18 @@ list_thems:
       strings:
       - '#b39730'
       - false
+      error:
+      - '#FF0000'
+      - true
     result-alternate-background-color: '#E0E0E0'
     result-background-color: '#FFFFFF'
     result-color_text: '#2C2A29'
+    result-color_number: '#AE81FF'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#ff8e01'
+    result-color_string: '#b39730'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#484746'
     result-header-color: '#A6A6A6'
     result-highlight: '#3B9EDF'
@@ -64,6 +66,7 @@ list_thems:
       command_format:
       - '#009055'
       - false
+      - true
       comment_format:
       - '#0172b4'
       - true
@@ -73,20 +76,12 @@ list_thems:
       operator_format:
       - '#7c368f'
       - false
+      - true
       parameter_format:
       - '#ff8e01'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -95,9 +90,18 @@ list_thems:
       strings:
       - '#b39730'
       - false
+      error:
+      - '#FF0000'
+      - true
     result-alternate-background-color: '#BDBDBD'
     result-background-color: '#D4D4D4'
     result-color_text: '#2C2A29'
+    result-color_number: '#AE81FF'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#7c368f'
+    result-color_string: '#b39730'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#484746'
     result-header-color: '#A6A6A6'
     result-highlight: '#3B9EDF'
@@ -117,6 +121,7 @@ list_thems:
       command_format:
       - '#80FF80'
       - false
+      - true
       comment_format:
       - '#6A9955'
       - false
@@ -126,20 +131,12 @@ list_thems:
       operator_format:
       - '#66d9ef'
       - false
+      - true
       parameter_format:
       - '#CE9178'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -148,9 +145,18 @@ list_thems:
       strings:
       - '#e0bd3d'
       - false
+      error:
+      - '#FF0000'
+      - true
     result-alternate-background-color: '#E0E0E0'
     result-background-color: '#FFFFFF'
     result-color_text: '#2C2A29'
+    result-color_number: '#AE81FF'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#66d9ef'
+    result-color_string: '#e0bd3d'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#484746'
     result-header-color: '#A6A6A6'
     result-highlight: '#3B9EDF'
@@ -170,6 +176,7 @@ list_thems:
       command_format:
       - '#80FF80'
       - false
+      - true
       comment_format:
       - '#09DCCF'
       - false
@@ -179,20 +186,12 @@ list_thems:
       operator_format:
       - '#66d9ef'
       - false
+      - true
       parameter_format:
       - '#7c368f'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -201,9 +200,18 @@ list_thems:
       strings:
       - '#ae81ff'
       - false
+      error:
+      - '#FFFF00'
+      - true
     result-alternate-background-color: '#585858'
     result-background-color: '#464646'
     result-color_text: '#FFFFFF'
+    result-color_number: '#e0bd3d'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#66d9ef'
+    result-color_string: '#ae81ff'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#1E1E1E'
     result-header-color: '#464646'
     result-highlight: '#04395e'
@@ -223,6 +231,7 @@ list_thems:
       command_format:
       - '#0DB06D'
       - false
+      - true
       comment_format:
       - '#09DCCF'
       - false
@@ -232,20 +241,12 @@ list_thems:
       operator_format:
       - '#AA00FF'
       - false
+      - true
       parameter_format:
       - '#7c368f'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -254,9 +255,18 @@ list_thems:
       strings:
       - '#ae81ff'
       - false
+      error:
+      - '#FFFF00'
+      - true
     result-alternate-background-color: '#585858'
     result-background-color: '#464646'
     result-color_text: '#FFFFFF'
+    result-color_number: '#e0bd3d'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#AA00FF'
+    result-color_string: '#ae81ff'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#1E1E1E'
     result-header-color: '#464646'
     result-highlight: '#04395e'
@@ -276,6 +286,7 @@ list_thems:
       command_format:
       - '#569CD6'
       - false
+      - true
       comment_format:
       - '#6A9955'
       - false
@@ -285,20 +296,12 @@ list_thems:
       operator_format:
       - '#4EC9B0'
       - false
+      - true
       parameter_format:
       - '#CE9178'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -307,9 +310,18 @@ list_thems:
       strings:
       - '#e0bd3d'
       - false
+      error:
+      - '#00BFFF'
+      - true
     result-alternate-background-color: '#585858'
     result-background-color: '#464646'
     result-color_text: '#D4D4D4'
+    result-color_number: '#AE81FF'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#4EC9B0'
+    result-color_string: '#E0BD3D'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#1E1E1E'
     result-header-color: '#464646'
     result-highlight: '#04395e'
@@ -329,6 +341,7 @@ list_thems:
       command_format:
       - '#009055'
       - false
+      - true
       comment_format:
       - '#0172b4'
       - false
@@ -338,20 +351,12 @@ list_thems:
       operator_format:
       - '#ff8e01'
       - false
+      - true
       parameter_format:
       - '#7c368f'
       - false
       parenthesis:
-      - - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#2b7c27'
-        - '#285aa1'
-        - '#2b7c27'
-        - '#a17014'
-        - '#e094d5'
-        - '#2e8fe4'
-        - '#1c5b18'
+      - '#a17014'
       - false
       searching: '#2B7BB0'
       semicolon:
@@ -360,9 +365,18 @@ list_thems:
       strings:
       - '#e0bd3d'
       - false
+      error:
+      - '#00BFFF'
+      - true
     result-alternate-background-color: '#585858'
     result-background-color: '#464646'
     result-color_text: '#D4D4D4'
+    result-color_number: '#AE81FF'
+    result-color_float: '#C678DD'
+    result-color_bolean: '#ff8e01'
+    result-color_string: '#E0BD3D'
+    result-color_date: '#61AFEF'
+    result-color_id: '#4EC9B0'
     result-gridline-color: '#1E1E1E'
     result-header-color: '#464646'
     result-highlight: '#04395e'

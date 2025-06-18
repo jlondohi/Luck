@@ -8,18 +8,23 @@ Basurero/
 dist/
 build/
 build_ptgd/
+share/
 .venv/
+.vscode/
 .github/
 *__pycache__
 
 #Ignoring specific files
-pyvenv.cfg
+*NS-*
+*.pem
 *.pyc
 *.spec
+*/Luck-Debug.log
+CACHEDIR.TAG
+pyvenv.cfg
 Luck.exe
 Luck.bat
 pyarmor.error.log
-*/Luck-Debug.log
 
 #Do not ignore these files
 #!install_env.bat

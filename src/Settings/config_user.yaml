@@ -1,3 +1,5 @@
-HOSTNAME:
-Fetch limit: 1000
-Days until next tree update: 7
+hostname:
+fetch-limit: 10000       #items
+tree-update-in: 7        #days
+truncate-after: 24       #caracters
+max-numbered-blocks: 11  #Maximum number of numbered blocks (odd)

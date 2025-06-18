@@ -85,7 +85,6 @@ class UploadDBWidget(QMainWindow):
 
         #Loding lenguage
         self.i18n = parent.i18n
-        self.lgg = parent.lgg
 
         #Replacing title bar
         self.parentWindow = parent.parentWindow
@@ -109,22 +108,21 @@ class UploadDBWidget(QMainWindow):
 
         #Language
         nested = parent.i18n.getNested
-        lgg = parent.lgg
         #Headers
-        self._header = nested(lgg, "upload-to-db", "header")
+        self._header = nested("upload-to-db", "header")
         #Cls
-        self._option1 = nested(lgg, "upload-to-db", "option1")
-        self._option2 = nested(lgg, "upload-to-db", "option2")
-        self._option3 = nested(lgg, "upload-to-db", "option3")
+        self._option1 = nested("upload-to-db", "option1")
+        self._option2 = nested("upload-to-db", "option2")
+        self._option3 = nested("upload-to-db", "option3")
         #others
-        self._starting = nested(lgg, "status-bar", "starting")
-        self._open = nested(lgg, "open-file", "open2")
-        self._allowed = nested(lgg, "open-file", "open4")
-        self._end = nested(lgg, "status-bar", "end")
-        self._endE = nested(lgg, "status-bar", "end-e")
-        self._cmic = nested(lgg, "status-bar", "cmic")
-        self._state = nested(lgg, "upload-to-db", "state")
-        self._time = nested(lgg, "upload-to-db", "time")
+        self._starting = nested("status-bar", "starting")
+        self._open = nested("open-file", "open2")
+        self._allowed = nested("open-file", "open4")
+        self._end = nested("status-bar", "end")
+        self._endE = nested("status-bar", "end-e")
+        self._cmic = nested("status-bar", "cmic")
+        self._state = nested("upload-to-db", "state")
+        self._time = nested("upload-to-db", "time")
 
         #Starting window
         self.initWindow()
@@ -195,7 +193,7 @@ class UploadDBWidget(QMainWindow):
         self.username = getpass.getuser()
         self.psw = self.qle_password.text()
         self.dsn = self.cfg_session.index.get("prede_dsn")
-        self.hostname = self.cfg_user.index.get("HOSTNAME")
+        self.hostname = self.cfg_user.index.get("hostname")
 
         #Confirming that the route is valid as well as the table
         if os.path.exists(self.file_path[0]) and len(self.tabla) > 3 and "." in self.tabla and len(self.psw)>=6:

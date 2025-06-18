@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QMainWindow, QApplication, QLabel, QVBoxLayout \
-    , QWidget, QMessageBox
-from PyQt6.QtGui import QScreen, QPixmap, QIcon, QFont
+from PyQt6.QtWidgets import QMainWindow, QApplication \
+    , QLabel, QVBoxLayout, QWidget
+from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt, QTimer
 
 #Importing own PyQt6 packages

@@ -1,24 +1,19 @@
 #Importing native packages
-import re, os
-import pandas as pd
-from datetime import datetime, timedelta
+import polars as pl
+from functools import partial
 
 #Importing PyQt6 packages
-from PyQt6 import uic
 from PyQt6.QtWidgets import QApplication, QTreeView, QMenu
 from PyQt6.QtCore import Qt, QSortFilterProxyModel, pyqtSignal
-from PyQt6.QtGui import QFont, QIcon, QAction, QActionGroup  \
-    , QKeySequence, QStandardItemModel, QStandardItem
-#Importing custom classes and methods
-from MyPackages import MyPlainTextEdit, ResultTable \
-    , MySyntaxHighlighter
+from PyQt6.QtGui import QIcon, QAction, QStandardItemModel, QStandardItem
+
 #=================================================
 #Creating database tree and exploratory functions
 #=================================================
 
 class MyTreeView(QTreeView):
     #Defining signals
-    describeReady = pyqtSignal(pd.DataFrame)
+    describeReady = pyqtSignal(pl.DataFrame)
 
     def __init__(self, parent):
         super().__init__()
@@ -53,21 +48,20 @@ class MyTreeView(QTreeView):
         
         #Language
         self.nested = parent.i18n.getNested
-        self.lgg = parent.lgg
         #Headers
-        self._status = self.nested(self.lgg, "execution", "header", "status")
-        self._error = self.nested(self.lgg, "execution", "header", "error")
-        self._table = self.nested(self.lgg, "execution", "header", "table")
+        self._status = self.nested("execution", "header", "status")
+        self._error = self.nested("execution", "header", "error")
+        self._table = self.nested("execution", "header", "table")
         #States
-        self._running = self.nested(self.lgg, "execution", "status", "running")
-        self._failed = self.nested(self.lgg, "execution", "status", "failed")
+        self._running = self.nested("execution", "status", "running")
+        self._failed = self.nested("execution", "status", "failed")
         #Msgs
-        self._msg6 = self.nested(self.lgg, "execution", "msgs", "msg6")
+        self._msg6 = self.nested("execution", "msgs", "msg6")
 
         #Tree
-        self._copy = self.nested(self.lgg, "tab-eco", "tree", "copy")
-        self._update = self.nested(self.lgg, "tab-eco", "tree", "update")
-        self._updateAll = self.nested(self.lgg, "tab-eco", "tree", "update-all")
+        self._copy = self.nested("tab-eco", "tree", "copy")
+        self._update = self.nested("tab-eco", "tree", "update")
+        self._updateAll = self.nested("tab-eco", "tree", "update-all")
 
     #Function to apply the search filter to the tree
     def filterTree(self, text):
@@ -172,16 +166,11 @@ class MyTreeView(QTreeView):
             #Changing mouse pointer to standby state
             self.app.setOverrideCursor(Qt.CursorShape.WaitCursor)
             #Creating a temporary Dataframe while the end arrives
-            temp = pd.DataFrame({
-                    self._status: pd.Series(dtype=str),
-                    self._table: pd.Series(dtype=str),
-                    self._error: pd.Series(dtype=str)
-                                })
-            #Managing general message
-            temp.loc[0, self._status] = self._running
-            temp.loc[0, self._table] = table
-            temp.loc[0, self._error] = ""
-
+            temp = pl.DataFrame({
+                self._status: [self._running],
+                self._table: [table],
+                self._error: [""]
+            })
             self.describeReady.emit(temp)
             
             #Verifying connection
@@ -198,7 +187,7 @@ class MyTreeView(QTreeView):
                 query = f"describe {table};"
                 self.parent.tableDescribed.setText(f"{self._table}: {table}")
                 try:
-                    temp2 = pd.read_sql(query, self.parent.conn)
+                    temp2 = pl.read_database(query, self.parent.conn)
                     self.describeReady.emit(temp2)
                 except Exception as exc:
                     temp.loc[0, self._status] = self._failed
@@ -223,7 +212,7 @@ class MyTreeView(QTreeView):
             if item.hasChildren():
                 #Upadate a DB
                 update = QAction(self._update, self)
-                update.triggered.connect(lambda: self.updateTables(item.text()))
+                update.triggered.connect(partial(self.updateTables, item.text()))
                 #Upadate tree
                 updateAll = QAction(self._updateAll, self)
                 updateAll.triggered.connect(self.updateAllTree)
@@ -235,7 +224,7 @@ class MyTreeView(QTreeView):
             else:
                 #Table
                 copy_action = QAction(self._copy, self)
-                copy_action.triggered.connect(lambda: self.copyTableName(item))
+                copy_action.triggered.connect(partial(self.copyTableName, item))
                 menu.addAction(copy_action)
 
             #Show the context menu
@@ -254,7 +243,7 @@ class MyTreeView(QTreeView):
 
         #Requesting information from the DB
         cursor = self.parent.conn.cursor()
-        self.parent.lbl_status.setText(self.nested(self.lgg, "status-bar", "update-db"))
+        self.parent.lbl_status.setText(self.nested("status-bar", "update-db"))
         #Downloading tables of database
         try:
             cursor.execute(f"SHOW TABLES IN {databaseName};")
@@ -270,7 +259,7 @@ class MyTreeView(QTreeView):
         self.parent.actualSession.saveSessionTree(self.sessionTree)
         #Send the data to the visual tree
         self.loadData(self.sessionTree)
-        self.parent.lbl_status.setText(self.nested(self.lgg, "status-bar", "updated-db"))
+        self.parent.lbl_status.setText(self.nested("status-bar", "updated-db"))
     
     #Function to update tree (All DB)
     def updateAllTree(self):

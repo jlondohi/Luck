@@ -40,7 +40,7 @@ class SearchWidget(QMainWindow):
         self.fm_reemplazar.hide()
         self.bt_showReem.setEnabled(True)
         self.setGeometry(self.geometry().x(), self.geometry().y(), 220, 35)
-        self.setWindowTitle('Buscador')
+        self.setWindowTitle('searcher')
 
     def showReem(self):
         self.fm_reemplazar.show()
@@ -52,7 +52,7 @@ class SearchWidget(QMainWindow):
         self.initWindow()
     
     def closeEvent(self, event):
-        self.textWidget.Searched_word = None
+        self.textWidget.searched_word = None
         self.endSearching.emit()
         super().closeEvent(event)
     
@@ -62,7 +62,7 @@ class SearchWidget(QMainWindow):
         self.textWidget.multiCursor_list.clear()
         self.textWidget.multiCursorEnabled = False
         #Changing the search text
-        self.textWidget.Searched_word = self.qle_textBuscar.text()
+        self.textWidget.searched_word = self.qle_textBuscar.text()
 
     def myShow(self):
         if self.textWidget and self.textWidget.isVisible():

@@ -1,8 +1,5 @@
-import re, os, pyodbc
-import pandas as pd
-from datetime import datetime
-from MyPackages import JulHelper
-from PyQt6.QtCore import QThread, pyqtSignal, QObject
+import pyodbc
+from PyQt6.QtCore import QThread, pyqtSignal
 
 #=============================================================
 ### Creating a connection manager (Execution in second thread)
