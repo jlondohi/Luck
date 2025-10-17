@@ -1,0 +1,64 @@
+/*General container*/
+QWidget {{
+    background: none;
+}}
+
+/*MyParamsManager*/
+MyParamsManager {{
+    color: {0};
+    background-color: {1};
+}}
+
+QLabel {{
+    color: {2};
+    background-color: {1};
+    border: none;
+    border-right: none;
+    border-top-left-radius: none;
+    border-bottom-left-radius: none;
+    padding: 4px 6px;
+}}
+
+/*QLineEdit general*/
+QLineEdit {{
+    color: {0};
+    background: {1};
+    border: none;
+    border-left: none;
+    border-top-right-radius: none;
+    border-bottom-right-radius: none;
+    padding: 4px;
+    
+}}
+
+/*QLineEdit empty*/
+QLineEdit[empty="true"] {{
+    border-bottom: 1.5px solid {3};
+    background: {1};
+    color: {0};
+}}
+
+/*QLineEdit no empty*/
+QLineEdit[empty="false"] {{
+    border-bottom: none;
+    background: {1};
+    color: {0};
+}}
+
+/*QLineEdit Focused*/
+QLineEdit:focus {{
+    border-bottom: 1.5px solid var(--4th-bg-color);
+    padding: 3px;
+}}
+
+/*QLineEdit hover*/
+QLineEdit:hover {{
+    border-bottom: 1.5px solid var(--2nd-hover-color);
+    padding: 3px;
+}}
+
+
+
+
+
+

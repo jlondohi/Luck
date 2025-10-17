@@ -1,0 +1,16 @@
+Compute stats: COMPUTE STATS {table}
+Count: SELECT COUNT(*) FROM {table}
+Count by ingestion: SELECT INGESTION_YEAR, INGESTION_MONTH, INGESTION_DAY, COUNT(1)
+  FROM {table} GROUP BY 1, 2, 3 ORDER BY 1 DESC, 2 DESC , 3 DESC
+Count by f_analisis: SELECT F_ANALISIS, COUNT(1)
+  FROM {table} GROUP BY 1 ORDER BY 1 DESC
+Count by {input}: SELECT {input}, COUNT(1)
+  FROM {table} GROUP BY 1 ORDER BY 1 DESC
+Describe: DESCRIBE {table}
+Describe formatted: DESCRIBE FORMATTED {table}
+Explain: '{query}'
+Select limit: SELECT * FROM {table} LIMIT 50
+Select all: SELECT * FROM {table}
+Show partitions: SHOW PARTITIONS {table}
+Show zones LZ: SHOW DATABASES
+Show tables of zone: SHOW TABLES IN {table}

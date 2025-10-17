@@ -1,0 +1,55 @@
+QFrame {{
+    background-color: {1};
+    color: {0};
+    border: none;
+}}
+
+QFrame#fm_buscar[search="true"] {{
+    border: 2px solid var(--1st-border-color);
+}}
+
+QFrame#fm_buscar[search="false"] {{
+    border: 2px solid var(--1st-border-color);
+    border-bottom: none;
+}}
+
+QFrame#fm_reemplazar {{
+    border: 2px solid var(--1st-border-color);
+    border-top: none;
+}}
+
+
+/*QLineEdit general*/
+QLineEdit {{
+    color: {2};
+    background-color: {3};
+	font: var(--1st-font);
+    border: 1px solid var(--1st-border-color);
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding: 4px;
+}}
+
+/*QLineEdit Focused*/
+QLineEdit:focus {{
+    border-bottom: 1.5px solid var(--4th-bg-color);
+    padding: 3px;
+}}
+
+/*QLineEdit hover*/
+QLineEdit:hover {{
+    border-bottom: 1.5px solid var(--2nd-hover-color);
+    padding: 3px;
+}}
+
+
+QPushButton {{
+    background-color: transparent;
+    color: inherit;
+    border: none;
+}}
+
+QPushButton:hover {{
+	background-color: var(--2nd-bg-color);
+	border-radius: 5px;
+}}

@@ -1,0 +1,304 @@
+header:
+  file: File
+  edit: Edit
+  select: Selection
+  view: View
+  go: Go
+  sql: SQL
+  ai: AI
+  help: Help
+file:
+  new: New
+  open: Open
+  open-block: Open in block
+  reload: Reload
+  save: Save
+  save-as: Save As
+  open-param: Open parameters
+  open-param-block: Open parameters in block
+  save-param: Save parameters
+  save-param-as: Save parameters as
+  close: Close
+edit:
+  search: Search
+  replace: Replace
+  comment: Comment/Uncomment
+  super-com: Insert super comment
+select:
+  stpq: Sel. up to previous query
+  stnq: Sel. until next query
+  snexo: Sel. sig. occurrence
+  acel: Add cursor to end of lines
+  acsl: Add cursor to start of lines
+  ac-above: Add cursor up
+  ac-below: Add cursor down
+view:
+  language: Language
+  profile: Style profile
+  font:
+    main: Font
+    font-editor: Editor
+    font-result: Results
+  ifse: Increase editor font size
+  lfse: Decrease editor font size
+  ifsr: Increase results font size
+  lfsr: Decrease results font size
+  tab-space: Set spaces per tab
+  result-fetch: Set results fetch limit
+  ww: Word wrap
+go:
+  go-ini: Go to start
+  go-end: Go to end
+  goto: Go to line, block
+  prev-q: Previous query
+  next-q: Next query
+  prev-block: Previous block
+  next-block: Next block
+  pt: Next tab
+  nt: Previous tab
+sql:
+  sel-dsn: Select DSN
+  con-dsn: Connect/Reconnect DSN
+  stop-run: Stop execution
+  run-query: Run query
+  run-all: Run all
+  save-result: Query and save
+  save-result-as: Query and save as
+  ufftlz: Upload file to DB
+  tmplts: Templates
+  assistant: Assistant
+  start-log: Start recording
+  end-log: Stop recording
+ai:
+  analize-query1: Analyze query with AI
+  analize-query2: Analyze query with
+help:
+  about: About
+  update: Update
+execution:
+  header:
+    status: Status
+    query: Query
+    shape: Size
+    time: Time
+    resources: Resources
+    error: Error
+    params: Parameters
+    cls: Class
+    saveAs: Save as
+    table: Table
+  status:
+    wating: Waiting
+    running: Running
+    executed: Executed
+    failed: Failed
+  msgs:
+    msg0: Sec
+    msg1: Parameters
+    msg2: Started
+    msg3: Saving
+    msg4: Downloaded, executing local save
+    msg5: Process interrupted by user
+    msg6: No connection to DB
+    msg7: Parameter error
+    msg8: Parameters not specified
+    msg9: Multiple parameters not specified
+    msg10: "All queries will be executed.\nDo you want to continue?"
+    msg11: Queue limit reached for chained queries
+    msgE: Error
+    msgI: Single execution
+    msgBE: Block execution
+    msgF: Download to local file
+    msgT: Execution time
+log-messages:
+  log-started: Log recording started. Time
+  log-end: Log recording ended. Time
+  user: User
+  dsn-changed: DSN changed
+  rows-affected: Rows affected
+  Num-columns: Num. columns
+  Num-rows: Num. rows
+  error-save: Error saving
+  error-load: Error loading
+  error-session: Permission denied for session path
+tooltips:
+  tb1: Close
+  tb2: Minimize
+  tb3: Collapse
+  tb4: Expand
+  tb5: Highlight
+  tb6: Normalize
+  tb7: Basic mode
+  tb8: Styled mode
+  tb9: Open downloads folder
+  tb10: Luck
+  sb1: Connect/Reconnect
+  sb2: Stop execution
+  sb3: Start log recording
+  sb4: Stop log recording
+  sb5: Current status
+  sb6: Total number of editor lines
+  sb7: Go to line, block
+  sb8: Set spaces per tab
+  sb9: Result table size
+  sb10: Set results fetch limit on screen
+  sb11: Version
+  ttp1: Copy
+  ttp2: Close
+status-bar:
+  starting: Starting ...
+  working: Working ...
+  end: Finished
+  end-e: Finished with error
+  cmic: Check, missing or incorrect data
+  nc-db: No connection to {}
+  sc-db: Connecting to {}
+  c-db: Connected to {}
+  update-tree: Updating tree ...
+  update-error: Could not download tree
+  updated-tree: Tree updated
+  update-db: Updating DB ...
+  updated-db: DB updated
+  log-started: Log recording started
+  log-end: Log recording ended
+  unex-error: Unexpected error
+  fetched: Partial result
+  no-fetched: Full result
+  cells: Num. cells
+  rows-cols: [Rows, Columns]
+  spaces: Spaces
+  cursors: Num. cursors
+  selected-lines: Num. lines
+  selections: Num. selections
+  line-block: [Line, Block]
+  lines: Lines
+  lines-msg: Enter number of spaces per tab
+  goto-title: Go to
+  goto-msg: Go to line [, block]
+  fetch-title: Results fetch limit
+  fetch-msg: "Max number of rows to display (fetch).\nHigh values may affect performance.\nWill apply on next execution."
+tab-editor:
+  new: New
+  pht-editor: Editor
+tab-paramsManager:
+  copy: Copy parameters
+  paste: Paste parameters
+  del-all: Delete parameters
+  del-bag: Clear memory
+  open: Open parameters
+  save: Save parameters
+  save-ass: Save parameters
+tab-eco:
+  eco: Ecosystem
+  db: Databases
+  searh-table: Search table
+  table-strctr: Table structure
+  history:
+    header: History
+    type: Type
+    type-u: Single
+    type-b: Block
+    time: Time
+    query: Query
+    param: Parameters
+  tree:
+    copy: Copy table
+    update: Update DB
+    update-all: Update all
+    expand: Expand
+    expand-all: Expand all
+    collapse: Collapse
+    collapse-all: Collapse all
+tab-result:
+  cell:
+    truncated: ' (...)'
+  cell-menu:
+    copy-value: Copy value
+    copy-value-header: Copy value with header
+    copy-vale-filter: Copy as filter
+    copy-table: Copy full table
+  headerMenuH:
+    copy-column: Copy column
+    sort-asc: Sort ascending
+    sort-des: Sort descending
+    restore: Restore original table
+    numbers-filter: Number filters
+    texts-filter: Text filters
+  filter-value-num:
+    title: Filter by number
+    num-equal: Equals
+    num-not-equal: Not equal
+    greater: Greater than
+    greater-equal: Greater or equal
+    lesser: Less than
+    lesser-equal: Less or equal
+    between: Between
+    top-10: Top ten
+    above-avg: Above average
+    below-avg: Below average
+  filter-value-text:
+    title: Filter by text
+    txt-equal: Equals
+    txt-not-equal: Not equal
+    start-with: Starts with
+    end-with: Ends with
+    contains: Contains
+    not-contains: Does not contain
+  headerMenuV:
+    copy-row: Copy row
+    copy-row-header: Copy row with header
+  between:
+    title: Filter between
+    min: Enter minimum value
+    max: Enter maximum value
+open-file:
+  open1: Open
+  open2: Open file
+  open3: Open in a single block?
+  open4: Allowed files
+  openSQL: SQL files
+  openP1: Open parameters
+  openP2: Open in a single block?
+  openP3: SQL parameter files
+save-files:
+  toFile1: CSV files comma-delimited
+  toFile2: CSV files semicolon-delimited
+  toFile3: CSV files pipe-delimited
+  toFile4: Excel file
+  toFile5: Log file
+  toFile6: SQL file
+  toFile7: SQL parameter files
+  save1: Save
+  save2: Save file
+  save3: Saved as
+  saveE1: Save changes?
+  saveE2: Save changes before closing?
+  saveM1: Saved
+  saveM2: Saved as
+  saveM3: Saved in Downloads
+  saveM4: File saved successfully
+  error1: Access denied
+  error2: Critical error
+  error3: File exceeded maximum rows allowed in Excel. Saved in
+  error4: Unable to save file. Error
+log:
+  log-started: Log recording started on
+  log-end: Log recording ended on
+update-app:
+  title1: Updated
+  update: You are currently using the latest version
+  title2: Update available
+  outdated: "We have a new version!\nDo you want to update now?\nNew version"
+  title3: Error
+  connection-error: Error connecting to Luck repository
+upload-to-db:
+  header: Upload file to DB
+  option1: Replace if exists in DB
+  option2: Stop if exists in DB
+  option3: Append to DB source
+  state: State
+  time: Time
+msgs:
+  msg1: No results
+  msg2: Unknown error
+  msg3: Oops! Something went wrong

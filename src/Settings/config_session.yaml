@@ -1,0 +1,60 @@
+language: es-CO
+global_theme: dark
+internal_profile: Gris oscuro
+prede_dsn: IMPALA_PROD
+prede_font:
+    editor-font: Consolas
+    editor-size: 11
+    result-font: Segoe UI
+    result-size: 10
+worldWrap: false
+baseSetter: false
+session_path: null
+fetch-limit: 10000
+tab-spaces: 4
+status_frame:
+    status:
+    - true
+    - 70
+    query:
+    - true
+    - 70
+    params:
+    - true
+    - 70
+    shape:
+    - false
+    - 70
+    time:
+    - true
+    - 70
+    resources:
+    - false
+    - 70
+    error:
+    - true
+    - 70
+    cls:
+    - false
+    - 70
+    saveAs:
+    - false
+    - 70
+prede_geo:
+- 0.10
+- 0.10
+- 0.60
+- 0.70
+splitter_geo:
+- 0.6
+- 0.8
+eco:
+    history-frame:
+    - 70
+    - 70
+    - 300
+    - 70
+    splitter_geo_eco:
+    - 0.2
+    - 0.3
+    - 0.5

@@ -1,0 +1,54 @@
+#Install dependencies in a Python 3.13.7 virtual environment
+#-----------------------------------------------------------
+PyQt6==6.7.1
+qt6-applications==6.5.0.2.3
+numpy>=2.1.1
+datetime>=5.5
+pandas>=2.2.2
+polars>=1.30.0
+pyarrow>=20.0.0
+openpyxl>=3.1.5
+xlsxwriter>=3.2.0
+pyodbc>=5.1.0
+regex>=2024.7.24
+pycryptodome>=3.20.0
+pyyaml>=6.0.2
+PyInstaller>=6.10.0
+#Dependencies for update
+#------------------------
+requests>=2.32.4
+tqdm>=4.67.1
+PyJWT>=2.10.1
+cryptography==45.0.5
+#Dependencies for Documentation
+#------------------------
+Sphinx>=8.2.3
+sphinx-autodoc-typehints>=3.2.0
+sphinx-rtd-theme>=3.0.2
+
+#Dependencies for compiling
+#------------------------
+#1
+nuitka>=2.7.12
+nuitka[pyqt6]
+ordered-set>=4.1.0
+zstandard>=0.24.0
+#2
+pyarmor>=8.5.11
+#3
+cython>=3.1.3
+pyinstaller>=6.15.0
+
+#Dependencies for tests
+pytest-qt>=4.4.0
+
+#Deprecated dependencies
+# sqlfluff>=3.2.0
+# openai>=1.50.2
+# impala-helper>=1.3.7
+# sparky_bc>=2.9.3
+# xlwings>=0.31.10
+
+
+
+

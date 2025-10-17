@@ -1,0 +1,34 @@
+#Ignoring specific folders
+src_compiled/
+eggs/
+Lib/
+Scripts/
+Include/
+dist/
+dist-msix/
+msix/
+build/
+build_ptgd/
+release/
+share/
+.venv/
+.vscode/
+.github/
+.pytest_cache
+*__pycache__
+
+#Ignoring specific files
+*NS-*
+*.pem
+*.pyc
+*.spec
+*/Luck-Debug.log
+CACHEDIR.TAG
+pyvenv.cfg
+Luck.exe
+Luck.bat
+pyarmor.error.log
+Parallel
+
+#Do not ignore these files
+#!install_env.bat

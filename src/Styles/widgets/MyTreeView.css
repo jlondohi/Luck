@@ -1,0 +1,23 @@
+/*QTreeView setting */
+QTreeView {{
+    color: {0};
+    background-color: {1};
+    border: 1px solid var(--1st-border-color);
+    padding: 0px;
+}}
+
+/*Style for database and table icons*/
+QTreeView::item {{
+    padding: 1px;
+    margin: 1px;
+}}
+
+QTreeView::item:hover {{
+    color: {0};
+    background-color: {2};
+}}
+
+QTreeView::item:selected {{
+    color: {0};
+    background-color: {2};
+}}

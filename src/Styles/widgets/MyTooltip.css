@@ -1,0 +1,35 @@
+QFrame {{
+    background-color: {1};
+    color: {0};
+    border: none;
+}}
+
+QFrame#fm_tooltip {{
+    border: 2px solid black;
+}}
+
+
+/* QTextEdit general */
+QTextEdit {{
+    color: {2};
+    background-color: {3};
+    font: var(--1st-font);
+    border: 1px solid var(--1st-border-color);
+    border-bottom: 2px solid var(--4th-bg-color);
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    padding: 4px;
+}}
+
+/* QPushButton normal */
+QPushButton {{
+    background-color: transparent;
+    color: inherit;
+    border: none;
+}}
+
+/* QPushButton al pasar el mouse */
+QPushButton:hover {{
+    background-color: var(--2nd-bg-color);
+    border-radius: 5px;
+}}

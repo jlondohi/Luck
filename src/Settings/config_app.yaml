@@ -1,0 +1,25 @@
+hostname:
+tree-update-in: 7 #INT. Days.
+query-queue-limit: null #INT. Queue limit for chained queries.
+truncate-after: null #INT. Character number to truncate in the cells of the results table or none.
+max-param-memory: 100 #INT. The maximun number of parameters to keep in current session.
+max-colored-blocks: 11 #INT. The maximum number of colors that can be used in blocks.
+max-colored-parenthesis: 11 #INT. The maximum number of colors that can be used in parenthesis.
+max-width-tabs: 150px  #PX. Defines the maximum width allocated per tab. This impacts both the tab size and the amount of text displayed.
+min-width-result-column: 100px #PX. Defines the minimum width for the results column. It does not affect user interaction with result table.
+max-width-result-column: 150px #PX. Defines the maximum width for the results column. It does not affect user interaction with result table.
+1st-font: 9pt 'Segoe UI' #FONT. Sets the font for UI elements such as messages, menus, submenus, tabs, and system labels.
+2nd-font: 9pt 'Segoe UI' #FONT. Sets the font for UI elements such as: tab font, menus (inside), result headers.
+list_fonts:
+  font:
+  - Arial
+  - Segoe UI
+  - French Script MT
+  - Javanese Text
+  - Verdana
+  - Cascadia Code
+  - Consolas
+  - Fira Code
+  - Roboto Mono
+  - Courier New
+  - DejaVu Sans Mono

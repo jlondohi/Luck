@@ -1,0 +1,108 @@
+# Instructions for use or disuse.
+# 1. The keys are aligned with the language file
+# 2. Do not define shortcuts here; the program searches here only when it needs one.
+# 3. This follows the Qt and GTK standard, where modifiers are written in English. No spaces.
+# 4. {} is replaced with the next letter from the title in the currently selected language.
+
+# NOTE: The following shortcuts are reserved for the editor.  
+# Defining them in this shortcut configuration file may cause bugs or unexpected behavior.
+
+# Reserved shortcuts:
+# 01. Ctrl+A
+# 02. Ctrl+C
+# 03. Ctrl+V
+# 04. Ctrl+X
+# 05. Ctrl+Z
+# 06. Ctrl+Y
+# 07. Ctrl+Shift+Right
+# 08. Ctrl+Shift+Left
+# 09. Ctrl+Right
+# 10. Ctrl+Left
+# 11. Shift+Right
+# 12. Shift+Up
+# 13. Shift+Left
+# 14. Shift+Down
+# 15. Shift+Tab
+# 16. Tab
+# 17. Ctrl+Home
+# 18. Ctrl+End
+# 19. Ctrl+Shift+Home
+# 20. Ctrl+Shift+End
+
+header:
+  file: Alt+{}
+  edit: Alt+{}
+  select: Alt+{}
+  view: Alt+{}
+  go:
+  sql: Alt+{}
+  ai: Alt+{}
+  help: Alt+{}
+file:
+  new: Ctrl+N
+  open: Ctrl+O
+  open-block: Ctrl+Shift+O
+  reload: Ctrl+R
+  save: Ctrl+S
+  save-as: Ctrl+Shift+S
+  open-param:
+  open-param-block:
+  save-param:
+  save-param-as:
+  close: Alt+F4
+edit:
+  search: Ctrl+F
+  replace: Ctrl+H
+  comment: Ctrl+}
+  super-com: Ctrl+Shift+}
+select:
+  stpq: Ctrl+Shift+Up
+  stnq: Ctrl+Shift+Down
+  snexo: Ctrl+D
+  acel: Ctrl+I
+  acsl: Ctrl+Shift+I
+  ac-above: Ctrl+Alt+Up
+  ac-below: Ctrl+Alt+Down
+view:
+  profile:
+  font:
+  ifse: Ctrl++
+  lfse: Ctrl+-
+  ifsr: Ctrl+Shift++
+  lfsr: Ctrl+Shift+-
+  tab-space:
+  result-fetch:
+  ww: Alt+Z
+go:
+  goto: Ctrl+G
+  prev-q: Ctrl+Up
+  next-q: Ctrl+Down
+  prev-block: Ctrl+Q
+  next-block: Ctrl+W
+  pt: Ctrl+PgUp
+  nt: Ctrl+PgDown
+sql:
+  sel-dsn:
+  con-dsn:
+  stop-run:
+  run-query: F9
+  run-all: F10
+  save-result: F5
+  save-result-as: Shift+F5
+  ufftlz: F6
+  tmplts: F7
+  assistant: F8
+  start/end-log: Ctrl+L
+ai:
+  analize-query1:
+  analize-query2:
+help:
+  about: Ctrl+J
+  update: Ctrl+U
+buttons:
+  downloads:
+  styler:
+  lighter: F11
+  darker: F11
+  panelize: F12
+  expand: F12

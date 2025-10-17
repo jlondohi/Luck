@@ -1,0 +1,55 @@
+editor-background-color: '#1E1E1E'
+editor-color_num: '#D4D4D4'
+editor-color_text: '#D4D4D4'
+editor-line-highlight: '#212121'
+editor-selection-bg-color: '#04395e'
+other_colors:
+  block_format:
+  - '#ffbf00'
+  - true
+  command_format:
+  - '#569CD6'
+  - false
+  - true
+  comment_format:
+  - '#6A9955'
+  - false
+  numbers:
+  - '#ae81ff'
+  - false
+  operator_format:
+  - '#4EC9B0'
+  - false
+  - true
+  parameter_format:
+  - '#CE9178'
+  - false
+  parenthesis:
+  - '#a17014'
+  - false
+  searching: '#2B7BB0'
+  semicolon:
+  - '#FC7A1E'
+  - true
+  strings:
+  - '#e0bd3d'
+  - false
+  error:
+  - '#00BFFF'
+  - true
+result-alternate-background-color: '#585858'
+result-background-color: '#464646'
+result-color_text: '#D4D4D4'
+result-color_number: '#bababa'
+result-color_float: '#e0e0e0'
+result-color_bolean: '#4EC9B0'
+result-color_string: '#E0BD3D'
+result-color_date: '#61AFEF'
+result-color_cat: '#4EC9B0'
+result-gridline-color: '#1E1E1E'
+result-header-color: '#464646'
+result-highlight: '#04395e'
+result-trafficlight:
+- '#4c9141'
+- '#afad00'
+- '#d57125'

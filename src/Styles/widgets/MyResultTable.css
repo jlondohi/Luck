@@ -1,0 +1,30 @@
+/*General table*/
+QTableView {{
+    border: none;
+    color: {0};
+    background-color: {1};
+    gridline-color: {3};
+    border-radius: 0;
+}}
+/*Items*/
+QAbstractItemView::item:selected {{
+    color: {0};
+    background-color: {4};
+}}
+QAbstractItemView::item:hover {{
+    background-color: {4};
+}}
+/*Corner*/
+QTableCornerButton::section {{
+    color: {0};
+    background-color: {5};
+}}
+/*Index and title bar*/
+QHeaderView::section {{
+    color: {0};
+    gridline-color: {3};
+    border: 1px solid {3};
+    background-color: {5};
+    padding: 4px;
+    font-weight: bold;
+}}

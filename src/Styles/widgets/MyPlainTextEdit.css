@@ -1,0 +1,6 @@
+QPlainTextEdit {{
+    border: none;
+    color: {0};
+    background-color: {1};
+    selection-background-color: {2};
+}}

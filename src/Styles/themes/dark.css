@@ -1,0 +1,335 @@
+:root {
+    /*General backgrounds*/
+    --1st-bg-color: #252526;        /*Body frames, Menus, Tab, InputDialog, MessageBox, Scroll bg, Inputs box*/
+    --2nd-bg-color: #4b4b4b;        /*Title frame, Tab (rigth border), Tooltips*/
+    --3rd-bg-color: #5e5e5e;        /*Scroll handlers*/
+    --4th-bg-color: #59CBE8;        /*Status bar, Bar frame, Tab (top border)*/
+
+    --connected-bg-color:#16825d;   /*Connect button on the status bar*/
+    --unconnected-bg-color:#e81123; /*UnConnect button on the status bar*/
+
+    /*Edges and lines*/
+    --1st-border-color: #000000;    /*General borders*/
+    
+    /*Typography*/
+    --1st-txt-color: #D4D4D4;       /*General texts in GUI*/
+    --2nd-txt-color: #ffffff;       /*Text in title bar, Selected menu*/
+    
+    /*Hovers*/
+    --1st-hover-color: #59CBE8;     /*Menus (inside), Splitters*/
+    --2nd-hover-color: #a8dcea;
+    --3rd-hover-color: #4b4b4b;     /*Scroll handlers*/
+    --4th-hover-color: #e81123;     /*Close button*/
+
+    /*Pressed*/
+    --1st-pressed-color: #59CBE8;   /*Scroll handlers*/
+    
+    /*Fonts*/
+    --1st-font: --app:1st-font;     /*General font*/
+    --2nd-font: --app:2nd-font;     /*Tab font, Menus (Inside), result headers*/
+
+    /*Others*/
+    --max-width-tabs: --app:max-width-tabs;
+
+    /*Images*/
+    --close-tab1: url('Guis/Resources/close-tab1.png');
+    --close-tab2: url('Guis/Resources/close-tab2.png');
+    --close-tab3: url('Guis/Resources/close-tab3.png');
+}
+
+/*---------------
+  General Objects
+-----------------*/
+QGroupBox {
+    color: var(--1st-txt-color);
+    border: 2px solid var(--1st-border-color);
+    border-radius: 5px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0 10px;
+    color: var(--1st-txt-color);
+    background-color: var(--1st-border-color);
+    border-radius: 3px;
+}
+
+
+QTabWidget {
+    font: var(--2nd-font);
+}
+
+QTabWidget::pane {
+    border: none;
+    top: -1px;
+}
+
+QTabBar::tab {
+    color: var(--1st-txt-color);
+    background-color: var(--1st-bg-color);
+    font: var(--2nd-font);
+    height: 30px;
+    border-right: 2px solid var(--2nd-bg-color);
+    padding-left: 10px;
+    padding-right: 7px;
+    max-width: var(--max-width-tabs);
+}
+
+QTabBar::tab:selected {
+    color: var(--1st-txt-color);
+    font: var(--2nd-font);
+    border-top: 1px solid var(--4th-bg-color);
+}
+
+QTabBar::tab:hover {
+    background-color: var(--2nd-bg-color);
+    color: var(--1st-txt-color);
+    border-top: 2px solid var(--1st-hover-color);
+}
+
+QTabBar::close-button {
+    image: var(--close-tab1) 0 0 0 0 stretch stretch;
+    subcontrol-origin: padding;
+    subcontrol-position: right;
+    width: 8px;
+    height: 8px;
+}
+
+QTabBar::close-button:selected {
+    image: var(--close-tab2) 0 0 0 0 stretch stretch;
+    width: 8px;
+    height: 8px;
+}
+
+QTabBar::close-button:hover {
+    image: var(--close-tab3) 0 0 0 0 stretch stretch;
+    background-color: var(--4th-hover-color);
+    width: 8px;
+    height: 8px;
+}
+
+
+QMenu {
+    background-color: var(--1st-bg-color);
+    color: var(--1st-txt-color);
+    border: 1px solid var(--1st-border-color);
+    border-radius: 5px;
+    font: var(--2nd-font);
+}
+
+QMenu::item {
+    background-color: var(--1st-bg-color);
+    padding: 5px 20px;
+}
+
+QMenu::item:selected {
+    background-color: var(--1st-hover-color);
+    color: var(--2nd-txt-color);
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: var(--2nd-bg-color);
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+
+TitleMenuButton {
+    border: 20px;
+    padding-left: 10;
+    padding-right: 10;
+    color: var(--1st-txt-color);
+    font: var(--1st-font);
+}
+
+TitleMenuButton:hover {
+    background-color: var(--4th-bg-color)fe;
+    border-radius: 5px;
+    padding-left: 10;
+    padding-right: 10;
+    font: var(--1st-font);
+}
+
+
+QScrollBar:vertical {
+    width: 12px;
+    background-color: var(--1st-bg-color);
+}
+
+QScrollBar:horizontal {
+    height: 12px;
+    background-color: var(--1st-bg-color);
+}
+
+QScrollBar::handle {
+    border: none;
+    background-color: var(--3rd-bg-color);
+}
+
+QScrollBar::handle:vertical {
+    min-height: 30px;
+}
+
+QScrollBar::handle:horizontal {
+    min-width: 30px;
+}
+
+QScrollBar::handle:hover {
+    border: none;
+    background-color: var(--3rd-hover-color);
+}
+
+QScrollBar::handle:pressed {
+    border: none;
+    background-color: var(--1st-pressed-color);
+}
+
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical,
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background-color: transparent;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line {
+    height: 0px;
+    width: 0px;
+    border: none;
+    background: none;
+}
+
+
+QSplitter::handle {
+    background-color: var(--1st-bg-color);
+}
+
+QSplitter::handle:hover {
+    background-color: var(--1st-hover-color);
+}
+
+
+QHeaderView::section {
+    font: var(--2nd-font);
+}
+
+
+QInputDialog {
+    background-color: var(--1st-bg-color);
+    color: var(--1st-txt-color);
+    border: none;
+}
+
+QInputDialog QLabel {
+    background-color: var(--1st-bg-color);
+    color: var(--1st-txt-color);
+}
+
+QInputDialog QLineEdit {
+    background-color: var(--2nd-bg-color);
+    color: var(--1st-txt-color);
+    border: 1px solid var(--1st-border-color);
+    border-radius: 3px;
+}
+
+QToolTip {
+    font: var(--1st-font);
+    color: var(--1st-txt-color);
+    background-color: var(--2nd-bg-color);
+}
+
+/*----------------
+  Specific Objects
+-----------------*/
+#lbl_tableDescribe {
+    color: var(--1st-txt-color);
+}
+
+#centralFrame {
+    border-radius: 0;
+    border: 2px solid var(--1st-border-color);
+}
+
+#fm_title {
+    background-color: var(--2nd-bg-color);
+    border-radius: 0;
+}
+
+#fm_title QLabel {
+    background-color: var(--2nd-bg-color);
+}
+
+TitleButton,
+#fm_title QPushButton {
+    border: 20px;
+    color: var(--1st-txt-color);
+    font: var(--1st-font);
+    background-color: var(--2nd-bg-color);
+}
+
+TitleButton:hover,
+#fm_title QPushButton:hover {
+    background-color: var(--4th-bg-color)fe;
+    border-radius: 5px;
+    font: var(--1st-font);
+}
+
+#fm_principal {
+    background-color: var(--1st-bg-color);
+    border-radius: 0;
+}
+
+#fm_title #bt_close:hover {
+    background-color: var(--4th-hover-color);
+    border-radius: 5px;
+}
+
+#fm_principal QFrame {
+    background-color: var(--1st-bg-color);
+}
+
+#fm_principal #qtb_description {
+    color: var(--2nd-txt-color);
+    background-color: var(--1st-bg-color);
+    font: var(--1st-font);
+    text-align: justify;
+    border: none;
+}
+
+#fm_bar,
+#fm_metadata {
+    background-color: var(--4th-bg-color);
+    border-radius: 0;
+}
+
+#fm_bar QPushButton,
+#fm_metadata QPushButton {
+    color: var(--2nd-txt-color);
+    background-color: transparent;
+    font: var(--1st-font);
+    border: none;
+    padding: 4;
+}
+
+#fm_bar QLabel {
+    color: var(--2nd-txt-color);
+    background-color: var(--4th-bg-color);
+    font: var(--1st-font);
+}
+
+#fm_bar #lbl_version {
+    font: var(--1st-font);
+}
+
+#bt_connect[connected='true'] {
+    background-color:var(--connected-bg-color);
+}
+
+#bt_connect[connected='false'] {
+    background-color: var(--unconnected-bg-color);
+}
