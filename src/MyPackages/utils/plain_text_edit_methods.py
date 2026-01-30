@@ -464,7 +464,7 @@ def addParamToManager(self, key, value, *args):
 def findSearched(self, textEditor, cls='n', *args):
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     if searchWidget:
-        textF = searchWidget.qle_textBuscar.text()
+        textF = searchWidget.qle_textSearch.text()
         if cls == 'n':
             status = textEditor.find(textF, QTextDocument.FindFlag(0))
             if status == False:
@@ -481,7 +481,7 @@ def findSearched(self, textEditor, cls='n', *args):
 def replaceOne(self, textEditor, *args):
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     if searchWidget:
-        textR = searchWidget.qle_textReem.text()
+        textR = searchWidget.qle_textReplace.text()
         cursor = textEditor.textCursor()
         selected_text = cursor.selectedText()
         if selected_text:
@@ -496,8 +496,8 @@ def replaceOne(self, textEditor, *args):
 def replaceAll(self, textEditor, *args):
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     if searchWidget:
-        textF = searchWidget.qle_textBuscar.text()
-        textR = searchWidget.qle_textReem.text()
+        textF = searchWidget.qle_textSearch.text()
+        textR = searchWidget.qle_textReplace.text()
         actualCursor = textEditor.textCursor()
         textEditor.moveCursor(QTextCursor.MoveOperation.Start)
         status = textEditor.find(textF, QTextDocument.FindFlag(0))
@@ -542,11 +542,11 @@ def searchText(self, *args):
         top_right = textEditor.mapToGlobal(textEditor.rect().topRight())
         #Showing window and defining search text
         self.MySearchWidget.myShow()
-        self.MySearchWidget.qle_textBuscar.setText(selectedText)
-        self.MySearchWidget.qle_textBuscar.setFocus()
+        self.MySearchWidget.qle_textSearch.setText(selectedText)
+        self.MySearchWidget.qle_textSearch.setFocus()
     else:
-        self.dict_MySearchWidget[textEditor.objectName].qle_textBuscar.setText(selectedText)
-        self.dict_MySearchWidget[textEditor.objectName].qle_textBuscar.setFocus()
+        self.dict_MySearchWidget[textEditor.objectName].qle_textSearch.setText(selectedText)
+        self.dict_MySearchWidget[textEditor.objectName].qle_textSearch.setFocus()
 
 
 #Function to move the search window as the parent spliter moves
@@ -571,15 +571,15 @@ def replaceText(self, *args):
     self.searchText()
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     
-    self.MySearchWidget.fm_reemplazar.show()
-    self.MySearchWidget.bt_showReem.setEnabled(False)
+    self.MySearchWidget.fm_replace.show()
+    self.MySearchWidget.bt_showReplace.setEnabled(False)
     self.MySearchWidget.setGeometry(self.MySearchWidget.geometry().x()
                     , self.MySearchWidget.geometry().y()
                     , 400, 80)
     #Modifying the visual style of replace
-    searchWidget.fm_buscar.setProperty('search', False)
-    searchWidget.fm_buscar.style().unpolish(searchWidget.fm_buscar)
-    searchWidget.style().polish(searchWidget.fm_buscar)
+    searchWidget.fm_search.setProperty('search', False)
+    searchWidget.fm_search.style().unpolish(searchWidget.fm_search)
+    searchWidget.style().polish(searchWidget.fm_search)
 
 #Function to comment or uncomment text
 def commentText(self, *args):

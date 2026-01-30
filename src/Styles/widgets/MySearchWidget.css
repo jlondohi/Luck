@@ -4,16 +4,16 @@ QFrame {{
     border: none;
 }}
 
-QFrame#fm_buscar[search="true"] {{
+QFrame#fm_search[search="true"] {{
     border: 2px solid var(--1st-border-color);
 }}
 
-QFrame#fm_buscar[search="false"] {{
+QFrame#fm_search[search="false"] {{
     border: 2px solid var(--1st-border-color);
     border-bottom: none;
 }}
 
-QFrame#fm_reemplazar {{
+QFrame#fm_replace {{
     border: 2px solid var(--1st-border-color);
     border-top: none;
 }}

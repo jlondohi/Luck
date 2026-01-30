@@ -58,14 +58,14 @@ class MySearchWidget(QMainWindow):
         self.setWindowOpacity(0.7)
         self.initWindow()
         self.bt_close.clicked.connect(self.close)
-        self.bt_arriba.clicked.connect(self.upBoton.emit)
-        self.bt_abajo.clicked.connect(self.downBoton.emit)
-        self.bt_showReem.clicked.connect(self.showReem)
-        self.bt_reemplazarO.clicked.connect(self.reemOne.emit)
-        self.bt_reemplazarA.clicked.connect(self.reemAll.emit)
-        self.qle_textBuscar.textChanged.connect(self.emitSearchText)
-        self.qle_textBuscar.returnPressed.connect(self.returnKeyF.emit)
-        self.qle_textReem.returnPressed.connect(self.reemOne.emit)
+        self.bt_up.clicked.connect(self.upBoton.emit)
+        self.bt_down.clicked.connect(self.downBoton.emit)
+        self.bt_showReplace.clicked.connect(self.showReem)
+        self.bt_replaceO.clicked.connect(self.reemOne.emit)
+        self.bt_replaceA.clicked.connect(self.reemAll.emit)
+        self.qle_textSearch.textChanged.connect(self.emitSearchText)
+        self.qle_textSearch.returnPressed.connect(self.returnKeyF.emit)
+        self.qle_textReplace.returnPressed.connect(self.reemOne.emit)
         
     def initWindow(self, *args):
         """
@@ -78,9 +78,9 @@ class MySearchWidget(QMainWindow):
         self._width = 300
         self._high  = 70
         self.centralWidget().setMaximumSize(self._width, self._high)
-        self.fm_reemplazar.hide()
-        self.bt_showReem.setEnabled(True)
-        self.fm_buscar.setProperty('search', True)
+        self.fm_replace.hide()
+        self.bt_showReplace.setEnabled(True)
+        self.fm_search.setProperty('search', True)
         #Defining position in search mode
         self.setGeometry(self.geometry().x(), self.geometry().y(), self._width, int(self._high/2))
         self.setWindowTitle('searcher')
@@ -92,14 +92,14 @@ class MySearchWidget(QMainWindow):
         Args:
             *args: Additional arguments (unused).
         """
-        self.fm_reemplazar.show()
-        self.bt_showReem.setEnabled(False)
-        self.fm_buscar.setProperty('search', False)
+        self.fm_replace.show()
+        self.bt_showReplace.setEnabled(False)
+        self.fm_search.setProperty('search', False)
         #Defining position in replace mode
         self.setGeometry(self.geometry().x(), self.geometry().y(), self._width, self._high)
         #Modifying the style
-        self.fm_buscar.style().unpolish(self.fm_buscar)
-        self.fm_buscar.style().polish(self.fm_buscar)
+        self.fm_search.style().unpolish(self.fm_search)
+        self.fm_search.style().polish(self.fm_search)
 
     def setEditor(self, textWidget, *args):
         """
@@ -133,7 +133,7 @@ class MySearchWidget(QMainWindow):
             *args: Additional arguments (unused).
         """
         #Changing the search text
-        self.textWidget.searchedWord = self.qle_textBuscar.text()
+        self.textWidget.searchedWord = self.qle_textSearch.text()
         self.textWidget.viewport().update()
 
     def myShow(self, *args):
