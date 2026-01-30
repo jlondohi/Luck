@@ -4,7 +4,7 @@ from functools import partial
 
 #Importing PyQt6 packages
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QSplitter
-    , QLabel, QLineEdit, QHBoxLayout, QScrollArea, QInputDialog)
+    , QLabel, QLineEdit, QHBoxLayout, QScrollArea, QInputDialog, QTabBar)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import (QFont, QTextDocument, QTextCursor, QFontMetrics)
 #Importing custom classes and methods
@@ -94,7 +94,9 @@ def newScriptTab(self, origin = '', *args):
 
     #Adding and activating the new tab
     self.tabWidget.addTab(tab_new, f"{self.i18nNes('tab-editor', 'new')} ({self.num_Stab})")
-    self.tabWidget.setCurrentIndex(self.tabWidget.count() - 1)
+    #Setting the index of the newly created tab
+    currentIndex = self.tabWidget.count() - 1
+    self.tabWidget.setCurrentIndex(currentIndex)
     #Establishing code for when the command arises from OpenFile
     origin_param = ''
     dict_params = {}
@@ -107,7 +109,7 @@ def newScriptTab(self, origin = '', *args):
         #Changing the name of the tab
         origin = origin.replace('\\', '/')
         name = origin.rsplit('/', 1)[-1]
-        self.tabWidget.setTabText(self.tabWidget.count() - 1, name)
+        self.tabWidget.setTabText(currentIndex, name)
 
         #Checking if the companion file exists
         if os.path.exists(origin+'p'):
@@ -126,18 +128,28 @@ def newScriptTab(self, origin = '', *args):
                     None
 
     #Store tab information in the tabInfo dictionary
-    self.tabInfo[self.tabWidget.currentWidget().objectName] = {
-        'text_editor'   : textEditor,
-        'saved'         : True,
-        'params_manager': params_manager,
-        'dict_paramsEtl': dict_params,
-        'result'        : result,
-        'result_data'   : {},
-        'rType'         : 'base',
-        'fetched'       : False,
-        'origin'        : origin,
-        'origin_param'  : origin_param
-    }
+    tab_name = self.tabWidget.currentWidget().objectName
+    self.tabInfo[tab_name] = self.tabInfoTemplate.copy()
+    tab_data = self.tabInfo[tab_name]
+    tab_data['text_editor']     = textEditor
+    tab_data['params_manager']  = params_manager
+    tab_data['dict_paramsEtl']  = dict_params
+    tab_data['result']          = result
+    tab_data['origin']          = origin
+    tab_data['origin_param']    = origin_param
+    
+    #Modifying the original button of the created tab
+    self.createCustomCloseButton(currentIndex)
+    #Modifying states
+    tabBar = self.tabWidget.tabBar()
+    btn = tabBar.tabButton(currentIndex, QTabBar.ButtonPosition.RightSide)
+    btn.setProperty('type', 'saved')
+    btn.style().unpolish(btn)
+    btn.style().polish(btn)
+
+    #Updating tab toolTips
+    self.updateTabTooltips()
+    #Note, do not update icons here
 
     #Setting splitter sizes
     geo = self.cfg_session.index.get('splitter_geo')

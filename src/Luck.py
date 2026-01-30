@@ -39,10 +39,10 @@ sys.stdout = log_file #PENDING COMMENT or UNCOMMENT IN DEBUG
 
 def main():
     #Deadline (AAAA, mm, DD)
-    EXPIRATION_DATE = datetime(2025, 12, 31)
+    EXPIRATION_DATE = datetime(2026, 12, 31)
 
     if datetime.now() > EXPIRATION_DATE:
-        print("This program has expired. Contact the developer.")
+        print('This program has expired. Contact the developer.')
         sys.exit(1)
     
     #Starting application

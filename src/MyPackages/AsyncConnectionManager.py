@@ -55,7 +55,7 @@ class AsyncConnectionManager(QThread):
         Args:
             *args: Additional arguments (unused).
         """
-        dsn = self.parent.cfg_session.index.get("prede_dsn")
+        dsn = self.parent.cfg_session.index.get('prede_dsn')
         self.conManWorking.emit()
 
         #Early Exit if the DSN does not exist
@@ -66,12 +66,12 @@ class AsyncConnectionManager(QThread):
         #Try to open connection directly in this thread
         try:
             conn = pyodbc.connect(
-                f"DSN={dsn}",
+                f'DSN={dsn}',
                 autocommit=True
             )
         except Exception as e:
             #Failure when connecting
-            print(f"[DEBUG] Error in connection: {e}")
+            print(f'[DEBUG] Error in connection: {e}')
             self.conManFinished.emit(None)
         else:
             #Success: return connection

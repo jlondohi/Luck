@@ -106,8 +106,12 @@ def savingChanges(self, tab_name = '', cls = 'save', *args):
         file = open(tab_data['origin'], 'w' , encoding = 'utf-8')
         file.write(tab_data['text_editor'].toPlainText() )
         file.close()
-        #Changing tobbar status
+        #Changing saved status
         tab_data['saved'] = True
+        #Updating tab toolTips
+        self.updateTabTooltips()
+        #Updating tab icons
+        self.updateTabIcons()
         return True
     if (cls == 'saveAs') or (tab_data['origin'] == ''):
         origin = self.saveFileAs()
@@ -126,8 +130,12 @@ def savingChanges(self, tab_name = '', cls = 'save', *args):
                 name = origin.rsplit('/', 1)[-1]
                 index = self.tabWidget.currentIndex()
                 self.tabWidget.setTabText(index, name)
-                #Changing tobbar status
+                #Changing saved status
                 tab_data['saved'] = True
+                #Updating tab toolTips
+                self.updateTabTooltips()
+                #Updating tab icons
+                self.updateTabIcons()
                 return True
 
 #Saving parameter changes

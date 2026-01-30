@@ -117,8 +117,22 @@ class MainWindow(QMainWindow):
 
     #Slots
     #--------------------------
+    #Metadata of all taps
+    tabInfoTemplate = {
+          'text_editor':    None #Widget reference
+        , 'params_manager': None #Widget reference
+        , 'result':         None #Widget reference
+        , 'saved':          True
+        , 'dict_paramsEtl': {}
+        , 'origin':         ''
+        , 'origin_param':   ''
+        , 'result_data':    {}
+        , 'rType':          'base' #('base', 'status', 'results')
+        , 'fetched':        False
+    }
+    tabInfo = {}
+
     #Reference current tab
-    tabInfo          = {}
     current_tabName   = None
     current_etlEditor = None
     current_pManager  = None
@@ -155,6 +169,21 @@ class MainWindow(QMainWindow):
         subprocess.Popen([sys.executable] + sys.argv)
         QApplication.exit(0)
     
+    #Binding Current Tab
+    def bindCurrentTab(self):
+        tab_name = self.tabWidget.currentWidget().objectName
+        tab_data = self.tabInfo.get(tab_name)
+        if not tab_data:
+            return
+
+        self.current_tabName   = tab_name
+        self.current_etlEditor = tab_data['text_editor']
+        self.current_pManager  = tab_data['params_manager']
+        self.current_paramsEtl = tab_data['dict_paramsEtl']
+        self.current_result    = tab_data['result']
+        self.current_rType     = tab_data['rType']
+        self.current_fetched   = tab_data['fetched']
+      
     #Function to update current references
     def tabChanged(self, index:int=0):
         #Terminating process if there is no active tab
@@ -164,17 +193,10 @@ class MainWindow(QMainWindow):
         #Default value
         tl_1, tl_2, tl_3 = self.profile['result-trafficlight']
         
-        #Getting the name of the current tab
-        tab_name = self.tabWidget.currentWidget().objectName
-        tab_data = self.tabInfo.get(tab_name)
-        if tab_data:
-            self.current_tabName   = tab_name
-            self.current_etlEditor = tab_data.get('text_editor', None)
-            self.current_pManager  = tab_data.get('params_manager', None)
-            self.current_paramsEtl = tab_data.get('dict_paramsEtl', {})
-            self.current_result    = tab_data.get('result', None)
-            self.current_rType     = tab_data.get('rType', 'base')
-            self.current_fetched   = tab_data.get('fetched', False)
+        #Binding Current Tab
+        self.bindCurrentTab()
+        #Updating tab icons
+        self.updateTabIcons()
         
         #Modifying status bar
         #--------------------------
@@ -524,28 +546,28 @@ class MainWindow(QMainWindow):
                 self.newScriptTab()
 
             #Loading information to the tab
-            for count, key in enumerate(self.tabInfo.keys()):
-                tab_data = self.tabInfo[key]
+            for count, widgetName in enumerate(self.tabInfo.keys()):
+                tab_data = self.tabInfo[widgetName]
                 session_data = self.actualSession.session.get(count)
-                
-                #Restore values
-                tab_data['text_editor'].setPlainText(session_data['text_editor'])
-                tab_data['saved']           = session_data.get('saved', True)
-                tab_data['dict_paramsEtl']  = session_data.get('dict_paramsEtl', {})
-                tab_data['result'].loadData(pl.DataFrame(session_data.get('result_data', None)), session_data.get('rType', 'base'))
-                tab_data['result_data']     = session_data.get('result_data', None)
-                tab_data['rType']           = session_data.get('rType', 'base')
-                tab_data['fetched']         = session_data.get('fetched', False)
-                tab_data['origin']          = session_data.get('origin', '')
-                tab_data['origin_param']    = session_data.get('origin_param', '')
+                for key in tab_data.keys():
+                    #Exceptions because they are references to current widgets
+                    ##Exception 1
+                    if key == 'text_editor':
+                        tab_data[key].setPlainText(session_data[key])
+                    ##Exception 2
+                    elif key in ('result', 'params_manager'):
+                        None
+                    else:
+                        #Restore all other values
+                        tab_data[key] = session_data[key]
 
-                #Update current references
-                self.current_etlEditor = tab_data['text_editor']
-                self.current_pManager  = tab_data['params_manager']
-                self.current_paramsEtl = tab_data['dict_paramsEtl']
-                self.current_result    = tab_data['result']
-                self.current_rType     = tab_data['rType']
-                self.current_fetched   = tab_data['fetched']
+                #Updating current references
+                self.bindCurrentTab()
+
+                #Updating tab toolTips
+                self.updateTabTooltips()
+                #Updating tab icons
+                self.updateTabIcons()
 
                 #Updating the parameter manager
                 self.updatePManager()
@@ -577,6 +599,12 @@ class MainWindow(QMainWindow):
 #==================================================================
 #Binding related functions to the main window
 #==================================================================
+MainWindow.createCustomCloseButton = window_methods.createCustomCloseButton
+MainWindow.updateTabTooltips = window_methods.updateTabTooltips
+MainWindow.updateTabIcons = window_methods.updateTabIcons
+MainWindow.onTabCloseClicked = window_methods.onTabCloseClicked
+
+MainWindow.buildTabTooltip = window_methods.buildTabTooltip
 MainWindow.applySelectedLanguage = window_methods.applySelectedLanguage
 MainWindow.styler = window_methods.styler
 MainWindow.captureProfileFormat = window_methods.captureProfileFormat

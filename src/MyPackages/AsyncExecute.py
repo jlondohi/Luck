@@ -208,7 +208,7 @@ class AsyncExecute(QThread):
                 _type = self._msgF
                 if self.total_task > 1 and state:
                     _saveAs = False
-                if data and not error:
+                if data is not None and not error:
                     self.toFile.emit(data, _saveAs)
                 #Prevent data from being displayed in the results
                 data = None

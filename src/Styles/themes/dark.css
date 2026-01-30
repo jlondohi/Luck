@@ -35,6 +35,8 @@
     --close-tab1: url('Guis/Resources/close-tab1.png');
     --close-tab2: url('Guis/Resources/close-tab2.png');
     --close-tab3: url('Guis/Resources/close-tab3.png');
+    --close-tab4: url('Guis/Resources/close-tab5.png');
+    --close-tab5: url('Guis/Resources/close-tab5.png');
 }
 
 /*---------------
@@ -90,6 +92,7 @@ QTabBar::tab:hover {
     border-top: 2px solid var(--1st-hover-color);
 }
 
+/*These close buttons are NOT the custom ones (tab Closer)*/
 QTabBar::close-button {
     image: var(--close-tab1) 0 0 0 0 stretch stretch;
     subcontrol-origin: padding;
@@ -111,6 +114,46 @@ QTabBar::close-button:hover {
     height: 8px;
 }
 
+/*These close buttons are the custom ones (tab Closer)*/
+QToolButton#tabCloser {
+    width: 15px;
+    height: 15px;
+    padding: 0px;
+    background-color:transparent;
+    border-radius: 4px;
+}
+
+QToolButton#tabCloser:hover {
+    image: var(--close-tab3) 0 0 0 0 stretch stretch;
+    background-color: var(--4th-hover-color);
+}
+
+QToolButton#tabCloser[type="active"] {
+    image: var(--close-tab2) 0 0 0 0 stretch stretch;
+}
+
+QToolButton#tabCloser[type="saved"] {
+    image: var(--close-tab1) 0 0 0 0 stretch stretch;   
+}
+
+QToolButton#tabCloser[type="unsaved"] {
+    image: var(--close-tab5) 0 0 0 0 stretch stretch;
+}
+
+QToolButton#tabCloser:hover[type="active"] {
+    image: var(--close-tab3) 0 0 0 0 stretch stretch;
+    background-color: var(--4th-hover-color);
+}
+
+QToolButton#tabCloser:hover[type="saved"] {
+    image: var(--close-tab3) 0 0 0 0 stretch stretch;
+    background-color: var(--4th-hover-color);
+}
+
+QToolButton#tabCloser:hover[type="unsaved"] {
+    image: var(--close-tab3) 0 0 0 0 stretch stretch;
+    background-color: var(--4th-hover-color);
+}
 
 QMenu {
     background-color: var(--1st-bg-color);
@@ -333,3 +376,4 @@ TitleButton:hover,
 #bt_connect[connected='false'] {
     background-color: var(--unconnected-bg-color);
 }
+

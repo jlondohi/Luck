@@ -251,6 +251,12 @@ tab-result:
     title: Filter between
     min: Enter minimum value
     max: Enter maximum value
+tab-tooltips:
+  name: Name
+  path: Path
+  saved: Saved
+  fetched: Partial result
+  no-fetched: Full result
 open-file:
   open1: Open
   open2: Open file

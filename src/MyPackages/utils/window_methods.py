@@ -5,10 +5,11 @@ import os, sys, platform, subprocess, tempfile, winreg \
 from datetime import datetime
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+from functools import partial
 #Importing PyQt6 packages
-from PyQt6.QtWidgets import (QFileDialog, QMessageBox)
-from PyQt6.QtGui import (QCursor, QDragEnterEvent, QDropEvent)
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QFileDialog, QMessageBox, QTabBar, QToolButton)
+from PyQt6.QtGui import (QCursor, QDragEnterEvent, QDropEvent, QIcon)
+from PyQt6.QtCore import (Qt)
 #Importing custom classes and methods
 from MyPackages import (AboutWidget, Updater, YamlHandler
     , MyResultTable, MyPlainTextEdit, MyParamsManager
@@ -17,6 +18,104 @@ from MyPackages import (AboutWidget, Updater, YamlHandler
 #==================================================================
 #Creating functions related to the main window
 #==================================================================
+#Function to create custom buttons for tabs
+def createCustomCloseButton(self, tabIndex):
+    tabWidget = self.tabWidget
+    tabBar = tabWidget.tabBar()
+    tab_name = tabWidget.widget(tabIndex).objectName
+    btn = QToolButton(tabBar)
+    btn.setObjectName("tabCloser")
+    btn.setAutoRaise(True)
+    btn.setCursor(Qt.CursorShape.ArrowCursor)
+    btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    #Setting button
+    tabBar.setTabButton(
+        tabIndex,
+        QTabBar.ButtonPosition.RightSide,
+        btn
+    )
+    #Connecting the new button with the custom close
+    btn.clicked.connect(partial(self.onTabCloseClicked, tab_name))
+
+#Function to close the tab to which the close button belongs
+def onTabCloseClicked(self, tab_name):
+    #Searching among all the tabs which index corresponds to the name
+    for i in range(self.tabWidget.count()):
+        w = self.tabWidget.widget(i)
+        if w and w.objectName == tab_name:
+            self.closeTab(i)
+
+#Function to update the tabBar toolTips
+def updateTabTooltips(self):
+    tabBar = self.tabWidget.tabBar()
+    for tab_index in range(self.tabWidget.count()):
+        tab_name = self.tabWidget.widget(tab_index).objectName
+        tab_data = self.tabInfo.get(tab_name)
+        if not tab_data:
+            tabBar.setTabToolTip(tab_index, '')
+            continue
+
+        tooltip = self.buildTabTooltip(tab_data)
+        tabBar.setTabToolTip(tab_index, tooltip)
+
+#Function to update the tabBar icons
+def updateTabIcons(self):
+    tabBar = self.tabWidget.tabBar()
+    currentIndex = self.tabWidget.currentIndex()
+    #Going through each of the tabs
+    for tab_index in range(self.tabWidget.count()):
+        tab_name = self.tabWidget.widget(tab_index).objectName
+        tab_data = self.tabInfo.get(tab_name)
+        #Early release condition
+        if not tab_data:
+            continue
+        #Early release condition
+        btn = tabBar.tabButton(tab_index, QTabBar.ButtonPosition.RightSide)
+        if not btn:
+            continue
+
+        #Setting final state ONCE
+        if tab_data['saved']==False:
+            newType = 'unsaved'
+        elif tab_index == currentIndex:
+            newType = 'active'
+        elif tab_data['saved']==True:
+            newType = 'saved'
+
+        #Avoid unnecessary repainting
+        if btn.property('type') == newType:
+            continue
+
+        btn.setProperty('type', newType)
+        btn.style().unpolish(btn)
+        btn.style().polish(btn)
+
+#Function to build the toolTips
+def buildTabTooltip(self, tab_data: dict) -> str:
+    #Pre-loading i18nNes
+    _name       = self.i18nNes('tab-tooltips', 'name')
+    _path       = self.i18nNes('tab-tooltips', 'path')
+    _saved       = self.i18nNes('tab-tooltips', 'saved')
+    _fetched    = self.i18nNes('tab-tooltips', 'fetched')
+    _no_fetched = self.i18nNes('tab-tooltips', 'no-fetched')
+    #Creating list of lines
+    lines = []
+    #Creating lines
+    origin = tab_data['origin']
+    origin = origin.replace('\\', '/')
+    name = origin.rsplit('/', 1)[-1]
+    if name:
+        lines.append(f'{_name}: {name}')
+        lines.append(f'{_path}: {origin}')
+        lines.append(f"{_saved}: {tab_data['saved']}")
+    if tab_data['rType'] == 'results':
+        if tab_data['fetched']:
+            lines.append(f'Resultado: {_fetched}')
+        else:
+            lines.append(f'Resultado: {_no_fetched}')
+    return '\n'.join(lines)
+
+
 #Function to establish language
 def applySelectedLanguage(self, *args):
     self.lgg = self.sender().text()

@@ -53,7 +53,7 @@ class AboutWidget(QMainWindow):
         self.parentWindow = self.window()
         #Loading GUI
         uic.loadUi('Guis/About.ui', self)
-        with open("Guis/About.html", "r", encoding="utf-8") as f:
+        with open('Guis/About.html', 'r', encoding='utf-8') as f:
             self.qtb_description.setHtml(f.read())
         self.qtb_description.setOpenExternalLinks(True)
 

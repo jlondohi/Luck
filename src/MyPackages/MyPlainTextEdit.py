@@ -210,7 +210,16 @@ class MyPlainTextEdit(QPlainTextEdit):
         tab_name = self.parent.tabWidget.currentWidget().objectName
         tab_data = self.parent.tabInfo.get(tab_name)
         if tab_data:
-            tab_data['saved'] = False
+            past = tab_data['saved']
+            present = False
+            tab_data['saved'] = present
+            #Updating only if there was a change
+            if past != present:
+                #Updating tab toolTips
+                self.parent.updateTabTooltips()
+                #Updating tab icons
+                self.parent.updateTabIcons()
+            
     
     def onTypingStopped(self, *args):
         #Note, a time is calculated to dynamically modify Typingtimer Timer
@@ -387,7 +396,7 @@ class MyPlainTextEdit(QPlainTextEdit):
         #Message if there are multiple selected lines
         cursor = self.textCursor()
         if cursor.hasSelection() and self.multiCursorEnabled:
-            text = f"{_selections}: {len(self.multiCursorList)}"
+            text = f'{_selections}: {len(self.multiCursorList)}'
         elif cursor.hasSelection() and not self.multiCursorEnabled:
             start = cursor.selectionStart()
             end = cursor.selectionEnd()
@@ -395,10 +404,10 @@ class MyPlainTextEdit(QPlainTextEdit):
             start_line = cursor.blockNumber()
             cursor.setPosition(end)
             end_line = cursor.blockNumber()
-            text = f"{_selected_lines}: {1 + end_line - start_line}"
+            text = f'{_selected_lines}: {1 + end_line - start_line}'
         #Message if the multicursor is activated
         elif self.multiCursorEnabled:
-            text = f"{_cursors}: {len(self.multiCursorList):,}"
+            text = f'{_cursors}: {len(self.multiCursorList):,}'
         
         #Setting text
         self.parent.bt_lineBlock.setText(text)
@@ -688,7 +697,7 @@ class MyPlainTextEdit(QPlainTextEdit):
                 return
             else:
                 for cursor in self.multiCursorList:
-                    cursor.insertText(event.text())   
+                    cursor.insertText(event.text())
                 self.ensureCursorVisible()
                 return
             
@@ -700,7 +709,6 @@ class MyPlainTextEdit(QPlainTextEdit):
             if key == Qt.Key.Key_Escape:
                 if cursor.hasSelection():
                     # Move the cursor to the start of the selection and delete the visual selection
-
                     cursor.setPosition(cursor.selectionEnd())
                     self.setTextCursor(cursor)
                     return

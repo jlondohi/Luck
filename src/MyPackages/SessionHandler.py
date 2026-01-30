@@ -151,25 +151,28 @@ class SessionHandler:
         count = 0
         session = {'version': self.version}
         for tab_index in range(self.parent.tabWidget.count()):
-            tab = self.parent.tabWidget.widget(tab_index).objectName
+            tab_name = self.parent.tabWidget.widget(tab_index).objectName
             #Verifying that the information of the log or ecosystem will not be saved
             tab_text = self.parent.tabWidget.tabText(tab_index)
             if ( tab_text.startswith('Log') or
                 tab_text == self.i18nNes('tab-eco', 'eco') ):
                 continue
             
-            tab_data = tabInfo.get(tab)
+            tab_data = tabInfo.get(tab_name)
             #Saving all the information in a dictionary
-            session[count] = {
-                              'text_editor':    tab_data.get('text_editor').toPlainText()
-                            , 'saved':          tab_data.get('saved')
-                            , 'dict_paramsEtl': tab_data.get('dict_paramsEtl', {})
-                            , 'origin':         tab_data.get('origin')
-                            , 'origin_param':   tab_data.get('origin_param')
-                            , 'result_data':    tab_data.get('result_data')
-                            , 'rType':          tab_data.get('rType')
-                            , 'fetched':        tab_data.get('fetched')
-                            }
+            template = self.parent.tabInfoTemplate.copy()
+            session[count] = template
+            for key in template.keys():
+                #Exceptions because they are references to widgets
+                ##Exception 1
+                if key == 'text_editor':
+                    session[count][key] = tab_data[key].toPlainText()
+                ##Exception 2
+                elif key in ('result', 'params_manager'):
+                    None
+                else:
+                    #Save all other values
+                    session[count][key] = tab_data[key]
             count += 1
         try:
             pickle.dump(session, open(self.sessionPath, 'wb'))
