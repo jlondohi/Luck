@@ -1,8 +1,7 @@
 #Importing native packages
-import os, sys, getpass
+import os, sys, getpass, ctypes, shutil, subprocess
 import polars as pl
-import subprocess
-
+from datetime import datetime
 #Importing PyQt6 packages
 from PyQt6 import uic
 from PyQt6.QtWidgets import (QMainWindow, QApplication
@@ -109,7 +108,7 @@ class MainWindow(QMainWindow):
     splitHChanged  = pyqtSignal(int)
     splitVChanged  = pyqtSignal(int)
     sendTextEditor = pyqtSignal(object, str)
-    
+
     #Flags
     #--------------------------
     updating_splits = False
@@ -119,16 +118,16 @@ class MainWindow(QMainWindow):
     #--------------------------
     #Metadata of all taps
     tabInfoTemplate = {
-          'text_editor':    None #Widget reference
-        , 'params_manager': None #Widget reference
-        , 'result':         None #Widget reference
-        , 'saved':          True
-        , 'dict_paramsEtl': {}
-        , 'origin':         ''
-        , 'origin_param':   ''
-        , 'result_data':    {}
-        , 'rType':          'base' #('base', 'status', 'results')
-        , 'fetched':        False
+          'text_editor'    : None #Widget reference
+        , 'params_manager' : None #Widget reference
+        , 'result'         : None #Widget reference
+        , 'saved'          : True
+        , 'dict_paramsEtl' : {}
+        , 'origin'         : ''
+        , 'origin_param'   : ''
+        , 'result_data'    : {}
+        , 'rType'          : 'base' #('base', 'status', 'results')
+        , 'fetched'        : False
     }
     tabInfo = {}
 
@@ -142,7 +141,6 @@ class MainWindow(QMainWindow):
 
     #secont thread functions
     #-------------------------
-    
 
     #List of object styleables
     dict_MySearchWidget = {}
@@ -242,6 +240,35 @@ class MainWindow(QMainWindow):
             if hasattr(self, 'MyTitleBar'):
                 self.MyTitleBar.updateMaximizeRestoreButtons()
     
+    #Verifying write path  and creating read/write copies of files if running from WindowsApps
+    def verifyingWritePath(self):
+        #Checking if the application is running from the WindowsApps directory
+        executablePath = sys.executable
+        #Creating a copy of the source path
+        originPath     = self.appDataPath
+
+        #Creating Session folder in appdata if they do not exist
+        sessionPath = os.getenv('LOCALAPPDATA') + '\\Luck\\Sessions'
+        if not os.path.exists(sessionPath):
+            os.makedirs(sessionPath, exist_ok=True)
+        
+        #Check if "WindowsApps" is in the path
+        if "WindowsApps" in executablePath:
+            #Modifying destination paths
+            self.appDataPath = os.getenv('LOCALAPPDATA') + '\\Luck\\Settings'
+            #Creating folders in appdata if they do not exist
+            if not os.path.exists(self.appDataPath):
+                os.makedirs(self.appDataPath, exist_ok=True)
+
+            #Creating a copy of the configuration files
+            for nameFile in os.listdir(originPath):
+                origialFile = os.path.join(originPath, nameFile)
+                copyFile    = os.path.join(self.appDataPath, nameFile)
+                #Only copy if it is a file and does not exist in the destination
+                if os.path.isfile(origialFile):
+                    if not os.path.exists(copyFile):
+                        shutil.copy2(origialFile, copyFile)
+    
     def __init__(self):
         super().__init__()
         self.user = getpass.getuser()
@@ -249,16 +276,33 @@ class MainWindow(QMainWindow):
         self.gui  = QGuiApplication.instance()
         self.parentWindow = self.window()
 
+        #Verifying if we need to create config copies
+        self.appDataPath = os.path.join(os.getcwd(), 'Settings')
+        self.verifyingWritePath()
+        logFilePath      = os.path.dirname(self.appDataPath) + '\\Luck-Debug.log'
+        #Redirecting terminal
+        if os.path.exists(logFilePath):
+            with open(logFilePath, 'r') as file:
+                lineas = file.readlines()
+                if len(lineas) > 1000:
+                    #If it has more than 1000 lines, we delete the file
+                    os.remove(logFilePath)
+        logFilePath = open(logFilePath, 'w')
+
+        #Redirecting console output (DEBUG)
+        sys.stdout = logFilePath
+        print(f"Luck Started {datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')}")
+
         #Loading Settings
-        #-----------------
-        self.version     = YamlHandler('Settings/version.yaml')
-        self.cfg_app     = YamlHandler('Settings/config_app.yaml')
-        self.cfg_session = YamlHandler('Settings/config_session.yaml')
-        self.cfg_shortcut = YamlHandler('Settings/config_shortcut.yaml')
-        self.syntaxList = YamlHandler('Settings/config_syntax_list.yaml')
-        self.list_assist = YamlHandler('Settings/config_assistant.yaml')
-        self.list_tmplts = YamlHandler('Settings/config_templates.yaml')
-        self.autoCompleteList = YamlHandler('Settings/config_autocomplete_list.yaml')
+        #----------------
+        self.version          = YamlHandler(self.appDataPath + '\\version.yaml')
+        self.cfg_app          = YamlHandler(self.appDataPath + '\\config_app.yaml')
+        self.cfg_session      = YamlHandler(self.appDataPath + '\\config_session.yaml')
+        self.cfg_shortcut     = YamlHandler(self.appDataPath + '\\config_shortcut.yaml')
+        self.syntaxList       = YamlHandler(self.appDataPath + '\\config_syntax_list.yaml')
+        self.list_assist      = YamlHandler(self.appDataPath + '\\config_assistant.yaml')
+        self.list_tmplts      = YamlHandler(self.appDataPath + '\\config_templates.yaml')
+        self.autoCompleteList = YamlHandler(self.appDataPath + '\\config_autocomplete_list.yaml')
 
         #Loading language
         language_yaml_dir = 'i18n'
@@ -288,18 +332,18 @@ class MainWindow(QMainWindow):
         self.shc = self.cfg_shortcut.getNested
         
         self.prepareFramework()
-        self.actualSession = SessionHandler(self)
-        self.icon  = QIcon('Guis/Resources/icon0.ico')
-        self.icon1 = QIcon('Guis/Resources/icon1.ico')
-        self.icon2 = QIcon('Guis/Resources/icon2.ico')
-        self.icon3 = QIcon('Guis/Resources/icon3.ico')
-        self.excWorkerIcon1 = QIcon('Guis/Resources/working-1.png')
-        self.excWorkerIcon2 = QIcon('Guis/Resources/working-2.png')
-        self.recIcon1 = QIcon('Guis/Resources/log1.png')
-        self.recIcon2 = QIcon('Guis/Resources/log2.png')
-        self.baseSetterIcon = QIcon('Guis/Resources/baseSetter.png')
+        self.actualSession    = SessionHandler(self)
+        self.icon             = QIcon('Guis/Resources/icon0.ico')
+        self.icon1            = QIcon('Guis/Resources/icon1.ico')
+        self.icon2            = QIcon('Guis/Resources/icon2.ico')
+        self.icon3            = QIcon('Guis/Resources/icon3.ico')
+        self.excWorkerIcon1   = QIcon('Guis/Resources/working-1.png')
+        self.excWorkerIcon2   = QIcon('Guis/Resources/working-2.png')
+        self.recIcon1         = QIcon('Guis/Resources/log1.png')
+        self.recIcon2         = QIcon('Guis/Resources/log2.png')
+        self.baseSetterIcon   = QIcon('Guis/Resources/baseSetter.png')
         self.baseUnSetterIcon = QIcon('Guis/Resources/baseUnSetter.png')
-        self.unsavedTab = QIcon('Guis/Resources/close-tab5.png')
+        self.unsavedTab       = QIcon('Guis/Resources/close-tab5.png')
         self.setWindowIcon(self.icon)
 
         #Loading themes

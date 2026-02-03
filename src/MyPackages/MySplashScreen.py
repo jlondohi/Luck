@@ -1,8 +1,8 @@
+#Importing PyQt6 packages
 from PyQt6.QtWidgets import (QMainWindow, QApplication
     , QLabel, QVBoxLayout, QWidget)
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt, QTimer
-
 #Importing own PyQt6 packages
 from MyPackages.MainWindow import MainWindow
 
@@ -30,8 +30,8 @@ class MySplashScreen(QMainWindow):
         super().__init__()
         self.app = QApplication.instance()
         #Defining default size
-        self._width = 350
-        self._height = 350
+        self._width   = 350
+        self._height  = 350
         self.settings = None
         #Initiating
         self.initUI()
@@ -73,7 +73,7 @@ class MySplashScreen(QMainWindow):
         container.setLayout(layout)
         container.setStyleSheet('background-color: transparent;')
         self.setCentralWidget(container)
-        
+
         #Requesting to load main window
         self.loadingTimer = QTimer(self)
         self.loadingTimer.timeout.connect(self.showMainWindow)

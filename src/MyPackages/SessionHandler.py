@@ -42,28 +42,27 @@ class SessionHandler:
         Args:
             parent (object): The parent object containing configuration and user information.
         """
-        self.parent = parent
-        self.path = parent.cfg_session.index.get('session_path')
-        self.path = os.path.join(tempfile.gettempdir(), 'Luck', 'session') if self.path is None else self.path
-        self.user = parent.user
+        self.parent  = parent
+        self.path    = parent.cfg_session.index.get('session_path')
+        self.path    = os.path.join(os.getenv('LOCALAPPDATA'), 'Luck', 'Sessions') if self.path is None else self.path
         self.version = parent.version.index.get('version')
         self.session = None
-        self.tree = None
+        self.tree    = None
         self.history = None
 
         #Defining the paths
-        self.sessionPath = os.path.join(self.path, self.user+'.pkl')
-        self.sessionTreePath = os.path.join(self.path, self.user+'_tree.pkl')
-        self.sessionHistoryPath = os.path.join(self.path, self.user+'_history.pkl')
+        self.sessionPath          = os.path.join(self.path, 'session_ppl.pkl')
+        self.sessionTreePath      = os.path.join(self.path, 'session_tree.pkl')
+        self.sessionHistoryPath   = os.path.join(self.path, 'session_history.pkl')
         #Confirming if the file exists
-        self.sessionExists = os.path.exists(self.sessionPath)
-        self.sessionTreeExists = os.path.exists(self.sessionTreePath)
+        self.sessionExists        = os.path.exists(self.sessionPath)
+        self.sessionTreeExists    = os.path.exists(self.sessionTreePath)
         self.sessionHistoryExists = os.path.exists(self.sessionHistoryPath)
         #Requesting opening if it exists
         if self.sessionExists:
             self.session = self.loadSession()
         if self.sessionTreeExists:
-            self.tree = self.loadSessionTree()
+            self.tree    = self.loadSessionTree()
         if self.sessionHistoryExists:
             self.history = self.loadSessionHistory()
         
