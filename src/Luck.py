@@ -7,16 +7,18 @@
 # Version:
 #================================================================== 
 
-import sys, ctypes
+import sys, os, ctypes
+from pathlib import Path
 #Importing own PyQt6 packages
 from PyQt6.QtWidgets import QApplication
 from MyPackages import YamlHandler
 from MyPackages.MySplashScreen import MySplashScreen
 
+baseDir = Path(__file__).resolve().parent
 #Add icon to the application
 try:
     #By registering system id
-    version      = YamlHandler('Settings\\version.yaml')
+    version      = YamlHandler(str(baseDir / 'Settings' / 'version.yaml'))
     _version     = version.index.get('version')
     majorVersion = _version.split('.')[0]
     myappid      = f'luck.luck.{majorVersion}'
@@ -28,7 +30,7 @@ def main():
     #Starting application
     app     = QApplication( sys.argv )
     #Loading home window
-    splash  = MySplashScreen()
+    splash  = MySplashScreen(baseDir)
     splash.show()
     #Linking system/app shutdown
     sys.exit( app.exec() )

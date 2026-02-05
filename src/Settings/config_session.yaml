@@ -9,7 +9,6 @@ prede_font:
     result-size: 10
 worldWrap: false
 baseSetter: false
-session_path: null
 fetch-limit: 10000
 tab-spaces: 4
 status_frame:

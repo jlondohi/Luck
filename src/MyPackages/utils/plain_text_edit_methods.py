@@ -524,7 +524,7 @@ def searchText(self, *args):
     #Checking if self.MySearchWidget already exists
     if not self.dict_MySearchWidget.get(textEditor.objectName, None):
         #Instantiating Search
-        self.MySearchWidget = MySearchWidget(textEditor)
+        self.MySearchWidget = MySearchWidget(self, textEditor)
         self.MySearchWidget.setStyleSheet( self.dict_styledSheets['MySearchWidget'] )
         #Adding instance to search engine dictionary
         self.dict_MySearchWidget[textEditor.objectName] = self.MySearchWidget

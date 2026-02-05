@@ -75,7 +75,7 @@ class UploadDBWidget(QMainWindow):
     def __init__(self, parent=None):
         super().__init__()
         self.parent = parent
-        uic.loadUi('Guis/UploadLZ.ui', self)
+        uic.loadUi(str(self.parent.guisPath / 'UploadLZ.ui'), self)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setWindowOpacity(1)
         self.bt_abrir.clicked.connect(self.openFile)
@@ -110,13 +110,13 @@ class UploadDBWidget(QMainWindow):
         self._option3 = self.i18nNes('upload-to-db', 'option3')
         #others
         self._starting = self.i18nNes('status-bar', 'starting')
-        self._open = self.i18nNes('open-file', 'open2')
-        self._allowed = self.i18nNes('open-file', 'open4')
-        self._end = self.i18nNes('status-bar', 'end')
-        self._endE = self.i18nNes('status-bar', 'end-e')
-        self._cmic = self.i18nNes('status-bar', 'cmic')
-        self._state = self.i18nNes('upload-to-db', 'state')
-        self._time = self.i18nNes('upload-to-db', 'time')
+        self._open     = self.i18nNes('open-file', 'open2')
+        self._allowed  = self.i18nNes('open-file', 'open4')
+        self._end      = self.i18nNes('status-bar', 'end')
+        self._endE     = self.i18nNes('status-bar', 'end-e')
+        self._cmic     = self.i18nNes('status-bar', 'cmic')
+        self._state    = self.i18nNes('upload-to-db', 'state')
+        self._time     = self.i18nNes('upload-to-db', 'time')
 
         #Starting window
         self.initWindow()
@@ -130,10 +130,10 @@ class UploadDBWidget(QMainWindow):
         self.setWindowTitle(self._header)
 
         #Get the geometry of the main window
-        main_window_geo = self.parent.geometry()
-        main_window_x = main_window_geo.x()
-        main_window_y = main_window_geo.y()
-        main_window_width = main_window_geo.width()
+        main_window_geo    = self.parent.geometry()
+        main_window_x      = main_window_geo.x()
+        main_window_y      = main_window_geo.y()
+        main_window_width  = main_window_geo.width()
         main_window_height = main_window_geo.height()
 
         #Calculate position for child window

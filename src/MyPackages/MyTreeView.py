@@ -85,10 +85,10 @@ class MyTreeView(QTreeView):
         #Setting the model
         self.setModel(self.proxyModel)
         #Loading Icon
-        self.icon0 = QIcon('Guis/Resources/database0.png')
-        self.icon1 = QIcon('Guis/Resources/database1.png')
-        self.icon2 = QIcon('Guis/Resources/database2.png')
-        self.icon3 = QIcon('Guis/Resources/database3.png')
+        self.icon0 = QIcon(str(self.parent.guisPath / 'Resources' / 'database0.png'))
+        self.icon1 = QIcon(str(self.parent.guisPath / 'Resources' / 'database1.png'))
+        self.icon2 = QIcon(str(self.parent.guisPath / 'Resources' / 'database2.png'))
+        self.icon3 = QIcon(str(self.parent.guisPath / 'Resources' / 'database3.png'))
         #Connecting the signals
         self.expanded.connect(self.onItemExpanded)
         self.collapsed.connect(self.onItemCollapsed)

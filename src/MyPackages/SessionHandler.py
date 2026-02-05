@@ -1,4 +1,5 @@
 import os, pickle, tempfile
+from pathlib import Path
 
 #==================================================================
 ### Creating a session handler to load and save system configuration
@@ -42,18 +43,17 @@ class SessionHandler:
         Args:
             parent (object): The parent object containing configuration and user information.
         """
-        self.parent  = parent
-        self.path    = parent.cfg_session.index.get('session_path')
-        self.path    = os.path.join(os.getenv('LOCALAPPDATA'), 'Luck', 'Sessions') if self.path is None else self.path
-        self.version = parent.version.index.get('version')
-        self.session = None
-        self.tree    = None
-        self.history = None
+        self.parent       = parent
+        self.path         = Path(os.getenv('LOCALAPPDATA')) / 'Luck'/ 'Sessions'
+        self.version      = parent.version.index.get('version')
+        self.session      = None
+        self.tree         = None
+        self.history      = None
 
         #Defining the paths
-        self.sessionPath          = os.path.join(self.path, 'session_ppl.pkl')
-        self.sessionTreePath      = os.path.join(self.path, 'session_tree.pkl')
-        self.sessionHistoryPath   = os.path.join(self.path, 'session_history.pkl')
+        self.sessionPath          = str(self.path / 'session_ppl.pkl')
+        self.sessionTreePath      = str(self.path / 'session_tree.pkl')
+        self.sessionHistoryPath   = str(self.path / 'session_history.pkl')
         #Confirming if the file exists
         self.sessionExists        = os.path.exists(self.sessionPath)
         self.sessionTreeExists    = os.path.exists(self.sessionTreePath)

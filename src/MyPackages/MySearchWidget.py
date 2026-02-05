@@ -43,7 +43,7 @@ class MySearchWidget(QMainWindow):
     reemOne      = pyqtSignal()
     reemAll      = pyqtSignal()
     
-    def __init__(self, textEditor):
+    def __init__(self, parent, textEditor):
         """
         Initializes the search widget and connects signals.
 
@@ -51,8 +51,9 @@ class MySearchWidget(QMainWindow):
             textEditor (QWidget): The text editor to associate with this search widget.
         """
         super().__init__()
+        self.parent = parent
         self.textWidget = textEditor
-        uic.loadUi('Guis/Search.ui', self)
+        uic.loadUi(str(self.parent.guisPath / 'Search.ui'), self)
         self.setWindowFlags(Qt.WindowType.Tool)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setWindowOpacity(0.7)
