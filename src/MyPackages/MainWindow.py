@@ -157,7 +157,7 @@ class MainWindow(QMainWindow):
     #Languages, styles or themes
     lgg               = None
     theme             = None
-    internalProfile  = None
+    internalProfile   = None
     dict_languages    = {}
     dict_profiles     = {}
     dict_themeSheets  = {}
@@ -318,6 +318,9 @@ class MainWindow(QMainWindow):
         self.list_tmplts      = YamlHandler(str(self.appDataPath / 'config_templates.yaml'))
         self.autoCompleteList = YamlHandler(str(self.appDataPath / 'config_autocomplete_list.yaml'))
 
+        #Adding resource path to cfg_app dictionary
+        self.cfg_app.index['resourcesPath'] = str(self.guisPath / 'Resources').replace('\\', '/')
+
         #Loading language
         for filename in os.listdir(str(self.baseDir / 'i18n')):
             if filename.endswith('.yaml'):
@@ -369,7 +372,7 @@ class MainWindow(QMainWindow):
         self.globalTheme = self.cfg_session.index.get('global_theme', 'dark')
         cssVariables = self.dict_themeSheets[self.globalTheme].variables
 
-        #Loading styleSheets 
+        #Loading styleSheets
         for filename in os.listdir(str(self.stylesPath / 'widgets')):
             if filename.endswith('.css'):
                 #Getting file name without extension

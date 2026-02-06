@@ -32,11 +32,11 @@
     --max-width-tabs: --app:max-width-tabs;
 
     /*Images*/
-    --close-tab1: url('Guis/Resources/close-tab1.png');
-    --close-tab2: url('Guis/Resources/close-tab2.png');
-    --close-tab3: url('Guis/Resources/close-tab3.png');
-    --close-tab4: url('Guis/Resources/close-tab5.png');
-    --close-tab5: url('Guis/Resources/close-tab5.png');
+    --close-tab1: url('--app:resourcesPath/close-tab1.png');
+    --close-tab2: url('--app:resourcesPath/close-tab2.png');
+    --close-tab3: url('--app:resourcesPath/close-tab3.png');
+    --close-tab4: url('--app:resourcesPath/close-tab5.png');
+    --close-tab5: url('--app:resourcesPath/close-tab5.png');
 }
 
 /*---------------

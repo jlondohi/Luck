@@ -15,6 +15,18 @@ from MyPackages import YamlHandler
 from MyPackages.MySplashScreen import MySplashScreen
 
 baseDir = Path(__file__).resolve().parent
+#Creating exceptions for baseDir
+if not baseDir.exists():
+    raise Exception(f'Base directory does not exist: {baseDir}')
+elif not baseDir.is_dir():
+    raise Exception(f'Base directory is not a directory: {baseDir}')
+elif not os.access(baseDir, os.R_OK):
+    raise Exception(f'Base directory is not readable: {baseDir}')
+elif not os.access(baseDir, os.X_OK):
+    raise Exception(f'Base directory is not executable: {baseDir}')
+elif str(baseDir).endswith('_internal'):
+    baseDir = baseDir.parent
+
 #Add icon to the application
 try:
     #By registering system id
