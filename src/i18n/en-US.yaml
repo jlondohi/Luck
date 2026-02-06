@@ -297,6 +297,8 @@ update-app:
   outdated: "We have a new version!\nDo you want to update now?\nNew version"
   title3: Error
   connection-error: Error connecting to Luck repository
+  tile4: Microsoft Store Update
+  msix-info: "Automatic updates are not available for the MSIX version. \nPlease visit the Luck page to download the latest version."
 upload-to-db:
   header: Upload file to DB
   option1: Replace if exists in DB

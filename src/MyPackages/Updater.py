@@ -55,15 +55,15 @@ class Updater(QObject):
         if not self.latest:
             return
         
-        download_url = self.latest['assets'][0]['browser_download_url']
-        self.UpdateAndExit(download_url, route_actual, self.version)
+        github_url = self.latest['assets'][0]['browser_download_url']
+        self.UpdateAndExit(github_url, route_actual, self.version)
 
     #Opening a window in CMD to download the new version
-    def UpdateAndExit(self, download_url, route_actual, version, *args):
+    def UpdateAndExit(self, github_url, route_actual, version, *args):
         #Build the command to open CMD and run the update script
         comand = [
             'cmd', '/k',  # /k To keep the window open after running
-            f'python Update.py {download_url} {route_actual} {version}'
+            f'python Update.py {github_url} {route_actual} {version}'
         ]
         subprocess.Popen(comand)
         sys.exit()  #Close the main program

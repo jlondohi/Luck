@@ -8,8 +8,8 @@ from Crypto.Util.Padding import pad, unpad
 from functools import partial
 #Importing PyQt6 packages
 from PyQt6.QtWidgets import (QFileDialog, QMessageBox, QTabBar, QToolButton)
-from PyQt6.QtGui import (QCursor, QDragEnterEvent, QDropEvent, QIcon)
-from PyQt6.QtCore import (Qt)
+from PyQt6.QtGui import (QCursor, QDragEnterEvent, QDropEvent, QIcon, QDesktopServices)
+from PyQt6.QtCore import (Qt, QUrl)
 #Importing custom classes and methods
 from MyPackages import (AboutWidget, Updater, YamlHandler
     , MyResultTable, MyPlainTextEdit, MyParamsManager
@@ -747,9 +747,30 @@ def compareVersion(WebVersion, currentVersion, *args):
 #Software update
 def startUpdate(self, silent=False, *args):
     error = False
+    #Microsoft Store update
+    #----------------------
+    #Identifying if the execution is in an MSIX environment
+    #In these environments the update is done through the application store
+    if "APPX_PACKAGE_FAMILY_NAME" in os.environ:
+        #Creating informative message and allowing the user to be redirected to the app page
+        msg = QMessageBox()
+        msg.setStyleSheet( self.dict_styledSheets['QMessageBox'] )
+        msg.setWindowIcon(self.icon)
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setWindowTitle(self.i18nNes('update-app', 'title4'))
+        msg.setText(self.i18nNes('update-app', 'msix-info'))
+        answer = msg.exec()
+        if answer == QMessageBox.StandardButton.Ok:
+            url = self.version.index.get('msix_url')
+            QDesktopServices.openUrl(QUrl(url))
+        return
+    
+    #GitHub update
+    #--------------
     #Instantiating updater
     updater = Updater(self)
-    updater.server_url = self.version.index.get('download_url')
+    updater.server_url = self.version.index.get('github_url')
     current_version = self.version.index.get('version')
     
     #Requesting official version in repo (web)

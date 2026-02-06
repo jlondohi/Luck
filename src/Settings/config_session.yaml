@@ -40,10 +40,10 @@ status_frame:
     - false
     - 70
 prede_geo:
-- 0.10
-- 0.10
-- 0.60
-- 0.70
+- 0.1
+- 0.1
+- 0.6
+- 0.7
 splitter_geo:
 - 0.6
 - 0.8

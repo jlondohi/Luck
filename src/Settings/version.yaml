@@ -1,6 +1,7 @@
 version: 1.1.0
 release_date: 2025-09-11
-download_url: https://github.com/jlondohi/Luck/tags
+github_url: https://github.com/jlondohi/Luck/tags
+msix_url: ms-windows-store://pdp/?productid=9N7CM2D8NBDX
 checksum:
 dependencies:
   cloudera_odbc_driver: '>=2.6'
