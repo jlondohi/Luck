@@ -1,4 +1,4 @@
-language: es-CO
+language: en-US
 global_theme: dark
 internal_profile: Gris oscuro
 prede_dsn: IMPALA_PROD

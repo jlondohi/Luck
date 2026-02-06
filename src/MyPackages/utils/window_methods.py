@@ -270,22 +270,30 @@ def stopIconTimer(self, *args):
 
 #Preparing frameworks
 def prepareFramework(self, *args):
-    ##Path and data folder
-    if platform.system() == 'Windows':
-        #Will try to get the downloads folder from the registry
-        try:
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders') as key:
-                download_folder = winreg.QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
-        #In case of error, take the user's default address
-        except Exception as exc:
-            download_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
-            #If the folder does not exist either, it creates it
-            os.makedirs(download_folder) if not os.path.exists(download_folder) else None
-    elif platform.system() == 'Darwin':  #MacOS
+    #On most modern operating systems (Win, macOS, Linux),
+    ##expanduser('~') is the safest and most standardized way to obtain the user profile.
+    try:
+        #This works on Windows, macOS and Linux without accessing the registry
         download_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
-    else:  #Linux
-        download_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
+        
+        #Additional validation for Windows: sometimes the folder is called 'Downloads' in the file system
+        ##although internally 'Downloads' is usually a valid alias.
+        if not os.path.exists(download_folder) and platform.system() == 'Windows':
+            #Try to get it via environment variable if expanduser fails
+            user_profile = os.getenv('USERPROFILE')
+            if user_profile:
+                download_folder = os.path.join(user_profile, 'Downloads')
+
+        #If for some reason it does not exist (the custom system), it creates it
+        if not os.path.exists(download_folder):
+            os.makedirs(download_folder)
+            
+    except Exception as e:
+        #Universal fallback in case of permissions or route error
+        download_folder = os.getcwd() 
+
     self.cfg_app.index['dataPath'] = download_folder
+
 
 #Function to initialize the window harmoniously with the monitor
 def initWindow(self, *args):

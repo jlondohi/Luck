@@ -3,7 +3,7 @@
 'Luck' was the name of my beloved pet, a Siberian wolf-dog who is no longer with me.  
 This application is a heartfelt tribute to him, reflecting the joy, loyalty, and energy he brought into my life.
 
-<img src="src/Guis/Resources/start.png" alt="LUCK Logo" style="width:5cm;">
+<img src="src/Guis/Resources/start.png" alt="LUCK Logo" width="200">
 
 ---
 
@@ -21,6 +21,12 @@ See the [LICENSE](LICENSE) file for the full license text.
 
 ---
 
+## Privacy & Terms
+
+Please review our [Privacy Policy and Terms of Use](PRIVACY_POLICY.md).
+
+---
+
 ## Trademark Policy
 
 The name **LUCK** and its logo are protected trademarks of the author.  
@@ -30,7 +36,7 @@ The name **LUCK** and its logo are protected trademarks of the author.
   or optionally add an identifier in the following format:  
 
 
-LUCK <Dog_Breed>
+`LUCK <Dog_Breed>`
 
 
 Examples: `LUCK Husky`, `LUCK German Shepherd`, `LUCK Dingo`.
