@@ -10,7 +10,7 @@ import os
 def download(url, dest_folder, version):
     zip_path = os.path.join(dest_folder, f'{version}.zip')
     try:
-        # Descarga con barra de progreso
+        #Download with progress bar
         response = requests.get(url, stream=True, timeout=30)
         total = int(response.headers.get('content-length', 0))
 
@@ -31,7 +31,7 @@ def download(url, dest_folder, version):
     
     else:
         print('Complete download. Decompressing ...')
-        decompressing(zip_path)
+        decompressing(zip_path, version)
 
 
 def decompressing(zip_path, version):
@@ -48,7 +48,7 @@ def decompressing(zip_path, version):
 #--------------------------------------
 #               Program
 #--------------------------------------
-#Definiendo parametros ingresado desde el sistema
+#Defining parameters entered from the system
 url = sys.argv[1]
 dest_folder = sys.argv[2]
 version = sys.argv[3]

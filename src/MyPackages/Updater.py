@@ -1,4 +1,4 @@
-import sys, os, jwt, time, requests, subprocess, cryptography
+import sys, os, requests, subprocess
 from PyQt6.QtCore import QObject
 
 #==============================================================================
@@ -12,9 +12,6 @@ class Updater(QObject):
         self.version = 'v0.0.0'
         self.latest = None
 
-        self.APP_ID = ''
-        self.INSTALLATION_ID = ''
-        self.PRIVATE_KEY = ""
         self.OWNER = 'jlondohi'
         self.REPO = 'Luck'
         
@@ -38,9 +35,7 @@ class Updater(QObject):
     #Function to know what is the last release (GITHUB)
     def checkForUpdate(self, *args):
         try:
-            jwt_token = self.createJwt()
-            access_token = self.getToken(jwt_token)
-            releases = self.getLatestRelease(access_token)
+            releases = self.getLatestRelease()
 
             if not releases:
                 self.latest = None
@@ -76,32 +71,13 @@ class Updater(QObject):
     #-------------------------------------------------------------------------------
     # Connection functions
     #-------------------------------------------------------------------------------
-    def createJwt(self, *args):
-        payload = {
-            'iat': int(time.time()) - 60,
-            'exp': int(time.time()) + (9 * 60), #9 minutes of validity
-            'iss': self.APP_ID,
-        }
-        encode = jwt.encode(payload, self.PRIVATE_KEY, algorithm='RS256')
-        return encode
-
-    def getToken(self, jwt_token, *args):
-        headers = {
-            'Authorization': f'Bearer {jwt_token}',
-            'Accept': 'application/vnd.github+json'
-        }
-        url = f'https://api.github.com/app/installations/{self.INSTALLATION_ID}/access_tokens'
-        r = requests.post(url, headers=headers)
-        r.raise_for_status()
-        return r.json()['token']
-
-    def getLatestRelease(self, token, *args):
+    def getLatestRelease(self, *args):
         url = f'https://api.github.com/repos/{self.OWNER}/{self.REPO}/releases'
         headers = {
-            'Authorization': f'token {token}',
             'Accept': 'application/vnd.github.v3+json'
         }
         r = requests.get(url, headers=headers)
+        r.raise_for_status()
         releases = r.json()
 
         return releases
