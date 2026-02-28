@@ -23,7 +23,7 @@ See the [LICENSE](LICENSE) file for the full license text.
 
 ## Privacy & Terms
 
-Please review our [Privacy Policy and Terms of Use](PRIVACY_POLICY.md).
+Please review our [Privacy Policy and Terms of Use](PRIVACY-POLICY.md).
 
 ---
 
