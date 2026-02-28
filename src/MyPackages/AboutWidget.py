@@ -47,13 +47,14 @@ class AboutWidget(QMainWindow):
         super().__init__()
         self.parent = parent
         self.i18nNes = self.parent.i18nNes
+        self.guisPath = self.parent.guisPath
         self.cfg_shortcut = self.parent.cfg_shortcut
         version = parent.version
         
         self.parentWindow = self.window()
         #Loading GUI
-        uic.loadUi('Guis/About.ui', self)
-        with open("Guis/About.html", "r", encoding="utf-8") as f:
+        uic.loadUi(str(self.parent.guisPath / 'About.ui'), self)
+        with open(str(self.parent.guisPath / 'About.html'), 'r', encoding='utf-8') as f:
             self.qtb_description.setHtml(f.read())
         self.qtb_description.setOpenExternalLinks(True)
 

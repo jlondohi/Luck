@@ -8,50 +8,42 @@
 #================================================================== 
 
 import sys, os, ctypes
-from datetime import datetime
+from pathlib import Path
 #Importing own PyQt6 packages
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtCore import Qt
 from MyPackages import YamlHandler
 from MyPackages.MySplashScreen import MySplashScreen
+
+baseDir = Path(__file__).resolve().parent
+#Creating exceptions for baseDir
+if not baseDir.exists():
+    raise Exception(f'Base directory does not exist: {baseDir}')
+elif not baseDir.is_dir():
+    raise Exception(f'Base directory is not a directory: {baseDir}')
+elif not os.access(baseDir, os.R_OK):
+    raise Exception(f'Base directory is not readable: {baseDir}')
+elif not os.access(baseDir, os.X_OK):
+    raise Exception(f'Base directory is not executable: {baseDir}')
+elif str(baseDir).endswith('_internal'):
+    baseDir = baseDir.parent
 
 #Add icon to the application
 try:
     #By registering system id
-    version = YamlHandler('Settings/version.yaml')
-    _version = version.index.get('version')
-    major_version = _version.split('.')[0]
-    myappid = f'luck.luck.{major_version}'
+    version      = YamlHandler(str(baseDir / 'Settings' / 'version.yaml'))
+    _version     = version.index.get('version')
+    majorVersion = _version.split('.')[0]
+    myappid      = f'luck.luck.{majorVersion}'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 except Exception as exc:
     print('Error: {0}'.format(exc))
 
-#Redirecting terminal
-log_file = 'Luck-Debug.log'
-if os.path.exists(log_file):
-    with open(log_file, 'r') as file:
-        lineas = file.readlines()
-        if len(lineas) > 1000:
-            #If it has more than 1000 lines, we delete the file
-            os.remove(log_file)
-log_file = open(log_file, 'w')
-sys.stdout = log_file #PENDING COMMENT or UNCOMMENT IN DEBUG
-
 def main():
-    #Deadline (AAAA, mm, DD)
-    EXPIRATION_DATE = datetime(2025, 12, 31)
-
-    if datetime.now() > EXPIRATION_DATE:
-        print("This program has expired. Contact the developer.")
-        sys.exit(1)
-    
     #Starting application
-    app = QApplication( sys.argv )
-    
+    app     = QApplication( sys.argv )
     #Loading home window
-    splash = MySplashScreen()
+    splash  = MySplashScreen(baseDir)
     splash.show()
-    print(f"Luck Started {datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')}")
     #Linking system/app shutdown
     sys.exit( app.exec() )
 

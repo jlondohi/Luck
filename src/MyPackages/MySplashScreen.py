@@ -1,8 +1,10 @@
+import os, sys
+from pathlib import Path
+#Importing PyQt6 packages
 from PyQt6.QtWidgets import (QMainWindow, QApplication
     , QLabel, QVBoxLayout, QWidget)
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt, QTimer
-
 #Importing own PyQt6 packages
 from MyPackages.MainWindow import MainWindow
 
@@ -23,15 +25,18 @@ class MySplashScreen(QMainWindow):
         initUI(self, *args): Sets up the splash screen UI and starts the loading timer.
         showMainWindow(self, *args): Stops the timer and shows the main application window.
     """
-    def __init__(self):
+    def __init__(self, baseDir):
         """
         Initializes the splash screen and sets up the UI.
         """
         super().__init__()
+        #Setting the base directory
+        self.baseDir = baseDir
+        
         self.app = QApplication.instance()
         #Defining default size
-        self._width = 350
-        self._height = 350
+        self._width   = 350
+        self._height  = 350
         self.settings = None
         #Initiating
         self.initUI()
@@ -44,7 +49,7 @@ class MySplashScreen(QMainWindow):
             *args: Additional arguments (unused).
         """
         #Window configuration
-        self.icon = QIcon('Guis/Resources/icon0.ico')
+        self.icon = QIcon(str(self.baseDir / 'Guis' / 'Resources' / 'icon0.ico'))
         self.setWindowIcon(self.icon)
         self.setWindowTitle('Splash Screen')
         self.resize(self._width, self._height)
@@ -59,7 +64,7 @@ class MySplashScreen(QMainWindow):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
         #Setting the center widget as a QLabel for the image
-        pixmap = QPixmap('Guis/Resources/start.png')
+        pixmap = QPixmap(str(self.baseDir / 'Guis' / 'Resources' / 'start.png'))
         scaled_pixmap = pixmap.scaledToWidth(self._width - 1, Qt.TransformationMode.SmoothTransformation)
         label = QLabel(self)
         label.setPixmap(scaled_pixmap)
@@ -73,7 +78,7 @@ class MySplashScreen(QMainWindow):
         container.setLayout(layout)
         container.setStyleSheet('background-color: transparent;')
         self.setCentralWidget(container)
-        
+
         #Requesting to load main window
         self.loadingTimer = QTimer(self)
         self.loadingTimer.timeout.connect(self.showMainWindow)
@@ -89,6 +94,6 @@ class MySplashScreen(QMainWindow):
         """
         self.loadingTimer.stop()
         #Loading main window
-        ventana = MainWindow()
-        ventana.show()
+        window = MainWindow(self.baseDir)
+        window.show()
         self.close()

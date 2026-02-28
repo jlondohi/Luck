@@ -1,5 +1,6 @@
 import ctypes
 from functools import partial
+from pathlib import Path
 from PyQt6.QtWidgets import (QFrame, QHBoxLayout
     , QPushButton, QSpacerItem, QSizePolicy, QLabel)
 from PyQt6.QtCore import Qt, QSize, QEvent
@@ -88,7 +89,7 @@ class Bar(QLabel):
         super().__init__(parent)
         self.setMaximumSize(20, 30)
         self.setScaledContents(True)
-        self.setPixmap(QPixmap('Guis/Resources/divider.png'))
+        self.setPixmap(QPixmap(str(parent.parent.guisPath / 'Resources' / 'divider.png')))
 
 #Directed class to create the title bar
 class MyTitleBar(QFrame):
@@ -313,6 +314,8 @@ class MyTitleBar(QFrame):
             menus (bool): Whether to include menu buttons.
             *args: Additional arguments (unused).
         """
+        _ResourcesPath = self.parent.guisPath / 'Resources'
+        
         #Creating the layout
         self.layout = QHBoxLayout(self)
         self.layout.setContentsMargins(10,0,10,0)
@@ -326,7 +329,7 @@ class MyTitleBar(QFrame):
         self.lbl_title = QLabel()
         self.lbl_title.setMaximumSize(30, 30)
         self.lbl_title.setScaledContents(True)
-        self.lbl_title.setPixmap(QPixmap('Guis/Resources/icon.png'))
+        self.lbl_title.setPixmap(QPixmap(str(_ResourcesPath / 'icon.png')))
         self.lbl_title.setToolTip(self.i18nNes('tooltips', 'tb10'))
 
         #Creating bottons
@@ -357,8 +360,8 @@ class MyTitleBar(QFrame):
   
         if menus:
             #Button
-            self.layout.addWidget(Bar())
-            self.bt_downloads = TitleWindowButton('', 'Guis/Resources/folder.png')
+            self.layout.addWidget(Bar(self))
+            self.bt_downloads = TitleWindowButton('', str(_ResourcesPath / 'folder.png'))
             self.bt_downloads.setObjectName('bt_downloads')
             self.bt_downloads.clicked.connect(self.parent.openDownloadsFolder)
             self.layout.addWidget(self.bt_downloads)
@@ -368,10 +371,10 @@ class MyTitleBar(QFrame):
             tootip = tootip if not sc else tootip + f' ({sc})'
             self.bt_downloads.setToolTip(tootip)
             
-            self.layout.addWidget(Bar())
+            self.layout.addWidget(Bar(self))
             
             #Button
-            self.bt_baseSetter = TitleWindowButton('', 'Guis/Resources/baseSetter.png')
+            self.bt_baseSetter = TitleWindowButton('', str(_ResourcesPath / 'baseSetter.png'))
             self.bt_baseSetter.setObjectName('bt_baseSetter')
             self.bt_baseSetter.setProperty('baseSetter', False)
             self.bt_baseSetter.clicked.connect(self.parent.baseSetter)
@@ -383,7 +386,7 @@ class MyTitleBar(QFrame):
             self.bt_baseSetter.setToolTip(tootip)
             
             #Button
-            self.bt_light = TitleWindowButton('', 'Guis/Resources/light.png')
+            self.bt_light = TitleWindowButton('', str(_ResourcesPath / 'light.png'))
             self.bt_light.setObjectName('bt_light')
             self.bt_light.clicked.connect(self.parent.lightenFrame)
             self.layout.addWidget(self.bt_light)
@@ -394,7 +397,7 @@ class MyTitleBar(QFrame):
             self.bt_light.setToolTip(tootip)
             
             #Button
-            self.bt_dark = TitleWindowButton('', 'Guis/Resources/dark.png')
+            self.bt_dark = TitleWindowButton('', str(_ResourcesPath / 'dark.png'))
             self.bt_dark.setObjectName('bt_dark')
             self.bt_dark.hide()
             self.bt_dark.clicked.connect(self.parent.darkenFrame)
@@ -406,8 +409,8 @@ class MyTitleBar(QFrame):
             self.bt_dark.setToolTip(tootip)
             
             #Button
-            self.layout.addWidget(Bar())
-            self.bt_panelize = TitleWindowButton('', 'Guis/Resources/panelize.png')
+            self.layout.addWidget(Bar(self))
+            self.bt_panelize = TitleWindowButton('', str(_ResourcesPath / 'panelize.png'))
             self.bt_panelize.setObjectName('bt_panelize')
             self.bt_panelize.clicked.connect(self.parent.panelizeFrame)
             self.layout.addWidget(self.bt_panelize)
@@ -419,7 +422,7 @@ class MyTitleBar(QFrame):
             self.bt_panelize.setToolTip(tootip)
             
             #Button
-            self.bt_expand = TitleWindowButton('', 'Guis/Resources/expand.png')
+            self.bt_expand = TitleWindowButton('', str(_ResourcesPath / 'expand.png'))
             self.bt_expand.clicked.connect(self.parent.expandFrame)
             self.layout.addWidget(self.bt_expand)
             #Tooltip
@@ -428,25 +431,25 @@ class MyTitleBar(QFrame):
             tootip = tootip if not sc else tootip + f' ({sc})'
             self.bt_expand.setToolTip(tootip)
         
-        self.layout.addWidget(Bar())
-        self.bt_minimize = TitleWindowButton('', 'Guis/Resources/minimize.png')
+        self.layout.addWidget(Bar(self))
+        self.bt_minimize = TitleWindowButton('', str(_ResourcesPath / 'minimize.png'))
         self.bt_minimize.setObjectName('bt_minimize')
         self.bt_minimize.setToolTip(self.i18nNes('tooltips', 'tb2'))
         self.bt_minimize.clicked.connect(self.minimizeWindow)
         self.layout.addWidget(self.bt_minimize)
 
-        self.bt_normalize= TitleWindowButton('', 'Guis/Resources/normal.png')
+        self.bt_normalize= TitleWindowButton('', str(_ResourcesPath / 'normal.png'))
         self.bt_normalize.setObjectName('bt_normalize')
         self.bt_normalize.clicked.connect(self.restoreWindow)
         self.layout.addWidget(self.bt_normalize)
         self.bt_normalize.hide()
         
-        self.bt_maximize = TitleWindowButton('', 'Guis/Resources/maximize.png')
+        self.bt_maximize = TitleWindowButton('', str(_ResourcesPath / 'maximize.png'))
         self.bt_maximize.setObjectName('bt_maximize')
         self.bt_maximize.clicked.connect(self.maximizeWindow)
         self.layout.addWidget(self.bt_maximize)
         
-        self.bt_close = TitleWindowButton('', 'Guis/Resources/close.png')
+        self.bt_close = TitleWindowButton('', str(_ResourcesPath / 'close.png'))
         self.bt_close.setObjectName('bt_close')
         self.bt_close.setToolTip(self.i18nNes('tooltips', 'tb1'))
         self.bt_close.clicked.connect(partial(self.parent.close))

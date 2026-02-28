@@ -1,8 +1,8 @@
 #Importing native packages
-import os, sys, getpass
+import os, sys, getpass, ctypes, shutil, subprocess
 import polars as pl
-import subprocess
-
+from datetime import datetime
+from pathlib import Path
 #Importing PyQt6 packages
 from PyQt6 import uic
 from PyQt6.QtWidgets import (QMainWindow, QApplication
@@ -103,13 +103,21 @@ class MainWindow(QMainWindow):
         ... (many methods are dynamically bound at the end of the file)
     """
 
+    #Paths
+    #--------------------------
+    baseDir        = None
+    appDataPath    = None
+    guisPath       = None
+    i18nPath       = None
+    stylesPath     = None
+        
     #Signals
     #--------------------------
     firstConexionSignal = pyqtSignal()
     splitHChanged  = pyqtSignal(int)
     splitVChanged  = pyqtSignal(int)
     sendTextEditor = pyqtSignal(object, str)
-    
+
     #Flags
     #--------------------------
     updating_splits = False
@@ -117,8 +125,22 @@ class MainWindow(QMainWindow):
 
     #Slots
     #--------------------------
+    #Metadata of all taps
+    tabInfoTemplate = {
+          'text_editor'    : None #Widget reference
+        , 'params_manager' : None #Widget reference
+        , 'result'         : None #Widget reference
+        , 'saved'          : True
+        , 'dict_paramsEtl' : {}
+        , 'origin'         : ''
+        , 'origin_param'   : ''
+        , 'result_data'    : {}
+        , 'rType'          : 'base' #('base', 'status', 'results')
+        , 'fetched'        : False
+    }
+    tabInfo = {}
+
     #Reference current tab
-    tabInfo          = {}
     current_tabName   = None
     current_etlEditor = None
     current_pManager  = None
@@ -128,7 +150,6 @@ class MainWindow(QMainWindow):
 
     #secont thread functions
     #-------------------------
-    
 
     #List of object styleables
     dict_MySearchWidget = {}
@@ -136,7 +157,7 @@ class MainWindow(QMainWindow):
     #Languages, styles or themes
     lgg               = None
     theme             = None
-    internalProfile  = None
+    internalProfile   = None
     dict_languages    = {}
     dict_profiles     = {}
     dict_themeSheets  = {}
@@ -155,6 +176,21 @@ class MainWindow(QMainWindow):
         subprocess.Popen([sys.executable] + sys.argv)
         QApplication.exit(0)
     
+    #Binding Current Tab
+    def bindCurrentTab(self):
+        tab_name = self.tabWidget.currentWidget().objectName
+        tab_data = self.tabInfo.get(tab_name)
+        if not tab_data:
+            return
+
+        self.current_tabName   = tab_name
+        self.current_etlEditor = tab_data['text_editor']
+        self.current_pManager  = tab_data['params_manager']
+        self.current_paramsEtl = tab_data['dict_paramsEtl']
+        self.current_result    = tab_data['result']
+        self.current_rType     = tab_data['rType']
+        self.current_fetched   = tab_data['fetched']
+      
     #Function to update current references
     def tabChanged(self, index:int=0):
         #Terminating process if there is no active tab
@@ -164,17 +200,10 @@ class MainWindow(QMainWindow):
         #Default value
         tl_1, tl_2, tl_3 = self.profile['result-trafficlight']
         
-        #Getting the name of the current tab
-        tab_name = self.tabWidget.currentWidget().objectName
-        tab_data = self.tabInfo.get(tab_name)
-        if tab_data:
-            self.current_tabName   = tab_name
-            self.current_etlEditor = tab_data.get('text_editor', None)
-            self.current_pManager  = tab_data.get('params_manager', None)
-            self.current_paramsEtl = tab_data.get('dict_paramsEtl', {})
-            self.current_result    = tab_data.get('result', None)
-            self.current_rType     = tab_data.get('rType', 'base')
-            self.current_fetched   = tab_data.get('fetched', False)
+        #Binding Current Tab
+        self.bindCurrentTab()
+        #Updating tab icons
+        self.updateTabIcons()
         
         #Modifying status bar
         #--------------------------
@@ -220,75 +249,123 @@ class MainWindow(QMainWindow):
             if hasattr(self, 'MyTitleBar'):
                 self.MyTitleBar.updateMaximizeRestoreButtons()
     
-    def __init__(self):
+    #Verifying write path  and creating read/write copies of files if running from WindowsApps
+    def verifyingWritePath(self):
+        #Creating a copy of the source path
+        originalPath = self.appDataPath
+
+        #Creating Session folder in appdata if they do not exist
+        sessionPath = Path(os.getenv('LOCALAPPDATA')) / 'Luck' / 'Sessions'
+        if not os.path.exists(str(sessionPath)):
+            os.makedirs(str(sessionPath), exist_ok=True)
+        
+        #Checking if the application is running from the WindowsApps directory
+        ##Check if "WindowsApps" is in the path
+        if "WindowsApps" in str(self.baseDir):
+            #Modifying destination paths
+            self.appDataPath = Path(os.getenv('LOCALAPPDATA')) / 'Luck' / 'Settings'
+            #Creating folders in appdata if they do not exist
+            if not os.path.exists(str(self.appDataPath)):
+                os.makedirs(str(self.appDataPath), exist_ok=True)
+
+            #Creating a copy of the configuration files
+            for nameFile in os.listdir(originalPath):
+                origialFile = Path(originalPath) / nameFile
+                copyFile    = Path(self.appDataPath) / nameFile
+                #Only copy if it is a file and does not exist in the destination
+                if os.path.isfile(origialFile):
+                    if not os.path.exists(str(copyFile)):
+                        shutil.copy2(origialFile, str(copyFile))
+    
+    def __init__(self, baseDir):
         super().__init__()
         self.user = getpass.getuser()
         self.app  = QApplication.instance()
         self.gui  = QGuiApplication.instance()
-        self.parentWindow = self.window()
+        self.parentWindow   = self.window()
+
+        #Defining initial paths
+        self.baseDir        = baseDir
+        self.appDataPath    = self.baseDir / 'Settings'
+        self.guisPath       = self.baseDir / 'Guis'
+        self.i18nPath       = self.baseDir / 'i18n'
+        self.stylesPath     = self.baseDir / 'Styles'
+        
+        #Verifying if we need to create config copies
+        self.verifyingWritePath()
+        logFilePath = Path(os.path.dirname(self.appDataPath)) / 'Luck-Debug.log'
+        #Redirecting terminal
+        if os.path.exists(str(logFilePath)):
+            with open(str(logFilePath), 'r') as file:
+                lineas = file.readlines()
+                if len(lineas) > 1000:
+                    #If it has more than 1000 lines, we delete the file
+                    os.remove(str(logFilePath))
+        logFilePath = open(str(logFilePath), 'w')
+
+        #Redirecting console output (DEBUG)
+        sys.stdout = logFilePath
+        print(f"Luck Started {datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')}")
 
         #Loading Settings
-        #-----------------
-        self.version     = YamlHandler('Settings/version.yaml')
-        self.cfg_app     = YamlHandler('Settings/config_app.yaml')
-        self.cfg_session = YamlHandler('Settings/config_session.yaml')
-        self.cfg_shortcut = YamlHandler('Settings/config_shortcut.yaml')
-        self.syntaxList = YamlHandler('Settings/config_syntax_list.yaml')
-        self.list_assist = YamlHandler('Settings/config_assistant.yaml')
-        self.list_tmplts = YamlHandler('Settings/config_templates.yaml')
-        self.autoCompleteList = YamlHandler('Settings/config_autocomplete_list.yaml')
+        #----------------
+        self.version          = YamlHandler(str(self.appDataPath / 'version.yaml'))
+        self.cfg_app          = YamlHandler(str(self.appDataPath / 'config_app.yaml'))
+        self.cfg_session      = YamlHandler(str(self.appDataPath / 'config_session.yaml'))
+        self.cfg_shortcut     = YamlHandler(str(self.appDataPath / 'config_shortcut.yaml'))
+        self.syntaxList       = YamlHandler(str(self.appDataPath / 'config_syntax_list.yaml'))
+        self.list_assist      = YamlHandler(str(self.appDataPath / 'config_assistant.yaml'))
+        self.list_tmplts      = YamlHandler(str(self.appDataPath / 'config_templates.yaml'))
+        self.autoCompleteList = YamlHandler(str(self.appDataPath / 'config_autocomplete_list.yaml'))
+
+        #Adding resource path to cfg_app dictionary
+        self.cfg_app.index['resourcesPath'] = str(self.guisPath / 'Resources').replace('\\', '/')
 
         #Loading language
-        language_yaml_dir = 'i18n'
-        for filename in os.listdir(language_yaml_dir):
+        for filename in os.listdir(str(self.baseDir / 'i18n')):
             if filename.endswith('.yaml'):
                 #Getting file name without extension
                 key = os.path.splitext(filename)[0]
                 #Reading file content
-                path = os.path.join(language_yaml_dir, filename)
-                self.dict_languages[key] = YamlHandler(path).index
+                self.dict_languages[key] = YamlHandler(str(self.baseDir / 'i18n' / filename)).index
         
         #Loading profiles
-        profile_sheets_dir = 'Styles/profiles'
-        for filename in os.listdir(profile_sheets_dir):
+        for filename in os.listdir(str(self.baseDir / 'Styles' / 'profiles')):
             if filename.endswith('.yaml'):
                 #Getting file name without extension
                 key = os.path.splitext(filename)[0]
                 #Reading file content
-                path = os.path.join(profile_sheets_dir, filename)
-                self.dict_profiles[key] = YamlHandler(path).index
+                self.dict_profiles[key] = YamlHandler(str(self.baseDir / 'Styles' / 'profiles' / filename)).index
         
         #Preparing language
         self.lgg = self.cfg_session.index.get('language', 'en-US')
-        i18n = YamlHandler(f'i18n/{self.lgg}.yaml')
+        i18n = YamlHandler(str(self.baseDir / 'i18n' / f'{self.lgg}.yaml'))
         self.i18nNes = i18n.getNested
         #Preparing shurtcuts
         self.shc = self.cfg_shortcut.getNested
-        
         self.prepareFramework()
-        self.actualSession = SessionHandler(self)
-        self.icon  = QIcon('Guis/Resources/icon0.ico')
-        self.icon1 = QIcon('Guis/Resources/icon1.ico')
-        self.icon2 = QIcon('Guis/Resources/icon2.ico')
-        self.icon3 = QIcon('Guis/Resources/icon3.ico')
-        self.excWorkerIcon1 = QIcon('Guis/Resources/working-1.png')
-        self.excWorkerIcon2 = QIcon('Guis/Resources/working-2.png')
-        self.recIcon1 = QIcon('Guis/Resources/log1.png')
-        self.recIcon2 = QIcon('Guis/Resources/log2.png')
-        self.baseSetterIcon = QIcon('Guis/Resources/baseSetter.png')
-        self.baseUnSetterIcon = QIcon('Guis/Resources/baseUnSetter.png')
-        self.unsavedTab = QIcon('Guis/Resources/close-tab5.png')
+        self.actualSession    = SessionHandler(self)
+        self.icon             = QIcon(str(self.guisPath / 'Resources' / 'icon0.ico'))
+        self.icon1            = QIcon(str(self.guisPath / 'Resources' / 'icon1.ico'))
+        self.icon2            = QIcon(str(self.guisPath / 'Resources' / 'icon2.ico'))
+        self.icon3            = QIcon(str(self.guisPath / 'Resources' / 'icon3.ico'))
+        self.excWorkerIcon1   = QIcon(str(self.guisPath / 'Resources' / 'working-1.png'))
+        self.excWorkerIcon2   = QIcon(str(self.guisPath / 'Resources' / 'working-2.png'))
+        self.recIcon1         = QIcon(str(self.guisPath / 'Resources' / 'log1.png'))
+        self.recIcon2         = QIcon(str(self.guisPath / 'Resources' / 'log2.png'))
+        self.baseSetterIcon   = QIcon(str(self.guisPath / 'Resources' / 'baseSetter.png'))
+        self.baseUnSetterIcon = QIcon(str(self.guisPath / 'Resources' / 'baseUnSetter.png'))
+        self.unsavedTab       = QIcon(str(self.guisPath / 'Resources' / 'close-tab5.png'))
         self.setWindowIcon(self.icon)
 
         #Loading themes
         ##In each theme comes a set of css variables
-        theme_sheets_dir = 'Styles/themes'
-        for filename in os.listdir(theme_sheets_dir):
+        for filename in os.listdir(str(self.stylesPath / 'themes')):
             if filename.endswith('.css'):
                 #Getting file name without extension
                 key = os.path.splitext(filename)[0]
                 #Reading file content
-                path = os.path.join(theme_sheets_dir, filename)
+                path = str(self.stylesPath / 'themes' / filename)
                 self.dict_themeSheets[key] = CssHandler(path, **self.cfg_app.index)
         
         #Loading the variables of the predetermined theme to apply on widgets
@@ -296,13 +373,12 @@ class MainWindow(QMainWindow):
         cssVariables = self.dict_themeSheets[self.globalTheme].variables
 
         #Loading styleSheets
-        style_sheets_dir = 'Styles/widgets'
-        for filename in os.listdir(style_sheets_dir):
+        for filename in os.listdir(str(self.stylesPath / 'widgets')):
             if filename.endswith('.css'):
                 #Getting file name without extension
                 key = os.path.splitext(filename)[0]
                 #Establishing definitive path
-                path = os.path.join(style_sheets_dir, filename)
+                path = str(self.stylesPath / 'widgets' / filename)
                 #Loading raw css
                 css = CssHandler(path)
                 #Loading predefined variables
@@ -322,9 +398,9 @@ class MainWindow(QMainWindow):
         self.fetch = self.cfg_session.index.get('fetch-limit', 1000)
         
         #Rescaling Settings
-        self.draggable = False
-        self.dragPosition = QPoint()
-        self.onResizing = False
+        self.draggable     = False
+        self.dragPosition  = QPoint()
+        self.onResizing    = False
         self.resizing_edge = None
 
         #Setting timers
@@ -378,10 +454,10 @@ class MainWindow(QMainWindow):
         #Loading interface
         #=================
         #Loading GUI template
-        uic.loadUi('Guis/MainWindow.ui', self)
+        uic.loadUi(str(self.guisPath / 'MainWindow.ui'), self)
         #Loading user default style
         self.internalProfile = self.cfg_session.index.get('internal_profile')
-        self.profile = self.dict_profiles[self.internalProfile]
+        self.profile         = self.dict_profiles[self.internalProfile]
         self.styler(self.internalProfile)
 
         #Overriding internal general style (From users)
@@ -435,7 +511,7 @@ class MainWindow(QMainWindow):
         self.editorThread = QThread()
         self.asyncEditor = AsyncEditor(self)
         self.asyncEditor.moveToThread(self.editorThread)
-
+        
         #Connections
         self.sendTextEditor.connect(self.asyncEditor.processTextEditor)
         self.asyncEditor.finished.connect(self.paintParentheses)
@@ -524,28 +600,28 @@ class MainWindow(QMainWindow):
                 self.newScriptTab()
 
             #Loading information to the tab
-            for count, key in enumerate(self.tabInfo.keys()):
-                tab_data = self.tabInfo[key]
+            for count, widgetName in enumerate(self.tabInfo.keys()):
+                tab_data = self.tabInfo[widgetName]
                 session_data = self.actualSession.session.get(count)
-                
-                #Restore values
-                tab_data['text_editor'].setPlainText(session_data['text_editor'])
-                tab_data['saved']           = session_data.get('saved', True)
-                tab_data['dict_paramsEtl']  = session_data.get('dict_paramsEtl', {})
-                tab_data['result'].loadData(pl.DataFrame(session_data.get('result_data', None)), session_data.get('rType', 'base'))
-                tab_data['result_data']     = session_data.get('result_data', None)
-                tab_data['rType']           = session_data.get('rType', 'base')
-                tab_data['fetched']         = session_data.get('fetched', False)
-                tab_data['origin']          = session_data.get('origin', '')
-                tab_data['origin_param']    = session_data.get('origin_param', '')
+                for key in tab_data.keys():
+                    #Exceptions because they are references to current widgets
+                    ##Exception 1
+                    if key == 'text_editor':
+                        tab_data[key].setPlainText(session_data[key])
+                    ##Exception 2
+                    elif key in ('result', 'params_manager'):
+                        None
+                    else:
+                        #Restore all other values
+                        tab_data[key] = session_data[key]
 
-                #Update current references
-                self.current_etlEditor = tab_data['text_editor']
-                self.current_pManager  = tab_data['params_manager']
-                self.current_paramsEtl = tab_data['dict_paramsEtl']
-                self.current_result    = tab_data['result']
-                self.current_rType     = tab_data['rType']
-                self.current_fetched   = tab_data['fetched']
+                #Updating current references
+                self.bindCurrentTab()
+
+                #Updating tab toolTips
+                self.updateTabTooltips()
+                #Updating tab icons
+                self.updateTabIcons()
 
                 #Updating the parameter manager
                 self.updatePManager()
@@ -577,6 +653,12 @@ class MainWindow(QMainWindow):
 #==================================================================
 #Binding related functions to the main window
 #==================================================================
+MainWindow.createCustomCloseButton = window_methods.createCustomCloseButton
+MainWindow.updateTabTooltips = window_methods.updateTabTooltips
+MainWindow.updateTabIcons = window_methods.updateTabIcons
+MainWindow.onTabCloseClicked = window_methods.onTabCloseClicked
+
+MainWindow.buildTabTooltip = window_methods.buildTabTooltip
 MainWindow.applySelectedLanguage = window_methods.applySelectedLanguage
 MainWindow.styler = window_methods.styler
 MainWindow.captureProfileFormat = window_methods.captureProfileFormat

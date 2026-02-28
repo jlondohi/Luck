@@ -1,4 +1,5 @@
 import os, pickle, tempfile
+from pathlib import Path
 
 #==================================================================
 ### Creating a session handler to load and save system configuration
@@ -42,28 +43,26 @@ class SessionHandler:
         Args:
             parent (object): The parent object containing configuration and user information.
         """
-        self.parent = parent
-        self.path = parent.cfg_session.index.get('session_path')
-        self.path = os.path.join(tempfile.gettempdir(), 'Luck', 'session') if self.path is None else self.path
-        self.user = parent.user
-        self.version = parent.version.index.get('version')
-        self.session = None
-        self.tree = None
-        self.history = None
+        self.parent       = parent
+        self.path         = Path(os.getenv('LOCALAPPDATA')) / 'Luck'/ 'Sessions'
+        self.version      = parent.version.index.get('version')
+        self.session      = None
+        self.tree         = None
+        self.history      = None
 
         #Defining the paths
-        self.sessionPath = os.path.join(self.path, self.user+'.pkl')
-        self.sessionTreePath = os.path.join(self.path, self.user+'_tree.pkl')
-        self.sessionHistoryPath = os.path.join(self.path, self.user+'_history.pkl')
+        self.sessionPath          = str(self.path / 'session_ppl.pkl')
+        self.sessionTreePath      = str(self.path / 'session_tree.pkl')
+        self.sessionHistoryPath   = str(self.path / 'session_history.pkl')
         #Confirming if the file exists
-        self.sessionExists = os.path.exists(self.sessionPath)
-        self.sessionTreeExists = os.path.exists(self.sessionTreePath)
+        self.sessionExists        = os.path.exists(self.sessionPath)
+        self.sessionTreeExists    = os.path.exists(self.sessionTreePath)
         self.sessionHistoryExists = os.path.exists(self.sessionHistoryPath)
         #Requesting opening if it exists
         if self.sessionExists:
             self.session = self.loadSession()
         if self.sessionTreeExists:
-            self.tree = self.loadSessionTree()
+            self.tree    = self.loadSessionTree()
         if self.sessionHistoryExists:
             self.history = self.loadSessionHistory()
         
@@ -151,25 +150,28 @@ class SessionHandler:
         count = 0
         session = {'version': self.version}
         for tab_index in range(self.parent.tabWidget.count()):
-            tab = self.parent.tabWidget.widget(tab_index).objectName
+            tab_name = self.parent.tabWidget.widget(tab_index).objectName
             #Verifying that the information of the log or ecosystem will not be saved
             tab_text = self.parent.tabWidget.tabText(tab_index)
             if ( tab_text.startswith('Log') or
                 tab_text == self.i18nNes('tab-eco', 'eco') ):
                 continue
             
-            tab_data = tabInfo.get(tab)
+            tab_data = tabInfo.get(tab_name)
             #Saving all the information in a dictionary
-            session[count] = {
-                              'text_editor':    tab_data.get('text_editor').toPlainText()
-                            , 'saved':          tab_data.get('saved')
-                            , 'dict_paramsEtl': tab_data.get('dict_paramsEtl', {})
-                            , 'origin':         tab_data.get('origin')
-                            , 'origin_param':   tab_data.get('origin_param')
-                            , 'result_data':    tab_data.get('result_data')
-                            , 'rType':          tab_data.get('rType')
-                            , 'fetched':        tab_data.get('fetched')
-                            }
+            template = self.parent.tabInfoTemplate.copy()
+            session[count] = template
+            for key in template.keys():
+                #Exceptions because they are references to widgets
+                ##Exception 1
+                if key == 'text_editor':
+                    session[count][key] = tab_data[key].toPlainText()
+                ##Exception 2
+                elif key in ('result', 'params_manager'):
+                    None
+                else:
+                    #Save all other values
+                    session[count][key] = tab_data[key]
             count += 1
         try:
             pickle.dump(session, open(self.sessionPath, 'wb'))

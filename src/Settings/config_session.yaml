@@ -1,7 +1,7 @@
-language: es-CO
+language: en-US
 global_theme: dark
 internal_profile: Gris oscuro
-prede_dsn: IMPALA_PROD
+prede_dsn: dsn_impala
 prede_font:
     editor-font: Consolas
     editor-size: 11
@@ -9,7 +9,6 @@ prede_font:
     result-size: 10
 worldWrap: false
 baseSetter: false
-session_path: null
 fetch-limit: 10000
 tab-spaces: 4
 status_frame:
@@ -41,10 +40,10 @@ status_frame:
     - false
     - 70
 prede_geo:
-- 0.10
-- 0.10
-- 0.60
-- 0.70
+- 0.1
+- 0.1
+- 0.6
+- 0.7
 splitter_geo:
 - 0.6
 - 0.8

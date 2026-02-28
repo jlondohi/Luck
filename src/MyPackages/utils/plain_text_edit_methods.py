@@ -4,7 +4,7 @@ from functools import partial
 
 #Importing PyQt6 packages
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QSplitter
-    , QLabel, QLineEdit, QHBoxLayout, QScrollArea, QInputDialog)
+    , QLabel, QLineEdit, QHBoxLayout, QScrollArea, QInputDialog, QTabBar)
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import (QFont, QTextDocument, QTextCursor, QFontMetrics)
 #Importing custom classes and methods
@@ -94,7 +94,9 @@ def newScriptTab(self, origin = '', *args):
 
     #Adding and activating the new tab
     self.tabWidget.addTab(tab_new, f"{self.i18nNes('tab-editor', 'new')} ({self.num_Stab})")
-    self.tabWidget.setCurrentIndex(self.tabWidget.count() - 1)
+    #Setting the index of the newly created tab
+    currentIndex = self.tabWidget.count() - 1
+    self.tabWidget.setCurrentIndex(currentIndex)
     #Establishing code for when the command arises from OpenFile
     origin_param = ''
     dict_params = {}
@@ -107,7 +109,7 @@ def newScriptTab(self, origin = '', *args):
         #Changing the name of the tab
         origin = origin.replace('\\', '/')
         name = origin.rsplit('/', 1)[-1]
-        self.tabWidget.setTabText(self.tabWidget.count() - 1, name)
+        self.tabWidget.setTabText(currentIndex, name)
 
         #Checking if the companion file exists
         if os.path.exists(origin+'p'):
@@ -126,18 +128,28 @@ def newScriptTab(self, origin = '', *args):
                     None
 
     #Store tab information in the tabInfo dictionary
-    self.tabInfo[self.tabWidget.currentWidget().objectName] = {
-        'text_editor'   : textEditor,
-        'saved'         : True,
-        'params_manager': params_manager,
-        'dict_paramsEtl': dict_params,
-        'result'        : result,
-        'result_data'   : {},
-        'rType'         : 'base',
-        'fetched'       : False,
-        'origin'        : origin,
-        'origin_param'  : origin_param
-    }
+    tab_name = self.tabWidget.currentWidget().objectName
+    self.tabInfo[tab_name] = self.tabInfoTemplate.copy()
+    tab_data = self.tabInfo[tab_name]
+    tab_data['text_editor']     = textEditor
+    tab_data['params_manager']  = params_manager
+    tab_data['dict_paramsEtl']  = dict_params
+    tab_data['result']          = result
+    tab_data['origin']          = origin
+    tab_data['origin_param']    = origin_param
+    
+    #Modifying the original button of the created tab
+    self.createCustomCloseButton(currentIndex)
+    #Modifying states
+    tabBar = self.tabWidget.tabBar()
+    btn = tabBar.tabButton(currentIndex, QTabBar.ButtonPosition.RightSide)
+    btn.setProperty('type', 'saved')
+    btn.style().unpolish(btn)
+    btn.style().polish(btn)
+
+    #Updating tab toolTips
+    self.updateTabTooltips()
+    #Note, do not update icons here
 
     #Setting splitter sizes
     geo = self.cfg_session.index.get('splitter_geo')
@@ -452,7 +464,7 @@ def addParamToManager(self, key, value, *args):
 def findSearched(self, textEditor, cls='n', *args):
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     if searchWidget:
-        textF = searchWidget.qle_textBuscar.text()
+        textF = searchWidget.qle_textSearch.text()
         if cls == 'n':
             status = textEditor.find(textF, QTextDocument.FindFlag(0))
             if status == False:
@@ -469,7 +481,7 @@ def findSearched(self, textEditor, cls='n', *args):
 def replaceOne(self, textEditor, *args):
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     if searchWidget:
-        textR = searchWidget.qle_textReem.text()
+        textR = searchWidget.qle_textReplace.text()
         cursor = textEditor.textCursor()
         selected_text = cursor.selectedText()
         if selected_text:
@@ -484,8 +496,8 @@ def replaceOne(self, textEditor, *args):
 def replaceAll(self, textEditor, *args):
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     if searchWidget:
-        textF = searchWidget.qle_textBuscar.text()
-        textR = searchWidget.qle_textReem.text()
+        textF = searchWidget.qle_textSearch.text()
+        textR = searchWidget.qle_textReplace.text()
         actualCursor = textEditor.textCursor()
         textEditor.moveCursor(QTextCursor.MoveOperation.Start)
         status = textEditor.find(textF, QTextDocument.FindFlag(0))
@@ -512,7 +524,7 @@ def searchText(self, *args):
     #Checking if self.MySearchWidget already exists
     if not self.dict_MySearchWidget.get(textEditor.objectName, None):
         #Instantiating Search
-        self.MySearchWidget = MySearchWidget(textEditor)
+        self.MySearchWidget = MySearchWidget(self, textEditor)
         self.MySearchWidget.setStyleSheet( self.dict_styledSheets['MySearchWidget'] )
         #Adding instance to search engine dictionary
         self.dict_MySearchWidget[textEditor.objectName] = self.MySearchWidget
@@ -530,11 +542,11 @@ def searchText(self, *args):
         top_right = textEditor.mapToGlobal(textEditor.rect().topRight())
         #Showing window and defining search text
         self.MySearchWidget.myShow()
-        self.MySearchWidget.qle_textBuscar.setText(selectedText)
-        self.MySearchWidget.qle_textBuscar.setFocus()
+        self.MySearchWidget.qle_textSearch.setText(selectedText)
+        self.MySearchWidget.qle_textSearch.setFocus()
     else:
-        self.dict_MySearchWidget[textEditor.objectName].qle_textBuscar.setText(selectedText)
-        self.dict_MySearchWidget[textEditor.objectName].qle_textBuscar.setFocus()
+        self.dict_MySearchWidget[textEditor.objectName].qle_textSearch.setText(selectedText)
+        self.dict_MySearchWidget[textEditor.objectName].qle_textSearch.setFocus()
 
 
 #Function to move the search window as the parent spliter moves
@@ -559,15 +571,15 @@ def replaceText(self, *args):
     self.searchText()
     searchWidget = self.dict_MySearchWidget.get(textEditor.objectName, None)
     
-    self.MySearchWidget.fm_reemplazar.show()
-    self.MySearchWidget.bt_showReem.setEnabled(False)
+    self.MySearchWidget.fm_replace.show()
+    self.MySearchWidget.bt_showReplace.setEnabled(False)
     self.MySearchWidget.setGeometry(self.MySearchWidget.geometry().x()
                     , self.MySearchWidget.geometry().y()
                     , 400, 80)
     #Modifying the visual style of replace
-    searchWidget.fm_buscar.setProperty('search', False)
-    searchWidget.fm_buscar.style().unpolish(searchWidget.fm_buscar)
-    searchWidget.style().polish(searchWidget.fm_buscar)
+    searchWidget.fm_search.setProperty('search', False)
+    searchWidget.fm_search.style().unpolish(searchWidget.fm_search)
+    searchWidget.style().polish(searchWidget.fm_search)
 
 #Function to comment or uncomment text
 def commentText(self, *args):

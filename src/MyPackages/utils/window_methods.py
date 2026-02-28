@@ -5,10 +5,11 @@ import os, sys, platform, subprocess, tempfile, winreg \
 from datetime import datetime
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
+from functools import partial
 #Importing PyQt6 packages
-from PyQt6.QtWidgets import (QFileDialog, QMessageBox)
-from PyQt6.QtGui import (QCursor, QDragEnterEvent, QDropEvent)
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (QFileDialog, QMessageBox, QTabBar, QToolButton)
+from PyQt6.QtGui import (QCursor, QDragEnterEvent, QDropEvent, QIcon, QDesktopServices)
+from PyQt6.QtCore import (Qt, QUrl)
 #Importing custom classes and methods
 from MyPackages import (AboutWidget, Updater, YamlHandler
     , MyResultTable, MyPlainTextEdit, MyParamsManager
@@ -17,6 +18,104 @@ from MyPackages import (AboutWidget, Updater, YamlHandler
 #==================================================================
 #Creating functions related to the main window
 #==================================================================
+#Function to create custom buttons for tabs
+def createCustomCloseButton(self, tabIndex):
+    tabWidget = self.tabWidget
+    tabBar = tabWidget.tabBar()
+    tab_name = tabWidget.widget(tabIndex).objectName
+    btn = QToolButton(tabBar)
+    btn.setObjectName("tabCloser")
+    btn.setAutoRaise(True)
+    btn.setCursor(Qt.CursorShape.ArrowCursor)
+    btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    #Setting button
+    tabBar.setTabButton(
+        tabIndex,
+        QTabBar.ButtonPosition.RightSide,
+        btn
+    )
+    #Connecting the new button with the custom close
+    btn.clicked.connect(partial(self.onTabCloseClicked, tab_name))
+
+#Function to close the tab to which the close button belongs
+def onTabCloseClicked(self, tab_name):
+    #Searching among all the tabs which index corresponds to the name
+    for i in range(self.tabWidget.count()):
+        w = self.tabWidget.widget(i)
+        if w and w.objectName == tab_name:
+            self.closeTab(i)
+
+#Function to update the tabBar toolTips
+def updateTabTooltips(self):
+    tabBar = self.tabWidget.tabBar()
+    for tab_index in range(self.tabWidget.count()):
+        tab_name = self.tabWidget.widget(tab_index).objectName
+        tab_data = self.tabInfo.get(tab_name)
+        if not tab_data:
+            tabBar.setTabToolTip(tab_index, '')
+            continue
+
+        tooltip = self.buildTabTooltip(tab_data)
+        tabBar.setTabToolTip(tab_index, tooltip)
+
+#Function to update the tabBar icons
+def updateTabIcons(self):
+    tabBar = self.tabWidget.tabBar()
+    currentIndex = self.tabWidget.currentIndex()
+    #Going through each of the tabs
+    for tab_index in range(self.tabWidget.count()):
+        tab_name = self.tabWidget.widget(tab_index).objectName
+        tab_data = self.tabInfo.get(tab_name)
+        #Early release condition
+        if not tab_data:
+            continue
+        #Early release condition
+        btn = tabBar.tabButton(tab_index, QTabBar.ButtonPosition.RightSide)
+        if not btn:
+            continue
+
+        #Setting final state ONCE
+        if tab_data['saved']==False:
+            newType = 'unsaved'
+        elif tab_index == currentIndex:
+            newType = 'active'
+        elif tab_data['saved']==True:
+            newType = 'saved'
+
+        #Avoid unnecessary repainting
+        if btn.property('type') == newType:
+            continue
+
+        btn.setProperty('type', newType)
+        btn.style().unpolish(btn)
+        btn.style().polish(btn)
+
+#Function to build the toolTips
+def buildTabTooltip(self, tab_data: dict) -> str:
+    #Pre-loading i18nNes
+    _name       = self.i18nNes('tab-tooltips', 'name')
+    _path       = self.i18nNes('tab-tooltips', 'path')
+    _saved       = self.i18nNes('tab-tooltips', 'saved')
+    _fetched    = self.i18nNes('tab-tooltips', 'fetched')
+    _no_fetched = self.i18nNes('tab-tooltips', 'no-fetched')
+    #Creating list of lines
+    lines = []
+    #Creating lines
+    origin = tab_data['origin']
+    origin = origin.replace('\\', '/')
+    name = origin.rsplit('/', 1)[-1]
+    if name:
+        lines.append(f'{_name}: {name}')
+        lines.append(f'{_path}: {origin}')
+        lines.append(f"{_saved}: {tab_data['saved']}")
+    if tab_data['rType'] == 'results':
+        if tab_data['fetched']:
+            lines.append(f'Resultado: {_fetched}')
+        else:
+            lines.append(f'Resultado: {_no_fetched}')
+    return '\n'.join(lines)
+
+
 #Function to establish language
 def applySelectedLanguage(self, *args):
     self.lgg = self.sender().text()
@@ -171,48 +270,30 @@ def stopIconTimer(self, *args):
 
 #Preparing frameworks
 def prepareFramework(self, *args):
-    #Preparing specific folders in session path, temporary path or home path
-    #-----------------------------------------------------------------------
-    ##Path and folder of the session
-    temp_path = os.path.join(tempfile.gettempdir(), 'Luck', 'session')
-    sesion_path = self.cfg_session.index.get('session_path', '')
-    if sesion_path and not os.path.exists(sesion_path):
-        #Creating the temporary folder if it does not exist
-        try:
-            os.makedirs(sesion_path)
-        except:
-            #Creating the Luck folder in the temporary folder
-            os.makedirs(temp_path) if not os.path.exists(temp_path) else None
-            self.cfg_session.index['session_path'] = temp_path
-    elif sesion_path and os.access(sesion_path, os.R_OK | os.W_OK):
-        print(self.i18nNes('log-messages', 'error-session'))
-    elif not sesion_path:
-        #Creating the Luck folder in the temporary folder
-        try:
-            os.makedirs(temp_path) if not os.path.exists(temp_path) else None
-        except:
-            #If it fails, it will create the Luck folder in the user's home directory
-            home_path = os.path.join(os.path.expanduser('~'), 'session')
-            os.makedirs(home_path) if not os.path.exists(home_path) else None
-            #Creating the session folder inside Luck
-            self.cfg_session.index['session_path'] = home_path
-    
-    ##Path and data folder
-    if platform.system() == 'Windows':
-        #Will try to get the downloads folder from the registry
-        try:
-            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders') as key:
-                download_folder = winreg.QueryValueEx(key, '{374DE290-123F-4565-9164-39C4925E467B}')[0]
-        #In case of error, take the user's default address
-        except Exception as exc:
-            download_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
-            #If the folder does not exist either, it creates it
-            os.makedirs(download_folder) if not os.path.exists(download_folder) else None
-    elif platform.system() == 'Darwin':  #MacOS
+    #On most modern operating systems (Win, macOS, Linux),
+    ##expanduser('~') is the safest and most standardized way to obtain the user profile.
+    try:
+        #This works on Windows, macOS and Linux without accessing the registry
         download_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
-    else:  #Linux
-        download_folder = os.path.join(os.path.expanduser('~'), 'Downloads')
+        
+        #Additional validation for Windows: sometimes the folder is called 'Downloads' in the file system
+        ##although internally 'Downloads' is usually a valid alias.
+        if not os.path.exists(download_folder) and platform.system() == 'Windows':
+            #Try to get it via environment variable if expanduser fails
+            user_profile = os.getenv('USERPROFILE')
+            if user_profile:
+                download_folder = os.path.join(user_profile, 'Downloads')
+
+        #If for some reason it does not exist (the custom system), it creates it
+        if not os.path.exists(download_folder):
+            os.makedirs(download_folder)
+            
+    except Exception as e:
+        #Universal fallback in case of permissions or route error
+        download_folder = os.getcwd() 
+
     self.cfg_app.index['dataPath'] = download_folder
+
 
 #Function to initialize the window harmoniously with the monitor
 def initWindow(self, *args):
@@ -666,9 +747,30 @@ def compareVersion(WebVersion, currentVersion, *args):
 #Software update
 def startUpdate(self, silent=False, *args):
     error = False
+    #Microsoft Store update
+    #----------------------
+    #Identifying if the execution is in an MSIX environment
+    #In these environments the update is done through the application store
+    if "APPX_PACKAGE_FAMILY_NAME" in os.environ:
+        #Creating informative message and allowing the user to be redirected to the app page
+        msg = QMessageBox()
+        msg.setStyleSheet( self.dict_styledSheets['QMessageBox'] )
+        msg.setWindowIcon(self.icon)
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setWindowTitle(self.i18nNes('update-app', 'title4'))
+        msg.setText(self.i18nNes('update-app', 'msix-info'))
+        answer = msg.exec()
+        if answer == QMessageBox.StandardButton.Ok:
+            url = self.version.index.get('msix_url')
+            QDesktopServices.openUrl(QUrl(url))
+        return
+    
+    #GitHub update
+    #--------------
     #Instantiating updater
     updater = Updater(self)
-    updater.server_url = self.version.index.get('download_url')
+    updater.server_url = self.version.index.get('github_url')
     current_version = self.version.index.get('version')
     
     #Requesting official version in repo (web)
@@ -725,15 +827,15 @@ def startUpdate(self, silent=False, *args):
         msg.exec()
 
 def disguiseFrame(self, *args):
-    info2 = 'KP5wSd9foRj+c9puxDUr8JKuH0l4hnDnRlMDceF7wybYLKOTsqHZBPcri94nHTup1Gns3mOx3jgHpiUXBdxtRqZOCpWFzFyTSUzrAJLkMvHE0eeA7c/MUCAoMtKTt/VP1qb3+zcidaYp4XsUkxwc1euqPPVavMpbfZX8HOgQSHislTG8dogfPnKnOLbeL6BzWqNypjo0KWywOYyCLgcbs8m6P6dWpPKoaewRfcDkmRPtE33XPnMjI5bXiG8hkiJTVXHStkesCcI2ftu8BmrQ54+JLlgtJ6QxA2en3r8OlgG13yHZIvOCKPCZkqVEbk+pA7weyiwP1UE3sY1zQumwvQOIyPvPYX4s4NLtyjOnJtTUs3Z7nhs5uisAB1PYAfEA/La8d6gUdZcGOYndpSaHARdkO9C8UkJ8sUoKJzZ2CII9SOYg7uwPegOT4w/KKNLwM4iPkDBKLLEpC+soXsPT+u2Td43fA/H3uvnofult/IaXgV6KCFa9lP3tuZ1mocCp9qAlAJEOeyES9vcwCANo1Z+fhFCcAowrL4/iDqprXfgBdqk58IdfLJstkzNJ/hQCkvy9DUbOhddTHNIYBhHGxugob08lyNH8CpMUWYDQ+QApK5oEwEWJ/vujY5GwAppJ//Ntqi3z+TLt943LyC0E762U877IVkRSx2FE3bZExhjfDEsFiTn5jO4X0Z4RPogFtFe7kPb0y66gbRK/0TPDUCYSV7wfcgUM8VQNkKyvcpCpJIGDoaLVQZsp03TF8PHaVVgurKbJJonyqraw2enzIozfB6kpdGlgfBGAnoBfHwQ='
+    info2    = 'KP5wSd9foRj+c9puxDUr8JKuH0l4hnDnRlMDceF7wybYLKOTsqHZBPcri94nHTup1Gns3mOx3jgHpiUXBdxtRqZOCpWFzFyTSUzrAJLkMvHE0eeA7c/MUCAoMtKTt/VP1qb3+zcidaYp4XsUkxwc1euqPPVavMpbfZX8HOgQSHislTG8dogfPnKnOLbeL6BzWqNypjo0KWywOYyCLgcbs8m6P6dWpPKoaewRfcDkmRPtE33XPnMjI5bXiG8hkiJTVXHStkesCcI2ftu8BmrQ54+JLlgtJ6QxA2en3r8OlgG13yHZIvOCKPCZkqVEbk+pA7weyiwP1UE3sY1zQumwvQOIyPvPYX4s4NLtyjOnJtTUs3Z7nhs5uisAB1PYAfEA/La8d6gUdZcGOYndpSaHARdkO9C8UkJ8sUoKJzZ2CII9SOYg7uwPegOT4w/KKNLwM4iPkDBKLLEpC+soXsPT+u2Td43fA/H3uvnofult/IaXgV6KCFa9lP3tuZ1mocCp9qAlAJEOeyES9vcwCANo1Z+fhFCcAowrL4/iDqprXfgBdqk58IdfLJstkzNJ/hQCkvy9DUbOhddTHNIYBhHGxugob08lyNH8CpMUWYDQ+QApK5oEwEWJ/vujY5GwAppJ//Ntqi3z+TLt943LyC0E762U877IVkRSx2FE3bZExhjfDEsFiTn5jO4X0Z4RPogFtFe7kPb0y66gbRK/0TPDUCYSV7wfcgUM8VQNkKyvcpCpJIGDoaLVQZsp03TF8PHaVVgurKbJJonyqraw2enzIozfB6kpdGlgfBGAnoBfHwQ='
     msg_comp = base64.b64decode(info2)
-    iv = msg_comp[:16]
-    msg_cif = msg_comp[16:]
-    cipher = AES.new(b'wa8P4bbhboiKKCRe', AES.MODE_CBC, iv=iv)
-    msg_org = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
-    rnn = ''.join(random.choice( string.ascii_lowercase ) for _ in range(3))
-    path = os.path.join(tempfile.gettempdir(), 'Luck', f'{rnn}.sql')
-    arcv = open( path, 'w' , encoding='utf-8')
+    iv       = msg_comp[:16]
+    msg_cif  = msg_comp[16:]
+    cipher   = AES.new(b'wa8P4bbhboiKKCRe', AES.MODE_CBC, iv=iv)
+    msg_org  = unpad(cipher.decrypt(msg_cif), AES.block_size).decode()
+    rnn      = ''.join(random.choice( string.ascii_lowercase ) for _ in range(3))
+    path     = os.path.join(tempfile.gettempdir(), 'Luck', f'{rnn}.sql')
+    arcv     = open( path, 'w' , encoding='utf-8')
     arcv.write( msg_org )
     arcv.close()
     self.newScriptTab(path)

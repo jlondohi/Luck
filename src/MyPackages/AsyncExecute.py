@@ -72,36 +72,36 @@ class AsyncExecute(QThread):
         #---
 
         self.tab_name = tab_name
-        self.fetch = parent.fetch
+        self.fetch    = parent.fetch
         self.finished.connect(self.closeCursor)
 
         #Language
-        self.i18nNes = parent.i18nNes
+        self.i18nNes    = parent.i18nNes
         #Headers
-        self._status = self.i18nNes('execution', 'header', 'status')
-        self._query = self.i18nNes('execution', 'header', 'query')
-        self._shape = self.i18nNes('execution', 'header', 'shape')
-        self._time = self.i18nNes('execution', 'header', 'time')
+        self._status    = self.i18nNes('execution', 'header', 'status')
+        self._query     = self.i18nNes('execution', 'header', 'query')
+        self._shape     = self.i18nNes('execution', 'header', 'shape')
+        self._time      = self.i18nNes('execution', 'header', 'time')
         self._resources = self.i18nNes('execution', 'header', 'resources')
-        self._error = self.i18nNes('execution', 'header', 'error')
+        self._error     = self.i18nNes('execution', 'header', 'error')
         #States
-        self._running = self.i18nNes('execution', 'status', 'running')
-        self._executed = self.i18nNes('execution', 'status', 'executed')
-        self._failed = self.i18nNes('execution', 'status', 'failed')
+        self._running   = self.i18nNes('execution', 'status', 'running')
+        self._executed  = self.i18nNes('execution', 'status', 'executed')
+        self._failed    = self.i18nNes('execution', 'status', 'failed')
         #Msgs
-        self._msg0 = self.i18nNes('execution', 'msgs', 'msg0')
-        self._msg1 = self.i18nNes('execution', 'msgs', 'msg1')
-        self._msg2 = self.i18nNes('execution', 'msgs', 'msg2')
-        self._msg3 = self.i18nNes('execution', 'msgs', 'msg3')
-        self._msg4 = self.i18nNes('execution', 'msgs', 'msg4')
-        self._msg5 = self.i18nNes('execution', 'msgs', 'msg5')
+        self._msg0  = self.i18nNes('execution', 'msgs', 'msg0')
+        self._msg1  = self.i18nNes('execution', 'msgs', 'msg1')
+        self._msg2  = self.i18nNes('execution', 'msgs', 'msg2')
+        self._msg3  = self.i18nNes('execution', 'msgs', 'msg3')
+        self._msg4  = self.i18nNes('execution', 'msgs', 'msg4')
+        self._msg5  = self.i18nNes('execution', 'msgs', 'msg5')
         #Type
-        self._msgI = self.i18nNes('execution', 'msgs', 'msgI')
+        self._msgI  = self.i18nNes('execution', 'msgs', 'msgI')
         self._msgBE = self.i18nNes('execution', 'msgs', 'msgBE')
-        self._msgF = self.i18nNes('execution', 'msgs', 'msgF')
-        self._msgT = self.i18nNes('execution', 'msgs', 'msgT')
+        self._msgF  = self.i18nNes('execution', 'msgs', 'msgF')
+        self._msgT  = self.i18nNes('execution', 'msgs', 'msgT')
         #Others
-        self._type = self.i18nNes('tab-eco', 'history', 'type')
+        self._type      = self.i18nNes('tab-eco', 'history', 'type')
         self._queryFile = self.i18nNes('sql', 'query-file')
 
         #Structure of the DataFrame that will be used to emit the status
@@ -174,7 +174,7 @@ class AsyncExecute(QThread):
             #-----------------------
             if self._stop:
                 #Ending message
-                state = False
+                state  = False
                 status = self._stop
                 error  = self._msg5
                 self.tasks = pm.replace_row(self.tasks, self.current_task,
@@ -208,7 +208,7 @@ class AsyncExecute(QThread):
                 _type = self._msgF
                 if self.total_task > 1 and state:
                     _saveAs = False
-                if data and not error:
+                if data is not None and not error:
                     self.toFile.emit(data, _saveAs)
                 #Prevent data from being displayed in the results
                 data = None

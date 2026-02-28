@@ -1,8 +1,6 @@
 #Ignoring specific folders
 src_compiled/
 eggs/
-Lib/
-Scripts/
 Include/
 dist/
 dist-msix/
@@ -13,7 +11,6 @@ release/
 share/
 .venv/
 .vscode/
-.github/
 .pytest_cache
 *__pycache__
 
@@ -22,11 +19,7 @@ share/
 *.pem
 *.pyc
 *.spec
-*/Luck-Debug.log
-CACHEDIR.TAG
-pyvenv.cfg
-Luck.exe
-Luck.bat
+*Luck-Debug.log
 pyarmor.error.log
 Parallel
 
