@@ -56,11 +56,11 @@ class MyTooltip(QMainWindow):
         """
         super().__init__()
         self.app = QApplication.instance()
-
+        
         #Language
         self.i18nNes = parent.i18nNes
-
-        uic.loadUi(str(self.parent.guisPath / 'Resources' / 'Tooltip.ui'), self)
+        
+        uic.loadUi(str(parent.parent.guisPath / 'Tooltip.ui'), self)
         self.setWindowFlags(Qt.WindowType.Tool)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setWindowOpacity(1)
@@ -82,7 +82,7 @@ class MyTooltip(QMainWindow):
         self.blinkerColor = parent.tl_3
         self.originalStyle = self.bt_copiar.styleSheet()
         #Loading second icon
-        self.iconCerrar = QIcon(str(self.parent.guisPath / 'Resources' /'close.png'))
+        self.iconCerrar = QIcon(str(parent.parent.guisPath / 'Resources' /'close.png'))
         self.stateClose = False
     
     def initWindow(self, *args):
