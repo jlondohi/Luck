@@ -62,6 +62,8 @@ sql:
   stop-run: Stop execution
   run-query: Run query
   run-all: Run all
+  run-above: Run queries above
+  run-below: Run query and below
   save-result: Query and save
   save-result-as: Query and save as
   ufftlz: Upload file to DB
@@ -104,6 +106,8 @@ execution:
     msg8: Parameters not specified
     msg9: Multiple parameters not specified
     msg10: "All queries will be executed.\nDo you want to continue?"
+    msg10a: "All the above queries will be executed.\nDo you want to continue?"
+    msg10b: "This and all queries below will be executed.\nDo you want to continue?"
     msg11: Queue limit reached for chained queries
     msgE: Error
     msgI: Single execution

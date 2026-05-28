@@ -265,7 +265,7 @@ def identifyQuery(self, *args):
     #Select text in textEditor widget
     cursor.setPosition(left_index)
     cursor.setPosition(right_index, QTextCursor.MoveMode.KeepAnchor)
-    return query
+    return query, left_index, right_index
 
 
 #Identifying the table in which right click was clicked
@@ -352,7 +352,7 @@ def runShortTask(self, *args):
     if not self.tabWidget:
         return None
     #Identifying the query on the cursor
-    query = self.identifyQuery()
+    query, _, _ = self.identifyQuery()
     #Cleaning comments
     query = self.cleanQ(query)
     if query == '':
@@ -383,7 +383,70 @@ def runLongTask(self, *args):
         self.runQueries(queries, cls='console', saveAs=False)
     else:
         return None
-        
+
+#Function linked directly to run Above.
+def runLongTaskAbove(self, *args):
+    #Terminating process if there is no active tab
+    if not self.tabWidget:
+        return None
+
+    #Identifying previous queries
+    _, left_index, _ = self.identifyQuery()
+    etl_text = self.current_etlEditor.toPlainText()
+    queries = etl_text[0:left_index]
+    
+    #Cleaning comments
+    queries = self.cleanQ(queries)
+    if queries == '':
+        return None
+    
+    #Asking the user if they are sure
+    msg = QMessageBox(self)
+    msg.setWindowIcon(self.icon)
+    msg.setWindowTitle(self.i18nNes('execution', 'msgs', 'msgBE'))
+    msg.setText(self.i18nNes('execution', 'msgs', 'msg10a'))
+    msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+    msg.setDefaultButton(QMessageBox.StandardButton.Yes)
+    answer = msg.exec()
+    if answer == QMessageBox.StandardButton.Yes:
+        #Sending to execution
+        self.runQueries(queries, cls='console', saveAs=False)
+    else:
+        return None
+    
+#Function linked directly to run Below.
+def runLongTaskBelow(self, *args):
+    #Terminating process if there is no active tab
+    if not self.tabWidget:
+        return None
+
+    #Identifying previous queries
+    query, left_index, right_index = self.identifyQuery()
+    etl_text = self.current_etlEditor.toPlainText()
+    
+    #Get the text to the left and right of the cursor
+    text_right = etl_text[right_index:-1]
+    queries = query + ";" + text_right
+
+    #Cleaning comments
+    queries = self.cleanQ(queries)
+    if queries == '':
+        return None
+    
+    #Asking the user if they are sure
+    msg = QMessageBox(self)
+    msg.setWindowIcon(self.icon)
+    msg.setWindowTitle(self.i18nNes('execution', 'msgs', 'msgBE'))
+    msg.setText(self.i18nNes('execution', 'msgs', 'msg10b'))
+    msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+    msg.setDefaultButton(QMessageBox.StandardButton.Yes)
+    answer = msg.exec()
+    if answer == QMessageBox.StandardButton.Yes:
+        #Sending to execution
+        self.runQueries(queries, cls='console', saveAs=False)
+    else:
+        return None
+
 #Function to stop the asyncExecute from executing
 def stopExcWorker(self, *args):
     if self.cursorIsWorking:
@@ -410,7 +473,7 @@ def runAssist(self, *args):
     if action is not None:
         #Identifying if it is the explain
         if action.text() == 'Explain':
-            query = self.identifyQuery()
+            query, _, _ = self.identifyQuery()
             query = 'explain '+ query
         else:
             table = self.identifyTable()
@@ -505,7 +568,7 @@ def saveResult(self, *args):
     if not msg:
         return None
     #Identifying the query on the cursor
-    query = self.identifyQuery()
+    query, _, _ = self.identifyQuery()
     #Cleaning comments
     query = self.cleanQ(query)
     if query == '':
@@ -520,7 +583,7 @@ def saveResultAs(self, *args):
     if not msg:
         return None
     #Identifying the query on the cursor
-    query = self.identifyQuery()
+    query, _, _ = self.identifyQuery()
     #Cleaning comments
     query = self.cleanQ(query)
     if query == '':
@@ -749,20 +812,19 @@ def recLog(self, *args):
         fileName, _ = QFileDialog.getSaveFileName(self, _save2, filepath, f'{_toFile5} (*.log)')
         if not fileName:
             return
-        #Redirecting the console
-        ##Open the file to write logs
-        self.log_file = open(fileName, 'w', encoding='utf-8')
 
-        #Redirect standard output to log file
-        sys.stdout = self.log_file
+        ##Open the file to write logs
+        self.log_file = open(fileName, 'w', encoding='utf-8', buffering=1)
+        #Writing standard output to log file
         msg = f'{_logStarted} {now}'
         leng = len(msg)
-        print('='*leng, msg, '='*leng, sep='\n')
-
+        self.log_file.write(f"{'='*leng}\n{msg}\n{'='*leng}\n")
         #Indicating user
-        print(f'[{_user.upper()}]: ({self.user}) {self.getFullUsername()}')
+        self.log_file.write(f'[{_user.upper()}]: ({self.user}) {self.getFullUsername()}\n')
         #Indicating the DSN
-        print(f'[DSN]: {self.dsn}')
+        self.log_file.write(f'[DSN]: {self.dsn}\n')
+        #Flushing
+        self.log_file.flush()
         
         #Various modifications to the ecosystem
         self.animationR_state = True
@@ -774,11 +836,11 @@ def recLog(self, *args):
         #Looking at the Log
         msg = f'{_logEnd} {now}'
         leng = len(msg)
-        print('='*leng, msg, '='*leng, sep='\n')
-        self.log_file.close()
 
-        #Restoring various configurations
-        sys.stdout = self.original_stdout
+        #Witing the closure directly before closing the file
+        self.log_file.write(f"{'='*leng}\n{msg}\n{'='*leng}\n")
+        self.log_file.close()
+        self.log_file = None #Cleaning the reference
         
         self.recordingLog = False
         self.animationR_state = False

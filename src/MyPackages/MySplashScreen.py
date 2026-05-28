@@ -25,13 +25,14 @@ class MySplashScreen(QMainWindow):
         initUI(self, *args): Sets up the splash screen UI and starts the loading timer.
         showMainWindow(self, *args): Stops the timer and shows the main application window.
     """
-    def __init__(self, baseDir):
+    def __init__(self, baseDir, UserDataDir):
         """
         Initializes the splash screen and sets up the UI.
         """
         super().__init__()
         #Setting the base directory
         self.baseDir = baseDir
+        self.UserDataDir = UserDataDir
         
         self.app = QApplication.instance()
         #Defining default size
@@ -94,6 +95,6 @@ class MySplashScreen(QMainWindow):
         """
         self.loadingTimer.stop()
         #Loading main window
-        window = MainWindow(self.baseDir)
+        window = MainWindow(self.baseDir, self.UserDataDir)
         window.show()
         self.close()

@@ -62,6 +62,8 @@ sql:
   stop-run: Detener ejecución
   run-query: Ejecutar consulta
   run-all: Ejecutar todo
+  run-above: Ejecutar consultas anteriores
+  run-below: Ejecutar consulta y siguientes
   save-result: Consultar y guardar
   save-result-as: Consultar y guardar como
   ufftlz: Subir desde archivo a DB
@@ -104,6 +106,8 @@ execution:
     msg8: Parámetros sin especificar
     msg9: Multiples parámetros sin especificar
     msg10: "Se ejecutarán todas las consultas.\n¿Deseas continuar?"
+    msg10a: "Se ejecutarán todas las consultas anteriores.\n¿Deseas continuar?"
+    msg10b: "Se ejecutará esta y todas las consultas siguientes.\n¿Deseas continuar?"
     msg11: Límite de cola alcanzado para consultas encadenadas
     msgE: Error
     msgI: Ejecución individual

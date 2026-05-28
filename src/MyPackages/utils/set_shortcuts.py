@@ -65,6 +65,8 @@ def setShortcuts(self, *args):
     self.actionStopRun.setShortcut(self.shc('sql', 'stop-run'))
     self.actionRun.setShortcut(self.shc('sql', 'run-query'))
     self.actionRunAll.setShortcut(self.shc('sql', 'run-all'))
+    self.actionRunAbove.setShortcut(self.shc('sql', 'run-above'))
+    self.actionRunBelow.setShortcut(self.shc('sql', 'run-below'))
     self.actionSaveResult.setShortcut(self.shc('sql', 'save-result'))
     self.actionSaveResultAs.setShortcut(self.shc('sql', 'save-result-as'))
     self.actionFile_to_lz.setShortcut(self.shc('sql', 'ufftlz'))

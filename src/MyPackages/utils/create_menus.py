@@ -64,6 +64,8 @@ def createPMenu(self, *args):
     self.actionStopRun      = QAction(self.i18nNes('sql', 'stop-run'), self)
     self.actionRun          = QAction(self.i18nNes('sql', 'run-query'), self)
     self.actionRunAll       = QAction(self.i18nNes('sql', 'run-all'), self)
+    self.actionRunAbove     = QAction(self.i18nNes('sql', 'run-above'), self)
+    self.actionRunBelow     = QAction(self.i18nNes('sql', 'run-below'), self)
     self.actionSaveResult   = QAction(self.i18nNes('sql', 'save-result'), self)
     self.actionSaveResultAs = QAction(self.i18nNes('sql', 'save-result-as'), self)
     self.actionFile_to_lz   = QAction(self.i18nNes('sql', 'ufftlz'), self)
@@ -166,6 +168,8 @@ def createPMenu(self, *args):
     self.menuSQL.addAction(self.actionStopRun)
     self.menuSQL.addAction(self.actionRun)
     self.menuSQL.addAction(self.actionRunAll)
+    self.menuSQL.addAction(self.actionRunAbove)
+    self.menuSQL.addAction(self.actionRunBelow)
     self.menuSQL.addSeparator()
     self.menuSQL.addAction(self.actionSaveResult)
     self.menuSQL.addAction(self.actionSaveResultAs)
@@ -263,6 +267,8 @@ def createPMenu(self, *args):
     #Creating actions for assistance
     self.menuAssistant.addAction(self.actionRun)
     self.menuAssistant.addAction(self.actionRunAll)
+    self.menuAssistant.addAction(self.actionRunAbove)
+    self.menuAssistant.addAction(self.actionRunBelow)
     self.menuAssistant.addSeparator()
     count = 10
     for assist in list_assist.keys():
@@ -357,6 +363,8 @@ def createPMenu(self, *args):
     self.actionConnectDSN.triggered.connect(self.asyncConnMan.start)
     self.actionRun.triggered.connect(self.runShortTask)
     self.actionRunAll.triggered.connect(self.runLongTask)
+    self.actionRunAbove.triggered.connect(self.runLongTaskAbove)
+    self.actionRunBelow.triggered.connect(self.runLongTaskBelow)
     self.actionSaveResult.triggered.connect(self.saveResult)
     self.actionSaveResultAs.triggered.connect(self.saveResultAs)
     self.actionFile_to_lz.triggered.connect(self.runFile_to_lz)

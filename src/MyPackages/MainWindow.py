@@ -3,6 +3,9 @@ import os, sys, getpass, ctypes, shutil, subprocess
 import polars as pl
 from datetime import datetime
 from pathlib import Path
+#Importing log packages
+import logging
+from logging.handlers import RotatingFileHandler
 #Importing PyQt6 packages
 from PyQt6 import uic
 from PyQt6.QtWidgets import (QMainWindow, QApplication
@@ -248,36 +251,8 @@ class MainWindow(QMainWindow):
         if event.type() == QEvent.Type.WindowStateChange:
             if hasattr(self, 'MyTitleBar'):
                 self.MyTitleBar.updateMaximizeRestoreButtons()
-    
-    #Verifying write path  and creating read/write copies of files if running from WindowsApps
-    def verifyingWritePath(self):
-        #Creating a copy of the source path
-        originalPath = self.appDataPath
-
-        #Creating Session folder in appdata if they do not exist
-        sessionPath = Path(os.getenv('LOCALAPPDATA')) / 'Luck' / 'Sessions'
-        if not os.path.exists(str(sessionPath)):
-            os.makedirs(str(sessionPath), exist_ok=True)
         
-        #Checking if the application is running from the WindowsApps directory
-        ##Check if "WindowsApps" is in the path
-        if "WindowsApps" in str(self.baseDir):
-            #Modifying destination paths
-            self.appDataPath = Path(os.getenv('LOCALAPPDATA')) / 'Luck' / 'Settings'
-            #Creating folders in appdata if they do not exist
-            if not os.path.exists(str(self.appDataPath)):
-                os.makedirs(str(self.appDataPath), exist_ok=True)
-
-            #Creating a copy of the configuration files
-            for nameFile in os.listdir(originalPath):
-                origialFile = Path(originalPath) / nameFile
-                copyFile    = Path(self.appDataPath) / nameFile
-                #Only copy if it is a file and does not exist in the destination
-                if os.path.isfile(origialFile):
-                    if not os.path.exists(str(copyFile)):
-                        shutil.copy2(origialFile, str(copyFile))
-    
-    def __init__(self, baseDir):
+    def __init__(self, baseDir, UserDataDir):
         super().__init__()
         self.user = getpass.getuser()
         self.app  = QApplication.instance()
@@ -286,26 +261,15 @@ class MainWindow(QMainWindow):
 
         #Defining initial paths
         self.baseDir        = baseDir
-        self.appDataPath    = self.baseDir / 'Settings'
+        self.UserDataDir    = UserDataDir
+        self.appDataPath    = self.UserDataDir / 'Settings'
         self.guisPath       = self.baseDir / 'Guis'
         self.i18nPath       = self.baseDir / 'i18n'
         self.stylesPath     = self.baseDir / 'Styles'
+        self.log_file       = None
         
-        #Verifying if we need to create config copies
-        self.verifyingWritePath()
-        logFilePath = Path(os.path.dirname(self.appDataPath)) / 'Luck-Debug.log'
-        #Redirecting terminal
-        if os.path.exists(str(logFilePath)):
-            with open(str(logFilePath), 'r') as file:
-                lineas = file.readlines()
-                if len(lineas) > 1000:
-                    #If it has more than 1000 lines, we delete the file
-                    os.remove(str(logFilePath))
-        logFilePath = open(str(logFilePath), 'w')
-
-        #Redirecting console output (DEBUG)
-        sys.stdout = logFilePath
-        print(f"Luck Started {datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')}")
+        #Initial message
+        logging.info(f"Main workspace window initializing")
 
         #Loading Settings
         #----------------
@@ -647,6 +611,7 @@ class MainWindow(QMainWindow):
         #Open window
         self.show()
         self.tabChanged()
+        logging.info(f"Main workspace window initialized successfully.")
         #Starting connection with data source
         self.asyncConnMan.start()
 
@@ -788,6 +753,8 @@ MainWindow.identifyQuery = execute_methods.identifyQuery
 MainWindow.identifyTable = execute_methods.identifyTable
 MainWindow.runShortTask = execute_methods.runShortTask
 MainWindow.runLongTask = execute_methods.runLongTask
+MainWindow.runLongTaskAbove = execute_methods.runLongTaskAbove
+MainWindow.runLongTaskBelow = execute_methods.runLongTaskBelow
 MainWindow.runQueries = execute_methods.runQueries
 MainWindow.stopExcWorker = execute_methods.stopExcWorker
 MainWindow.runAssist = execute_methods.runAssist

@@ -87,6 +87,8 @@ sql:
   stop-run:
   run-query: F9
   run-all: F10
+  run-above:
+  run-below:
   save-result: F5
   save-result-as: Shift+F5
   ufftlz: F6
