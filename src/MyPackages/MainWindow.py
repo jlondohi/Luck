@@ -109,10 +109,14 @@ class MainWindow(QMainWindow):
     #Paths
     #--------------------------
     baseDir        = None
-    appDataPath    = None
+    UserDataDir    = None
     guisPath       = None
     i18nPath       = None
     stylesPath     = None
+
+    #LogFile
+    #---------------------------
+    log_file       = None
         
     #Signals
     #--------------------------
@@ -262,25 +266,23 @@ class MainWindow(QMainWindow):
         #Defining initial paths
         self.baseDir        = baseDir
         self.UserDataDir    = UserDataDir
-        self.appDataPath    = self.UserDataDir / 'Settings'
         self.guisPath       = self.baseDir / 'Guis'
         self.i18nPath       = self.baseDir / 'i18n'
         self.stylesPath     = self.baseDir / 'Styles'
-        self.log_file       = None
         
         #Initial message
         logging.info(f"Main workspace window initializing")
 
         #Loading Settings
         #----------------
-        self.version          = YamlHandler(str(self.appDataPath / 'version.yaml'))
-        self.cfg_app          = YamlHandler(str(self.appDataPath / 'config_app.yaml'))
-        self.cfg_session      = YamlHandler(str(self.appDataPath / 'config_session.yaml'))
-        self.cfg_shortcut     = YamlHandler(str(self.appDataPath / 'config_shortcut.yaml'))
-        self.syntaxList       = YamlHandler(str(self.appDataPath / 'config_syntax_list.yaml'))
-        self.list_assist      = YamlHandler(str(self.appDataPath / 'config_assistant.yaml'))
-        self.list_tmplts      = YamlHandler(str(self.appDataPath / 'config_templates.yaml'))
-        self.autoCompleteList = YamlHandler(str(self.appDataPath / 'config_autocomplete_list.yaml'))
+        self.version          = YamlHandler(str(self.UserDataDir / 'Settings' / 'version.yaml'))
+        self.cfg_app          = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_app.yaml'))
+        self.cfg_session      = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_session.yaml'))
+        self.cfg_shortcut     = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_shortcut.yaml'))
+        self.syntaxList       = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_syntax_list.yaml'))
+        self.list_assist      = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_assistant.yaml'))
+        self.list_tmplts      = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_templates.yaml'))
+        self.autoCompleteList = YamlHandler(str(self.UserDataDir / 'Settings' / 'config_autocomplete_list.yaml'))
 
         #Adding resource path to cfg_app dictionary
         self.cfg_app.index['resourcesPath'] = str(self.guisPath / 'Resources').replace('\\', '/')

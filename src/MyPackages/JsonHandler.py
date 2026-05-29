@@ -1,4 +1,5 @@
 import json
+import logging
 
 #=================================================================
 ### Creating a json handler to load and save system configuration
@@ -41,9 +42,9 @@ class JsonHandler:
             with open(self.json_path, 'r') as file:
                 self.index = json.load(file)
         except FileNotFoundError:
-            print(f'The file {self.json_path} was not found.')
+            logging.error(f'The file {self.json_path} was not found.')
         except json.JSONDecodeError:
-            print(f'Error decoding JSON file {self.json_path}.')
+            logging.error(f'Error decoding JSON file {self.json_path}.')
     
     def save(self, *args):
         """
@@ -56,4 +57,4 @@ class JsonHandler:
             with open(self.json_path, 'w') as file:
                 json.dump(self.index, file, indent=4)
         except Exception as exc:
-            print(f'Error saving: {exc}')
+            logging.error(f'Error saving: {exc}')

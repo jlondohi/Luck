@@ -1,4 +1,5 @@
 import os, re
+import logging
 
 #======================================================
 ### Creating a css handler to load system configuration
@@ -61,10 +62,10 @@ class CssHandler:
                 self.fullContent = file.read()
                 self.content = re.sub(r':root\s*{[^}]*}', '', self.fullContent, flags=re.DOTALL).strip()
         except FileNotFoundError:
-            print(f'The file {self.css_path} was not found.')
+            logging.error(f'The file {self.css_path} was not found.')
             return False
         except Exception as e:
-            print(f'Error loading CSS: {e}')
+            logging.error(f'Error loading CSS: {e}')
             return False
         else:
             return True
@@ -136,7 +137,7 @@ class CssHandler:
         self.rendered = pattern.sub(replaceVar, self.content)
         #Checking for missing variables
         if missing_vars:
-            print('Non defined variables:', ', '.join(missing_vars))
+            logging.debug('Non defined variables:', ', '.join(missing_vars))
 
     #Saving the current content (without replace) on disk.
     def save(self, new_path=None, *args):
@@ -156,5 +157,5 @@ class CssHandler:
                 file.write(self.content)
             return True
         except Exception as exc:
-            print(f'Error saving CSS: {exc}.')
+            logging.error(f'Error saving CSS: {exc}.')
             return False

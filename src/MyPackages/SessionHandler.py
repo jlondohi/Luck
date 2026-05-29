@@ -1,4 +1,5 @@
 import os, pickle, tempfile
+import logging
 from pathlib import Path
 
 #==================================================================
@@ -111,7 +112,7 @@ class SessionHandler:
         try:
             tree = pickle.load(open(self.sessionTreePath, 'rb'))
         except Exception as exc:
-            print(f'{self._errorL}: {exc}')
+            logging.error(f'{self._errorL}: {exc}')
             self.sessionTreeExists = False
             return None
         else:
@@ -131,7 +132,7 @@ class SessionHandler:
         try:
             history = pickle.load(open(self.sessionHistoryPath, 'rb'))
         except Exception as exc:
-            print(f'{self._errorL}: {exc}')
+            logging.error(f'{self._errorL}: {exc}')
             self.sessionHistoryExists = False
             return None
         else:
@@ -176,7 +177,7 @@ class SessionHandler:
         try:
             pickle.dump(session, open(self.sessionPath, 'wb'))
         except Exception as exc:
-            print(f'{self._errorS}: {exc}')
+            logging.error(f'{self._errorS}: {exc}')
             self.sessionExists = False
         else:
             self.sessionExists = True
@@ -196,7 +197,7 @@ class SessionHandler:
         try:
             pickle.dump(object, open(self.sessionTreePath, 'wb'))
         except Exception as exc:
-            print(f'{self._errorS}: {exc}')
+            logging.error(f'{self._errorS}: {exc}')
             self.sessionTreeExists = False
         else:
             self.tree = object
@@ -217,7 +218,7 @@ class SessionHandler:
             else:
                 pickle.dump(object, open(self.sessionHistoryPath, 'wb'))
         except Exception as exc:
-            print(f'{self._errorS}: {exc}')
+            logging.error(f'{self._errorS}: {exc}')
             self.sessionHistoryExists = False
         else:
             self.sessionHistoryExists = True

@@ -62,7 +62,7 @@ def setupLogging():
     logging.basicConfig(
         filename=str(logsDir / 'Luck-Debug.log'),
         filemode='a',
-        level=logging.INFO, # Cambiar a logging.DEBUG si necesitas ver los internos
+        level=logging.INFO, #Change to logging.DEBUG if you need to see the internals
         format='%(asctime)s - [%(levelname)s] - %(message)s',
         encoding='utf-8'
     )
@@ -99,7 +99,7 @@ def prepareEnvironment():
     base directory to AppData if files are missing or the version changed.
     """
     
-    srcSettingsDir = UserDataDir / 'Settings'
+    srcSettingsDir = baseDir / 'Settings'
     #1. If the configuration source folder does not exist, there is nothing to copy
     if not srcSettingsDir.exists():
         logging.warning(f"The configuration source folder was not found in: {srcSettingsDir}")
@@ -110,10 +110,10 @@ def prepareEnvironment():
     destVersionPath = settingsDir / 'version.yaml'
     
     #By default we assume it changed if we cannot verify it
-    versionChanged = True 
+    versionChanged = True
     
     if srcVersionPath.exists() and destVersionPath.exists():
-        try:           
+        try:
             srcVersion  = YamlHandler(str(srcVersionPath)) .index.get('version', '0.0.0')
             destVersion = YamlHandler(str(destVersionPath)).index.get('version', '0.0.0')
             

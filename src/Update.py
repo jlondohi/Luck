@@ -3,6 +3,7 @@ import requests
 from tqdm import tqdm
 import zipfile
 import os
+import logging
 
 #--------------------------------------
 #               Functions
@@ -26,11 +27,11 @@ def download(url, dest_folder, version):
                 bar.update(size)
 
     except Exception as e:
-        print(f'Error during download: {e}')
+        logging.error(f'Error during download: {e}')
         return
     
     else:
-        print('Complete download. Decompressing ...')
+        logging.info('Complete download. Decompressing ...')
         decompressing(zip_path, version)
 
 
@@ -38,12 +39,12 @@ def decompressing(zip_path, version):
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(f'{version}')
 
-    # Aquí puedes decidir si:
+    # PENDING. Aquí puedes decidir si:
     # - Reemplazas archivos antiguos
     # - Ejecutas un nuevo instalador
     # - Solo informas al usuario
 
-    print('Completed extraction')
+    logging.info('Completed extraction')
 
 #--------------------------------------
 #               Program
@@ -52,5 +53,5 @@ def decompressing(zip_path, version):
 url = sys.argv[1]
 dest_folder = sys.argv[2]
 version = sys.argv[3]
-print('')
+logging.info('')
 download(url, dest_folder, version)

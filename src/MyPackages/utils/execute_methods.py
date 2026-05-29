@@ -1,6 +1,7 @@
 #Importing native packages
 import re, os, sys, yaml, time, platform \
-    , subprocess , ctypes, ctypes.wintypes, locale
+    , subprocess , ctypes, ctypes.wintypes, locale \
+    , logging
 #Trying to import pwd only on Linux
 if sys.platform != 'win32':
     import pwd
@@ -60,7 +61,7 @@ def connectedDSN(self, conn, *args):
 
         #Bringing new connection to the log
         if self.recordingLog:
-            print(f'\n[{_dsnC.upper()}]: {self.dsn}')
+            self.log_file.write(f'\n[{_dsnC.upper()}]: {self.dsn}')
     else:
         self.lbl_status.setText(_nc_db.format(self.dsn))
         self.bt_connect.setProperty('connected', False)
@@ -607,7 +608,7 @@ def reportLog(self, data, *args):
     if not self.recordingLog:
         return
     time.sleep(0.5)
-    print(data)
+    self.log_file.write(data)
     return
 
 #Function to report progress

@@ -1,7 +1,7 @@
 
 #Importing native packages
 import os, sys, platform, subprocess, tempfile, winreg \
-    , string, random, base64, getpass, socket
+    , string, random, base64, getpass, socket, logging
 from datetime import datetime
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
@@ -571,7 +571,7 @@ def closeEvent(self, event, *args):
     if self.recordingLog:
         self.recLog()
     #Closing
-    print(f"Luck ended well {datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')}")
+    logging.info(f"Luck ended well")
     
     #Closing second thread
     #---------------------

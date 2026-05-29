@@ -1,4 +1,5 @@
 import pyodbc
+import logging
 from PyQt6.QtCore import QThread, pyqtSignal
 
 #=============================================================
@@ -43,6 +44,7 @@ class AsyncConnectionManager(QThread):
         """
         super().__init__()
         self.parent = parent
+        self.log_file = parent.log_file
 
     def run(self, *args):
         """
@@ -71,7 +73,9 @@ class AsyncConnectionManager(QThread):
             )
         except Exception as e:
             #Failure when connecting
-            print(f'[DEBUG] Error in connection: {e}')
+            logging.error(f'Error in connection: {e}')
+            if self.log_file:
+                self.log_file.write(f'[DSN]: Error in connection: {e}\n')
             self.conManFinished.emit(None)
         else:
             #Success: return connection

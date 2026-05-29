@@ -1,4 +1,5 @@
 import yaml, os
+import logging
 
 #=================================================================
 ### Creating a yaml handler to load and save system configuration
@@ -45,10 +46,10 @@ class YamlHandler:
             with open(self.yaml_path, 'r', encoding='utf-8') as file:
                 self.index = yaml.safe_load(file)
         except FileNotFoundError:
-            print(f'The file {self.yaml_path} was not found.')
+            logging.error(f'The file {self.yaml_path} was not found.')
             return False
         except yaml.YAMLError:
-            print(f'Error decoding JSON YAML {self.yaml_path}.')
+            logging.error(f'Error decoding JSON YAML {self.yaml_path}.')
             return False
         else:
             return True
@@ -67,7 +68,7 @@ class YamlHandler:
             with open(self.yaml_path, 'w', encoding='utf-8') as file:
                 yaml.dump(self.index, file, indent=4, allow_unicode=True, sort_keys=False)
         except Exception as exc:
-            print(f'Error saving parameters: {exc}.')
+            logging.error(f'Error saving parameters: {exc}.')
             return False
         else:
             return True
