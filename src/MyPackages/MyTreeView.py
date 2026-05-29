@@ -300,7 +300,7 @@ class MyTreeView(QTreeView):
             if not self.parent.cursorIsWorking:
                 msg = self.parent.verifyConn()
                 if not msg:
-                    pm.replace_row(temp, 0, {self._status:self._failed, self._error:self._msg6})
+                    temp = pm.replace_row(temp, 0, {self._status:self._failed, self._error:self._msg6})
                     self.describeReady.emit(temp)
                     self.app.restoreOverrideCursor()
                     return None
@@ -312,7 +312,7 @@ class MyTreeView(QTreeView):
                     temp2 = pl.read_database(query, self.parent.conn)
                     self.describeReady.emit(temp2)
                 except Exception as exc:
-                    pm.replace_row(temp, 0, {self._status:self._failed, self._error:exc})
+                    temp = pm.replace_row(temp, 0, {self._status:self._failed, self._error:str(exc)})
                     self.describeReady.emit(temp)
             #Changing mouse pointer to default state
             self.app.restoreOverrideCursor()
