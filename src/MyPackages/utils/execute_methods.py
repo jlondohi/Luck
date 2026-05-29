@@ -120,7 +120,7 @@ def verifyConn(self, *args):
 # Its purpose is to determine whether to execute it or add it to the current execution list. 
 # Use the asyncExecute to execute it.
 def runQueries(self, queries, cls: Literal['console', 'file']='console', saveAs=False, *args):
-    _wating = self.i18nNes('execution', 'status', 'wating')
+    _wating  = self.i18nNes('execution', 'status', 'wating')
     _running = self.i18nNes('execution', 'status', 'running')
     
     #Save session
@@ -456,8 +456,16 @@ def stopExcWorker(self, *args):
 #Function linked directly to execute.
 ##Find the inputs to run query between ';'
 def runAssist(self, *args):
+    #------------------------------------------------------------
+    # Exit conditions
+    #------------------------------------------------------------
     #Terminating if there is no active tab
     if not self.tabWidget:
+        return None
+    
+    #Verify that the action is not null and get its text
+    action = self.sender()
+    if not action:
         return None
     
     #Terminating if the asyncExecute is working
@@ -469,42 +477,74 @@ def runAssist(self, *args):
     if not msg:
         return None
     
-    action = self.sender()
-    #Verify that the action is not null and get its text
-    if action is not None:
-        #Identifying if it is the explain
-        if action.text() == 'Explain':
-            query, _, _ = self.identifyQuery()
-            query = 'explain '+ query
-        else:
-            table = self.identifyTable()
-            if table == False:
-                return None
-            #Taking the query corresponding to the actionMenu
-            query = self.list_assist.index[action.text()]
-            query = query.replace('{table}', table)
+    #------------------------------------------------------------
+    # Real code
+    #------------------------------------------------------------
+    #Identifying the target table
+    table = self.identifyTable()
+    #Taking the query corresponding to the actionMenu
+    query = self.list_assist.index[action.text()]
+    
+    #Identifying if it is the explainand and modifying query
+    if action.text() == 'Explain':
+        query, _, _ = self.identifyQuery()
+        query = 'explain '+ query
+        table = ' '
 
-        #Performing a check if it is count by ingestion
-        if action.text() == 'Count by ingestion':
-            try:
-                ingestions = pl.read_database('DESCRIBE {};'.format(table), self.conn)
-            except Exception as exc:
-                return None
-            else:
-                #Getting the intakes
-                allowed_elements = ['ingestion_year', 'ingestion_month', 'ingestion_day']
-                filtered_list = [element for element in ingestions['name'].to_list() if element in allowed_elements]
-                #Modifying the final list
-                ingestions = sorted(filtered_list, reverse=True)
-            if len(ingestions)>0:
-                nums1 = [str(x+1) for x in range(len(ingestions))]
-                nums2 = [str(x+1)+' DESC' for x in range(len(ingestions))]
-                query = 'SELECT {}, COUNT(*) FROM {} GROUP BY {} ORDER BY {}'.format(', '.join(ingestions), table, ', '.join(nums1), ', '.join(nums2))
-            else:
-                return None
-        #Sending to execution
-        self.runQueries(query)
+    #Other exit conditions -- Checking table name
+    if table == False:
         return None
+
+    #Performing a check if it is count by ingestion and modifying query
+    if action.text() == 'Count by ingestion':
+        try:
+            describe = pl.read_database(f'DESCRIBE {table};', self.conn)
+        except Exception as exc:
+            return None
+        else:
+            #Getting the ingestions names
+            allowed_elements = ['ingestion_year', 'ingestion_month', 'ingestion_day']
+            filtered_list = [element for element in describe['name'].to_list() if element in allowed_elements]
+            #Modifying the final list
+            ingestions = sorted(filtered_list, reverse=True)
+            if len(ingestions)>0:
+                nums1 = [str(var+1) for var in range(len(ingestions))]
+                nums2 = [str(var+1)+' DESC' for var in range(len(ingestions))]
+                query = f'SELECT {', '.join(ingestions)}, COUNT(1) FROM {table} GROUP BY {', '.join(nums1)} ORDER BY {', '.join(nums2)}'
+            else:
+                return None
+    elif action.text() == 'Copy columns':
+        try:
+            describe = pl.read_database(f'DESCRIBE {table};', self.conn)
+        except Exception as exc:
+            return None
+        else:
+            _executed  = self.i18nNes('execution', 'status', 'executed')
+            clipboard = self.app.clipboard()
+            clipboard.setText('\n, '.join( describe['name'].to_list() ))
+            template_row = {
+                      'status':     _executed
+                    , 'query':      'Copy columns'
+                    , 'params':     ''
+                    , 'shape':      ''
+                    , 'time':       ''
+                    , 'resources':  ''
+                    , 'error':      ''
+                    #Internal operation columns
+                    , 'cls':        ''
+                    , 'saveAs':     False
+            }
+            df = pl.DataFrame(template_row)
+            result = self.current_result
+            result.loadData(df, 'status')
+            return None
+
+    #EXECUTION
+    #---------
+    query = query.replace('{table}', table)
+    #Sending to execution
+    self.runQueries(query)
+    return None
 
 #Function to process and store query history
 def processHistory(self, queries, params, *args):
@@ -558,9 +598,9 @@ def runTemplate(self, *args):
         #Get the QPlainTextEdit object corresponding to the active tab
         textEditor = self.tabInfo[tab_name]['text_editor']
         #Adding the info
-        plantilla = self.list_tmplts.index[action.text()]
+        template = self.list_tmplts.index[action.text()]
         cursor = textEditor.textCursor()
-        cursor.insertText( plantilla )
+        cursor.insertText( template )
 
 #Function linked to the query to file menu
 def saveResult(self, *args):

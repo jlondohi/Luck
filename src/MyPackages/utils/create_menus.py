@@ -282,10 +282,10 @@ def createPMenu(self, *args):
         self.menuAssistant.addSeparator() if count % 4 == 0 else None
     #Creating actions for templates
     count = 10
-    for plantilla in list_tmplts.keys():
+    for template in list_tmplts.keys():
         count += 1
         shortcut = 'Alt+P,{}'.format(','.join(list(str(count))))
-        template_assist = QAction(plantilla, self)
+        template_assist = QAction(template, self)
         template_assist.setShortcut(QKeySequence(str(count)))
         template_assist.triggered.connect(self.runTemplate)
         template_assist.setShortcut(QKeySequence(shortcut))

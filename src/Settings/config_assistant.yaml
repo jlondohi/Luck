@@ -6,6 +6,7 @@ Count by f_analisis: SELECT F_ANALISIS, COUNT(1)
   FROM {table} GROUP BY 1 ORDER BY 1 DESC
 Count by {input}: SELECT {input}, COUNT(1)
   FROM {table} GROUP BY 1 ORDER BY 1 DESC
+Copy columns: DESCRIBE {table}
 Describe: DESCRIBE {table}
 Describe formatted: DESCRIBE FORMATTED {table}
 Explain: '{query}'
