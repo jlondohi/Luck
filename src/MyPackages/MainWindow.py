@@ -404,7 +404,7 @@ class MainWindow(QMainWindow):
         #Creating system tray menu
         trayMenu = QMenu()
         #Adding actions to menu
-        stopExec = QAction(self.i18nNes('sql', 'stop-run'), self)
+        stopExec   = QAction(self.i18nNes('sql', 'stop-run'), self)
         quitAction = QAction(self.i18nNes('file', 'close'), self)
         trayMenu.addAction(stopExec)
         trayMenu.addAction(quitAction)
@@ -566,17 +566,29 @@ class MainWindow(QMainWindow):
                 self.newScriptTab()
 
             #Loading information to the tab
+            ##Moving in each of the created tabs
             for count, widgetName in enumerate(self.tabInfo.keys()):
                 tab_data = self.tabInfo[widgetName]
                 session_data = self.actualSession.session.get(count)
+        
+                ##Moving inside each key of its corresponding tabdata
                 for key in tab_data.keys():
                     #Exceptions because they are references to current widgets
-                    ##Exception 1
-                    if key == 'text_editor':
-                        tab_data[key].setPlainText(session_data[key])
-                    ##Exception 2
-                    elif key in ('result', 'params_manager'):
+                    #1. They are references to widgets or redundants.
+                    if key in ('params_manager'):
                         None
+                    
+                    #2. Loading the text in the editor reference
+                    elif key == 'text_editor':
+                        tab_data[key].setPlainText(session_data[key])
+                    
+                    #3. Cargando resultados en memoria
+                    elif key == 'result':
+                        _result = pl.DataFrame(session_data['result_data'])
+                        _rType  = session_data['rType']
+                        tab_data[key].loadData(_result, _rType)
+
+                    #4. Loading all data that shares the same key and does not need special treatment
                     else:
                         #Restore all other values
                         tab_data[key] = session_data[key]
