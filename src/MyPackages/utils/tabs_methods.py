@@ -103,16 +103,31 @@ def savingChanges(self, tab_name = '', cls = 'save', *args):
     tab_data = self.tabInfo.get(tab_name)
     #Asking the save type
     if cls == 'save' and tab_data['origin'] != '':
-        file = open(tab_data['origin'], 'w' , encoding = 'utf-8')
-        file.write(tab_data['text_editor'].toPlainText() )
-        file.close()
-        #Changing saved status
-        tab_data['saved'] = True
-        #Updating tab toolTips
-        self.updateTabTooltips()
-        #Updating tab icons
-        self.updateTabIcons()
-        return True
+        try:
+            file = open(tab_data['origin'], 'w' , encoding = 'utf-8')
+            file.write(tab_data['text_editor'].toPlainText() )
+            file.close()
+        except Exception as exc:
+            tab_data['saved'] = False
+            #Updating tab icons
+            self.updateTabIcons()
+            #Creating a QMessageBox instance to display the error message
+            msg = QMessageBox()
+            msg.setStyleSheet( self.dict_styledSheets['QMessageBox'] )
+            msg.setWindowIcon(self.icon)
+            msg.setIcon(QMessageBox.Icon.Critical)
+            msg.setWindowTitle(self.i18nNes('execution', 'msgs', 'msgE'))
+            msg.setText(str(exc))
+            msg.exec()
+            return False
+        else:
+            #Changing saved status
+            tab_data['saved'] = True
+            #Updating tab toolTips
+            self.updateTabTooltips()
+            #Updating tab icons
+            self.updateTabIcons()
+            return True
     if (cls == 'saveAs') or (tab_data['origin'] == ''):
         origin = self.saveFileAs()
         if origin == '':

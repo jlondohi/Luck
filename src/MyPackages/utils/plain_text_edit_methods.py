@@ -99,7 +99,7 @@ def newScriptTab(self, origin = '', *args):
     self.tabWidget.setCurrentIndex(currentIndex)
     #Establishing code for when the command arises from OpenFile
     origin_param = ''
-    dict_params = {}
+    dict_params  = {}
     if origin != '':
         #Loading script
         file = open(origin, 'r' , encoding='utf-8')
@@ -108,7 +108,7 @@ def newScriptTab(self, origin = '', *args):
         file.close()
         #Changing the name of the tab
         origin = origin.replace('\\', '/')
-        name = origin.rsplit('/', 1)[-1]
+        name   = origin.rsplit('/', 1)[-1]
         self.tabWidget.setTabText(currentIndex, name)
 
         #Checking if the companion file exists
@@ -118,14 +118,16 @@ def newScriptTab(self, origin = '', *args):
             params = YamlHandler(origin_param)
             dict_params = params.index
         else:
-            pattern = r'--\s*PARAMS?\s*:\s*(\{\s*"(?:\{\d+\}"\s*:\s*".*?"\s*,?\s*)+\})'
+            pattern = r'--\s*PARAMS?\s*:\s*(\{\s*"(?:\{[^}]+\}"\s*:\s*".*?"\s*,?\s*)+\})'
             matches = re.findall(pattern, text, flags=re.IGNORECASE | re.DOTALL)
             if matches:
+                #Taking the last set of parameters found
                 last = matches[-1]
                 try:
-                    dict_params = json.loads(last.replace("'", '"'))
-                except Exception as e:
-                    None
+                    #Loading parameters as a dictionary
+                    dict_params = json.loads(last)                    
+                except json.JSONDecodeError as e:
+                    dict_params = ''
 
     #Store tab information in the tabInfo dictionary
     tab_name = self.tabWidget.currentWidget().objectName
@@ -178,9 +180,9 @@ def addParmScriptTab(self, origin, *args):
     #Saving the origin of the parameters
     tab_name = self.tabWidget.currentWidget().objectName
     tab_data = self.tabInfo.get(tab_name)
-    tab_data['origin_param'] = origin
+    tab_data['origin_param']   = origin
     tab_data['dict_paramsEtl'] = params.index
-    self.current_paramsEtl = params.index
+    self.current_paramsEtl     = params.index
     self.updatePManager()
 
 #Function to apply the new font to all text boxes connected to the signal  

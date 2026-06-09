@@ -167,9 +167,9 @@ def runQueries(self, queries, cls: Literal['console', 'file']='console', saveAs=
         #Adding the new row to the status DataFrame
         new_row = template_row.copy()
         new_row['status'] = _wating
-        new_row['query'] = query
+        new_row['query']  = query
         new_row['params'] = params
-        new_row['cls'] = cls
+        new_row['cls']    = cls
         new_row['saveAs'] = saveAs
         tasks += [new_row.copy()]
     
@@ -549,18 +549,18 @@ def runAssist(self, *args):
 #Function to process and store query history
 def processHistory(self, queries, params, *args):
     #Headers
-    _type = self.i18nNes('tab-eco', 'history', 'type')
+    _type  = self.i18nNes('tab-eco', 'history', 'type')
     _typeU = self.i18nNes('tab-eco', 'history', 'type-u')
     _typeB = self.i18nNes('tab-eco', 'history', 'type-b')
     _query = self.i18nNes('tab-eco', 'history', 'query')
-    _time = self.i18nNes('tab-eco', 'history', 'time')
+    _time  = self.i18nNes('tab-eco', 'history', 'time')
     _param = self.i18nNes('tab-eco', 'history', 'param')
 
     #Creating history structure if it does not exist
     if not self.actualSession.sessionHistoryExists:
         prev = pl.DataFrame({
-            _type: pl.Series([], dtype=pl.String),
-            _time: pl.Series([], dtype=pl.String),
+            _type:  pl.Series([], dtype=pl.String),
+            _time:  pl.Series([], dtype=pl.String),
             _query: pl.Series([], dtype=pl.String),
             _param: pl.Series([], dtype=pl.String)
         })
@@ -572,8 +572,8 @@ def processHistory(self, queries, params, *args):
     now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     #Creating the new row
     new_row = pl.DataFrame({
-        _type: [cls],
-        _time: [now],
+        _type:  [cls],
+        _time:  [now],
         _query: [str(queries)],
         _param: [str(params)]
     })
