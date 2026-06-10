@@ -359,29 +359,29 @@ class MyPlainTextEdit(QPlainTextEdit):
         #Flow if Ctrl + Click is pressed
         if event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.button() == Qt.MouseButton.LeftButton:
             #Obtaining the position of the cursor according to click
-            cursor = self.cursorForPosition(event.pos())
+            cursorPos = self.cursorForPosition(event.pos())
             #If the multicursor was disabled, add the current one
             if not self.multiCursorEnabled:
                 actual = self.textCursor()
                 self.multiCursorList.append(actual)
                 self.startMultiCursor()
             #Adding or deleting cursor
-            if cursor in self.multiCursorList:
-                self.multiCursorList.remove(cursor)
+            if cursorPos in self.multiCursorList:
+                self.multiCursorList.remove(cursorPos)
             else:
-                self.multiCursorList.append(cursor)
+                self.multiCursorList.append(cursorPos)
             self.cursorChanged()
             return
         #Route if clicked when the multicursor is activated
         elif self.multiCursorEnabled and event.button() == Qt.MouseButton.LeftButton:
             #Obtaining the position of the cursor according to click
-            cursor = self.cursorForPosition(event.pos())
+            cursorPos = self.cursorForPosition(event.pos())
             #Disabling multicursor mode
             self.stopMultiCursor()
         #Setting cursor where to right click
         elif event.button() == Qt.MouseButton.RightButton:
-            cursor = self.cursorForPosition(event.pos())
-            self.setTextCursor(cursor)
+            cursorPos = self.cursorForPosition(event.pos())
+            # self.setTextCursor(cursorPos) #PENDING: This line is pending verification if it should be deleted. Analyzing bugs
         super().mousePressEvent(event)
     
     #Function to show on status information about selections, cursors or cursor location

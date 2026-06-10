@@ -64,6 +64,7 @@ def setShortcuts(self, *args):
     self.actionConnectDSN.setShortcut(self.shc('sql', 'con-dsn'))
     self.actionStopRun.setShortcut(self.shc('sql', 'stop-run'))
     self.actionRun.setShortcut(self.shc('sql', 'run-query'))
+    self.actionRunSelected.setShortcut(self.shc('sql', 'run-selected'))
     self.actionRunAll.setShortcut(self.shc('sql', 'run-all'))
     self.actionRunAbove.setShortcut(self.shc('sql', 'run-above'))
     self.actionRunBelow.setShortcut(self.shc('sql', 'run-below'))

@@ -385,6 +385,40 @@ def runLongTask(self, *args):
     else:
         return None
 
+#Function linked directly to run selected.
+def runLongTaskSelected(self, *args):
+    #Terminating process if there is no active tab
+    if not self.tabWidget:
+        return None
+
+    #Getting the selected text
+    cursor = self.current_etlEditor.textCursor()
+    queries = cursor.selectedText()
+    #Cleaning comments
+    queries = self.cleanQ(queries)
+    
+    #Terminating process if there is no query
+    if not queries:
+        return None
+
+    #Determining if there are multiple queries and if it should ask about their execution
+    answer = QMessageBox.StandardButton.Yes #Default
+    if str(queries).count(';')>1:
+        #Asking the user if they are sure
+        msg = QMessageBox(self)
+        msg.setWindowIcon(self.icon)
+        msg.setWindowTitle(self.i18nNes('execution', 'msgs', 'msgBE'))
+        msg.setText(self.i18nNes('execution', 'msgs', 'msg10'))
+        msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        msg.setDefaultButton(QMessageBox.StandardButton.Yes)
+        answer = msg.exec()
+  
+    if answer == QMessageBox.StandardButton.Yes:
+        #Sending to execution
+        self.runQueries(queries, cls='console', saveAs=False)
+    else:
+        return None
+
 #Function linked directly to run Above.
 def runLongTaskAbove(self, *args):
     #Terminating process if there is no active tab

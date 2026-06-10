@@ -767,6 +767,7 @@ MainWindow.identifyQuery = execute_methods.identifyQuery
 MainWindow.identifyTable = execute_methods.identifyTable
 MainWindow.runShortTask = execute_methods.runShortTask
 MainWindow.runLongTask = execute_methods.runLongTask
+MainWindow.runLongTaskSelected = execute_methods.runLongTaskSelected
 MainWindow.runLongTaskAbove = execute_methods.runLongTaskAbove
 MainWindow.runLongTaskBelow = execute_methods.runLongTaskBelow
 MainWindow.runQueries = execute_methods.runQueries

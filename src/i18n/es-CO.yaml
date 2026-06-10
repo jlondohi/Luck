@@ -61,6 +61,7 @@ sql:
   con-dsn: Conectar/Reconectar DSN
   stop-run: Detener ejecución
   run-query: Ejecutar consulta
+  run-selected: Ejecutar selección
   run-all: Ejecutar todo
   run-above: Ejecutar consultas anteriores
   run-below: Ejecutar consulta y siguientes

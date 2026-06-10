@@ -86,6 +86,7 @@ sql:
   con-dsn:
   stop-run:
   run-query: F9
+  run-selected:
   run-all: F10
   run-above:
   run-below:

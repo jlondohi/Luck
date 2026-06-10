@@ -61,6 +61,7 @@ sql:
   con-dsn: Connect/Reconnect DSN
   stop-run: Stop execution
   run-query: Run query
+  run-selected: Run selected
   run-all: Run all
   run-above: Run queries above
   run-below: Run query and below

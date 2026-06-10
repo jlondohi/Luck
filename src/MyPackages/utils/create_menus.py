@@ -63,6 +63,7 @@ def createPMenu(self, *args):
     self.actionConnectDSN   = QAction(self.i18nNes('sql', 'con-dsn'), self)
     self.actionStopRun      = QAction(self.i18nNes('sql', 'stop-run'), self)
     self.actionRun          = QAction(self.i18nNes('sql', 'run-query'), self)
+    self.actionRunSelected  = QAction(self.i18nNes('sql', 'run-selected'), self)
     self.actionRunAll       = QAction(self.i18nNes('sql', 'run-all'), self)
     self.actionRunAbove     = QAction(self.i18nNes('sql', 'run-above'), self)
     self.actionRunBelow     = QAction(self.i18nNes('sql', 'run-below'), self)
@@ -166,7 +167,9 @@ def createPMenu(self, *args):
     self.menuSQL.addAction(self.actionConnectDSN)
     self.menuSQL.addSeparator()
     self.menuSQL.addAction(self.actionStopRun)
+    self.menuSQL.addSeparator()
     self.menuSQL.addAction(self.actionRun)
+    self.menuSQL.addAction(self.actionRunSelected)
     self.menuSQL.addAction(self.actionRunAll)
     self.menuSQL.addAction(self.actionRunAbove)
     self.menuSQL.addAction(self.actionRunBelow)
@@ -266,6 +269,7 @@ def createPMenu(self, *args):
         self.menuProfile.addSeparator() if count % 4 == 0 else None
     #Creating actions for assistance
     self.menuAssistant.addAction(self.actionRun)
+    self.menuAssistant.addAction(self.actionRunSelected)
     self.menuAssistant.addAction(self.actionRunAll)
     self.menuAssistant.addAction(self.actionRunAbove)
     self.menuAssistant.addAction(self.actionRunBelow)
@@ -362,6 +366,7 @@ def createPMenu(self, *args):
     #menuSQL actions
     self.actionConnectDSN.triggered.connect(self.asyncConnMan.start)
     self.actionRun.triggered.connect(self.runShortTask)
+    self.actionRunSelected.triggered.connect(self.runLongTaskSelected)
     self.actionRunAll.triggered.connect(self.runLongTask)
     self.actionRunAbove.triggered.connect(self.runLongTaskAbove)
     self.actionRunBelow.triggered.connect(self.runLongTaskBelow)
