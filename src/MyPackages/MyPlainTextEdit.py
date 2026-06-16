@@ -358,19 +358,24 @@ class MyPlainTextEdit(QPlainTextEdit):
     def mousePressEvent(self, event, *args):
         #Flow if Ctrl + Click is pressed
         if event.modifiers() == Qt.KeyboardModifier.ControlModifier and event.button() == Qt.MouseButton.LeftButton:
+            print(1)
             #Obtaining the position of the cursor according to click
             cursorPos = self.cursorForPosition(event.pos())
             #If the multicursor was disabled, add the current one
             if not self.multiCursorEnabled:
+                print(2)
                 actual = self.textCursor()
                 self.multiCursorList.append(actual)
                 self.startMultiCursor()
             #Adding or deleting cursor
             if cursorPos in self.multiCursorList:
                 self.multiCursorList.remove(cursorPos)
+                print(3)
             else:
                 self.multiCursorList.append(cursorPos)
+                print(4)
             self.cursorChanged()
+            print(5)
             return
         #Route if clicked when the multicursor is activated
         elif self.multiCursorEnabled and event.button() == Qt.MouseButton.LeftButton:
@@ -378,11 +383,23 @@ class MyPlainTextEdit(QPlainTextEdit):
             cursorPos = self.cursorForPosition(event.pos())
             #Disabling multicursor mode
             self.stopMultiCursor()
+            print(6)
         #Setting cursor where to right click
         elif event.button() == Qt.MouseButton.RightButton:
             cursorPos = self.cursorForPosition(event.pos())
-            # self.setTextCursor(cursorPos) #PENDING: This line is pending verification if it should be deleted. Analyzing bugs
+            currentCursor = self.textCursor()
+            #Checking if there is an active selection and if the click occurred within it
+            if currentCursor.hasSelection() and currentCursor.selectionStart() <= cursorPos.position() <= currentCursor.selectionEnd():
+                #Keeps the selection but moves the visual position of the cursor
+                currentCursor.setPosition(cursorPos.position(), QTextCursor.MoveMode.KeepAnchor)
+                self.setTextCursor(currentCursor)
+                print(7)
+            else:
+                #Default behavior: move the cursor and clear the selection
+                self.setTextCursor(cursorPos)
+                print(8)
         super().mousePressEvent(event)
+        print(10, '\n')
     
     #Function to show on status information about selections, cursors or cursor location
     def cursorChanged(self, *args):
