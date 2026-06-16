@@ -107,5 +107,7 @@ buttons:
   styler:
   lighter: F11
   darker: F11
+  export:
   panelize: F12
+  unlink:
   expand: F12

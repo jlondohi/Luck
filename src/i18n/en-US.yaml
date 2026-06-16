@@ -137,6 +137,8 @@ tooltips:
   tb8: Styled mode
   tb9: Open downloads folder
   tb10: Luck
+  tb11: Export results
+  tb12: Unlink
   sb1: Connect/Reconnect
   sb2: Stop execution
   sb3: Start log recording

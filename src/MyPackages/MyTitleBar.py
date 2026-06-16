@@ -410,6 +410,17 @@ class MyTitleBar(QFrame):
             
             #Button
             self.layout.addWidget(Bar(self))
+            self.bt_export = TitleWindowButton('', str(_ResourcesPath / 'export.png'))
+            self.bt_export.setObjectName('bt_export')
+            self.bt_export.clicked.connect(print)
+            self.layout.addWidget(self.bt_export)
+            #Tooltip
+            tootip = self.i18nNes('tooltips', 'tb11')
+            sc = self.shc('buttons', 'export')
+            tootip = tootip if not sc else tootip + f' ({sc})'
+            self.bt_export.setToolTip(tootip)
+            
+            #Button
             self.bt_panelize = TitleWindowButton('', str(_ResourcesPath / 'panelize.png'))
             self.bt_panelize.setObjectName('bt_panelize')
             self.bt_panelize.clicked.connect(self.parent.panelizeFrame)
@@ -430,6 +441,17 @@ class MyTitleBar(QFrame):
             sc = self.shc('buttons', 'expand')
             tootip = tootip if not sc else tootip + f' ({sc})'
             self.bt_expand.setToolTip(tootip)
+
+            #Button
+            self.bt_unlink = TitleWindowButton('', str(_ResourcesPath / 'unlink.png'))
+            self.bt_unlink.setObjectName('bt_unlink')
+            self.bt_unlink.clicked.connect(print)
+            self.layout.addWidget(self.bt_unlink)
+            #Tooltip
+            tootip = self.i18nNes('tooltips', 'tb12')
+            sc = self.shc('buttons', 'unlink')
+            tootip = tootip if not sc else tootip + f' ({sc})'
+            self.bt_unlink.setToolTip(tootip)
         
         self.layout.addWidget(Bar(self))
         self.bt_minimize = TitleWindowButton('', str(_ResourcesPath / 'minimize.png'))

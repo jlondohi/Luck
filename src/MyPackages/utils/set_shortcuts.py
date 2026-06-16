@@ -85,8 +85,10 @@ def setShortcuts(self, *args):
     self.fm_title.bt_baseSetter.setShortcut(self.shc('buttons', 'styler'))
     self.fm_title.bt_light.setShortcut(self.shc('buttons', 'lighter'))
     self.fm_title.bt_dark.setShortcut(self.shc('buttons', 'darker'))
+    self.fm_title.bt_export.setShortcut(self.shc('buttons', 'export'))
     self.fm_title.bt_panelize.setShortcut(self.shc('buttons', 'panelize'))
     self.fm_title.bt_expand.setShortcut(self.shc('buttons', 'expand'))
+    self.fm_title.bt_unlink.setShortcut(self.shc('buttons', 'unlink'))
 
     #--------------------------
     #2. Adding to centralwidget

@@ -137,6 +137,8 @@ tooltips:
   tb8: Modo estilizado
   tb9: Abrir carpeta de descargas
   tb10: Luck
+  tb11: Exportar resultados
+  tb12: Desvincular
   sb1: Conectar/Reconectar
   sb2: Detener ejecución
   sb3: Iniciar grabación del log
